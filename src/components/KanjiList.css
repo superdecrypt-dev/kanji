@@ -1,0 +1,168 @@
+.kanji-list-container {
+  width: 100%;
+}
+
+.list-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  color: var(--text-secondary);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  border-color: var(--primary);
+}
+
+.lesson-filter {
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  outline: none;
+  cursor: pointer;
+}
+
+.lesson-filter:focus {
+  border-color: var(--primary);
+}
+
+.kanji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+@media (max-width: 400px) {
+  .kanji-grid {
+    grid-template-columns: 1fr;
+  }
+  .kanji-list-card {
+    padding: 12px;
+  }
+  .kanji-char {
+    font-size: 2.5rem;
+    width: 60px;
+  }
+  .kanji-details h4 {
+    font-size: 1rem;
+  }
+}
+
+.kanji-list-card {
+  display: flex;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  gap: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.kanji-list-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.kanji-list-card.mastered {
+  border-color: var(--success);
+  background-color: rgba(42, 157, 143, 0.05);
+}
+
+.kanji-char {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.kanji-list-card.mastered .kanji-char {
+  color: var(--success);
+}
+
+.kanji-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.kanji-details h4 {
+  margin: 0 0 8px 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.readings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.reading {
+  font-size: 0.85rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.lesson-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  background-color: rgba(69, 123, 157, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.status-icon {
+  color: var(--success);
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}

@@ -1,0 +1,25 @@
+.lesson-selector {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.lesson-selector label {
+  font-weight: bold;
+  color: #1d3557;
+  margin-right: 10px;
+}
+
+.lesson-selector select {
+  padding: 8px 16px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 2px solid #a8dadc;
+  background-color: white;
+  color: #1d3557;
+  cursor: pointer;
+  outline: none;
+}
+
+.lesson-selector select:focus {
+  border-color: #457b9d;
+}
