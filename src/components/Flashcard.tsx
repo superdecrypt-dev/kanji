@@ -5,6 +5,7 @@ import { CheckCircle2, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { AudioButton } from './AudioPlayer';
 
 interface FlashcardProps {
   kanji: Kanji;
@@ -42,15 +43,18 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
           <div className="absolute inset-0 backface-hidden bg-card border-2 border-border rounded-2xl shadow-xl flex flex-col items-center justify-center p-6">
             <div className="absolute top-4 right-4 flex gap-2">
               {isMastered && <CheckCircle2 className="text-success w-6 h-6" />}
-              <Badge variant="outline" className="opacity-50">L{kanji.lesson}</Badge>
+              <Badge variant="outline" className="opacity-50 font-black">L{kanji.lesson}</Badge>
             </div>
             
-            <motion.span 
-              className="text-9xl font-bold text-foreground"
-              layoutId="kanji-text"
-            >
-              {kanji.kanji}
-            </motion.span>
+            <div className="flex items-center gap-4">
+              <motion.span 
+                className="text-9xl font-bold text-foreground"
+                layoutId="kanji-text"
+              >
+                {kanji.kanji}
+              </motion.span>
+              <AudioButton text={kanji.kanji} size={24} className="mt-4" />
+            </div>
             
             <div className="absolute bottom-6 text-muted-foreground flex items-center gap-2 text-sm font-medium">
               <RefreshCcw className="w-4 h-4" /> Ketuk untuk membalik
@@ -68,15 +72,21 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
             </div>
 
             <div className="grid grid-cols-1 gap-4 w-full pt-4">
-              <div className="bg-secondary/30 p-3 rounded-xl">
-                <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Kunyomi</p>
-                <p className="text-lg font-medium">{kanji.kunyomi || '-'}</p>
-                {kanji.kunyomi_romaji && <p className="text-sm text-primary/70">{kanji.kunyomi_romaji}</p>}
+              <div className="bg-secondary/30 p-3 rounded-xl flex items-center justify-between">
+                <div className="text-left">
+                  <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Kunyomi</p>
+                  <p className="text-lg font-medium leading-tight">{kanji.kunyomi || '-'}</p>
+                  {kanji.kunyomi_romaji && <p className="text-xs text-primary/70 font-bold">{kanji.kunyomi_romaji}</p>}
+                </div>
+                {kanji.kunyomi && <AudioButton text={kanji.kunyomi.split(' / ')[0].replace(/-/g, '')} />}
               </div>
-              <div className="bg-secondary/30 p-3 rounded-xl">
-                <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Onyomi</p>
-                <p className="text-lg font-medium">{kanji.onyomi || '-'}</p>
-                {kanji.onyomi_romaji && <p className="text-sm text-primary/70">{kanji.onyomi_romaji}</p>}
+              <div className="bg-secondary/30 p-3 rounded-xl flex items-center justify-between">
+                <div className="text-left">
+                  <p className="text-xs font-bold text-muted-foreground uppercase mb-1">Onyomi</p>
+                  <p className="text-lg font-medium leading-tight">{kanji.onyomi || '-'}</p>
+                  {kanji.onyomi_romaji && <p className="text-xs text-primary/70 font-bold">{kanji.onyomi_romaji}</p>}
+                </div>
+                {kanji.onyomi && <AudioButton text={kanji.onyomi.split(' / ')[0].replace(/-/g, '')} />}
               </div>
             </div>
 
