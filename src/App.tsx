@@ -3,17 +3,16 @@ import { kanjiList } from './data';
 import Flashcard from './components/Flashcard';
 import AdvancedQuiz from './components/AdvancedQuiz';
 import LessonSelector from './components/LessonSelector';
-import Dashboard from './components/Dashboard';
 import KanjiList from './components/KanjiList';
 import { useProgress } from './store/useProgress';
-import { Moon, Sun, LayoutDashboard, Layers, PlayCircle, List, Menu, X, ChevronRight } from 'lucide-react';
+import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppMode = 'dashboard' | 'flashcards' | 'quiz' | 'list';
+type AppMode = 'flashcards' | 'quiz' | 'list';
 
 function App() {
-  const [mode, setMode] = useState<AppMode>('dashboard');
+  const [mode, setMode] = useState<AppMode>('list');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<number | 'all'>('all');
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -24,7 +23,7 @@ function App() {
     return 'light';
   });
 
-  const { progress, metadata, updateKanji, markMastered, resetProgress, isLoaded } = useProgress();
+  const { progress, metadata, updateKanji, markMastered, isLoaded } = useProgress();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -54,7 +53,6 @@ function App() {
   );
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'list', label: 'Daftar Kanji', icon: List },
     { id: 'flashcards', label: 'Flashcards', icon: Layers },
     { id: 'quiz', label: 'Latihan Kuis', icon: PlayCircle },
@@ -127,6 +125,9 @@ function App() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-white/10 space-y-4">
+          <div className="flex items-center justify-between px-4 py-2 mb-2">
+             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Streak: {metadata.streak} 🔥</span>
+          </div>
           <Button 
             variant="secondary" 
             className="w-full justify-start gap-4 h-14 rounded-2xl border border-white/10"
@@ -137,10 +138,6 @@ function App() {
               {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
             </span>
           </Button>
-          
-          <div className="px-4 py-3 bg-white/5 rounded-2xl border border-white/5 text-[10px] font-black text-muted-foreground/40 text-center uppercase tracking-[0.2em]">
-            v2.0 Premium Glass
-          </div>
         </div>
       </motion.aside>
 
@@ -171,28 +168,17 @@ function App() {
               {/* Header Title for Context */}
               <div className="mb-10 max-lg:hidden flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-black tracking-tighter text-foreground">
+                  <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase">
                     {navItems.find(i => i.id === mode)?.label}
                   </h2>
-                  <p className="text-muted-foreground text-sm font-bold opacity-60">
-                    Mastering JLPT N4 Kanji with Spaced Repetition
-                  </p>
                 </div>
                 <div className="bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10 flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">System Online</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">N4 Mastery System</span>
                 </div>
               </div>
 
-              {mode === 'dashboard' ? (
-                 <Dashboard 
-                   kanjiList={kanjiList} 
-                   progress={progress} 
-                   metadata={metadata}
-                   onNavigate={(m) => setMode(m as AppMode)} 
-                   onReset={resetProgress}
-                 />
-              ) : mode === 'list' ? (
+              {mode === 'list' ? (
                  <KanjiList kanjiList={kanjiList} progress={progress} />
               ) : (
                 <div className="space-y-10">
@@ -236,7 +222,7 @@ function App() {
                           className="flex-1 h-16 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
                           onClick={handleNextCard}
                         >
-                          Selanjutnya
+                          Lanjut
                         </Button>
                       </div>
                     </div>
