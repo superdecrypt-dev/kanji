@@ -3,7 +3,7 @@ import type { Kanji } from '../data';
 import { Search, Filter } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { AudioButton } from './AudioPlayer';
 import { Button } from './ui/button';
 
@@ -14,15 +14,16 @@ interface KanjiListProps {
 const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lessonFilter, setLessonFilter] = useState<number | 'all'>('all');
-  const [displayLimit, setDisplayLimit] = useState(30);
+  const [displayLimit, setDisplayLimit] = useState(20);
 
   const maxLesson = useMemo(() => Math.max(...kanjiList.map(k => k.lesson)), [kanjiList]);
 
   const filteredList = useMemo(() => {
+    const term = searchTerm.toLowerCase();
     return kanjiList.filter(k => {
       const matchLesson = lessonFilter === 'all' || k.lesson === lessonFilter;
-      const term = searchTerm.toLowerCase();
-      const matchSearch = k.kanji.includes(term) || 
+      const matchSearch = !term || 
+                          k.kanji.includes(term) || 
                           k.meaning.toLowerCase().includes(term) || 
                           (k.kunyomi && k.kunyomi.toLowerCase().includes(term)) || 
                           (k.onyomi && k.onyomi.toLowerCase().includes(term)) ||
@@ -32,23 +33,23 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
     });
   }, [kanjiList, lessonFilter, searchTerm]);
 
-  // Show more items when scrolling near the bottom
+  // Show more items when scrolling
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-        setDisplayLimit(prev => Math.min(prev + 30, filteredList.length));
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 800) {
+        setDisplayLimit(prev => Math.min(prev + 20, filteredList.length));
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [filteredList.length]);
 
-  // Reset limit when searching or filtering
+  // Reset limit when searching
   useEffect(() => {
-    setDisplayLimit(30);
+    setDisplayLimit(20);
   }, [searchTerm, lessonFilter]);
 
-  const displayedItems = filteredList.slice(0, displayLimit);
+  const displayedItems = useMemo(() => filteredList.slice(0, displayLimit), [filteredList, displayLimit]);
 
   return (
     <div className="space-y-8">
@@ -81,62 +82,54 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
         </div>
       </div>
 
-      <motion.div 
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-        layout
-      >
-        <AnimatePresence mode="popLayout">
-          {displayedItems.map((kanji, index) => {
-            return (
-              <motion.div
-                key={kanji.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.2) }}
-              >
-                <Card className="group overflow-hidden border-white/10">
-                  <CardContent className="p-6 flex gap-5">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="flex items-center justify-center w-16 h-16 rounded-2xl text-3xl font-black transition-all duration-500 shadow-lg bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110">
-                        {kanji.kanji}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {displayedItems.map((kanji) => (
+          <motion.div
+            key={kanji.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            style={{ willChange: 'opacity' }}
+          >
+            <Card className="group overflow-hidden border-white/10 h-full">
+              <CardContent className="p-6 flex gap-5">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-2xl text-3xl font-black transition-all duration-500 shadow-lg bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+                    {kanji.kanji}
+                  </div>
+                  <AudioButton text={kanji.kanji} size={14} className="h-9 w-9 bg-white/5" />
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-black text-lg truncate pr-2 tracking-tight">{kanji.meaning}</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {kanji.kunyomi && (
+                      <div className="flex flex-col">
+                        <span className="text-[9px] uppercase font-black text-orange-500/60 tracking-widest leading-none mb-1">Kun</span>
+                        <span className="text-sm font-bold leading-tight">
+                          {kanji.kunyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.kunyomi_romaji})</span>
+                        </span>
                       </div>
-                      <AudioButton text={kanji.kanji} size={14} className="h-9 w-9 bg-white/5" />
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black text-lg truncate pr-2 tracking-tight">{kanji.meaning}</h4>
+                    )}
+                    {kanji.onyomi && (
+                      <div className="flex flex-col">
+                        <span className="text-[9px] uppercase font-black text-blue-500/60 tracking-widest leading-none mb-1">On</span>
+                        <span className="text-sm font-bold leading-tight">
+                          {kanji.onyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.onyomi_romaji})</span>
+                        </span>
                       </div>
-                      <div className="space-y-3">
-                        {kanji.kunyomi && (
-                          <div className="flex flex-col">
-                            <span className="text-[9px] uppercase font-black text-orange-500/60 tracking-widest leading-none mb-1">Kun</span>
-                            <span className="text-sm font-bold leading-tight">
-                              {kanji.kunyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.kunyomi_romaji})</span>
-                            </span>
-                          </div>
-                        )}
-                        {kanji.onyomi && (
-                          <div className="flex flex-col">
-                            <span className="text-[9px] uppercase font-black text-blue-500/60 tracking-widest leading-none mb-1">On</span>
-                            <span className="text-sm font-bold leading-tight">
-                              {kanji.onyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.onyomi_romaji})</span>
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-4 pt-3 border-t border-white/5 flex justify-end">
-                        <Badge variant="outline" className="text-[10px] px-2 h-5 opacity-40 font-black border-white/20">L{kanji.lesson}</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
+                    )}
+                  </div>
+                  <div className="mt-auto pt-4 flex justify-end">
+                    <Badge variant="outline" className="text-[10px] px-2 h-5 opacity-40 font-black border-white/20">L{kanji.lesson}</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
 
       {filteredList.length > displayLimit && (
         <div className="text-center py-10">
@@ -145,21 +138,16 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
             onClick={() => setDisplayLimit(prev => prev + 50)}
             className="text-primary font-black animate-pulse"
           >
-            Mencari lebih banyak kanji...
+            Memuat lebih banyak kanji...
           </Button>
         </div>
       )}
       
       {filteredList.length === 0 && (
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }}
-          className="text-center py-20 text-muted-foreground"
-        >
+        <div className="text-center py-20 text-muted-foreground bg-white/5 rounded-[2.5rem] border-2 border-dashed border-white/10">
           <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
           <p className="text-lg font-medium">Kanji tidak ditemukan.</p>
-          <p className="text-sm">Coba kata kunci lain atau ubah filter pelajaran.</p>
-        </motion.div>
+        </div>
       )}
     </div>
   );
