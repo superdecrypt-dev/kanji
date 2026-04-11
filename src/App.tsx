@@ -241,7 +241,7 @@ function App() {
                       </div>
                     </div>
                   ) : (
-                    <AdvancedQuiz key={selectedLesson} kanjiList={filteredKanji} onResult={handleQuizResult} />
+                    <AdvancedQuiz key={selectedLesson} kanjiList={filteredKanji} progress={progress} onResult={handleQuizResult} />
                   )}
                 </div>
               )}
