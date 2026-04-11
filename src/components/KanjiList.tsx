@@ -33,15 +33,23 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
     });
   }, [kanjiList, lessonFilter, searchTerm]);
 
-  // Infinite Scroll using Intersection Observer
+  // IMPROVED: Infinite Scroll using Intersection Observer with explicit root
   useEffect(() => {
+    // We look for the main scrollable container in the sidebar layout
+    const scrollRoot = document.querySelector('main')?.parentElement;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && displayLimit < filteredList.length) {
+          // Use functional update to ensure we have latest state
           setDisplayLimit((prev) => Math.min(prev + 20, filteredList.length));
         }
       },
-      { threshold: 0.1, rootMargin: '200px' }
+      { 
+        threshold: 0.01, 
+        root: scrollRoot || null, // Explicitly target the sidebar's main content area
+        rootMargin: '400px' // Load much earlier so user doesn't wait
+      }
     );
 
     if (loaderRef.current) {
@@ -141,12 +149,12 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
       {/* Sentinel element for infinite scroll */}
       <div 
         ref={loaderRef} 
-        className="h-20 flex items-center justify-center"
+        className="h-40 flex items-center justify-center"
       >
         {displayLimit < filteredList.length && (
-          <div className="flex items-center gap-2 text-muted-foreground animate-pulse font-black text-xs uppercase tracking-widest">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Memuat lebih banyak...
+          <div className="flex items-center gap-3 text-primary/50 font-black text-xs uppercase tracking-[0.3em] bg-white/5 px-8 py-4 rounded-2xl border border-white/5">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Auto-loading...
           </div>
         )}
       </div>
