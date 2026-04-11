@@ -29,8 +29,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     formattedMessages.push({ role: 'user', content: finalMessageContent });
 
-    // Memanggil model Gemma-7b-it dari Cloudflare AI
-    const response = await env.AI.run('@cf/google/gemma-7b-it', {
+    // Memanggil model Gemma-3-12b-it dari Cloudflare AI
+    const response = await env.AI.run('@cf/google/gemma-3-12b-it', {
       messages: formattedMessages
     });
 
