@@ -24,7 +24,7 @@ function App() {
     return 'light';
   });
 
-  const { progress, updateKanji, markMastered, resetProgress, isLoaded } = useProgress();
+  const { progress, metadata, updateKanji, markMastered, resetProgress, isLoaded } = useProgress();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -114,9 +114,9 @@ function App() {
               {mode === item.id && (
                 <motion.div
                   layoutId="active-sidebar-nav"
-                  className="absolute inset-0 bg-primary shadow-lg shadow-primary/20"
+                  className="absolute inset-0 bg-primary shadow-lg shadow-primary/30 inner-glow"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  style={{ borderRadius: '1rem' }}
+                  style={{ borderRadius: '1.25rem' }}
                 />
               )}
               <item.icon className={`w-5 h-5 z-10 transition-transform duration-300 ${mode === item.id ? 'scale-110' : 'group-hover:scale-110'}`} />
@@ -188,6 +188,7 @@ function App() {
                  <Dashboard 
                    kanjiList={kanjiList} 
                    progress={progress} 
+                   metadata={metadata}
                    onNavigate={(m) => setMode(m as AppMode)} 
                    onReset={resetProgress}
                  />
@@ -235,7 +236,7 @@ function App() {
                           className="flex-1 h-16 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
                           onClick={handleNextCard}
                         >
-                          Lanjut
+                          Selanjutnya
                         </Button>
                       </div>
                     </div>

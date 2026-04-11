@@ -21,9 +21,9 @@ export interface ButtonProps
     }
 
     const sizes = {
-      default: "h-14 px-8 py-3 text-base rounded-2xl",
+      default: "h-14 px-8 py-3 text-base rounded-[1.5rem]",
       sm: "h-11 rounded-xl px-4",
-      lg: "h-20 rounded-3xl px-12 text-xl",
+      lg: "h-24 rounded-[2.5rem] px-12 text-xl",
       icon: "h-14 w-14 rounded-full",
     }
 
