@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import type { Kanji } from '../data';
-import { Search, Filter, Loader2 } from 'lucide-react';
+import { Search, Filter, Loader2, ChevronDown } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { motion } from 'framer-motion';
@@ -33,33 +33,20 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
     });
   }, [kanjiList, lessonFilter, searchTerm]);
 
-  // IMPROVED: Infinite Scroll using Intersection Observer with explicit root
   useEffect(() => {
-    // We look for the main scrollable container in the sidebar layout
     const scrollRoot = document.querySelector('main')?.parentElement;
-
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && displayLimit < filteredList.length) {
-          // Use functional update to ensure we have latest state
           setDisplayLimit((prev) => Math.min(prev + 20, filteredList.length));
         }
       },
-      { 
-        threshold: 0.01, 
-        root: scrollRoot || null, // Explicitly target the sidebar's main content area
-        rootMargin: '400px' // Load much earlier so user doesn't wait
-      }
+      { threshold: 0.01, root: scrollRoot || null, rootMargin: '400px' }
     );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
+    if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
   }, [displayLimit, filteredList.length]);
 
-  // Reset limit when searching
   useEffect(() => {
     setDisplayLimit(20);
   }, [searchTerm, lessonFilter]);
@@ -67,77 +54,90 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const displayedItems = useMemo(() => filteredList.slice(0, displayLimit), [filteredList, displayLimit]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row gap-4 bg-white/5 backdrop-blur-2xl p-6 rounded-[2rem] border-2 border-white/10 shadow-2xl">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5 opacity-50" />
+    <div className="space-y-10">
+      {/* Premium Glass Search & Filter Bar */}
+      <div className="flex flex-col md:flex-row gap-6 bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border-2 border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
+        
+        {/* Search Input */}
+        <div className="relative flex-[2] group">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary w-5 h-5 transition-transform group-focus-within:scale-110" />
           <input 
             type="text" 
             placeholder="Cari kanji, arti, atau romaji..." 
-            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-muted-foreground/50 font-medium"
+            className="w-full pl-14 pr-6 py-4 bg-white/5 border-2 border-white/10 rounded-2xl focus:border-primary/40 focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/40 font-bold text-sm uppercase tracking-wider"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-3">
-          <Filter className="text-muted-foreground w-5 h-5 opacity-50" />
+
+        {/* Filter Dropdown */}
+        <div className="relative flex-1 group">
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary pointer-events-none transition-transform group-hover:scale-110">
+            <Filter size={18} />
+          </div>
           <select 
-            className="bg-white/5 border border-white/10 rounded-2xl px-6 py-3 outline-none focus:ring-2 focus:ring-primary cursor-pointer font-bold"
+            className="w-full pl-14 pr-12 py-4 bg-white/5 border-2 border-white/10 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 cursor-pointer appearance-none font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-white/10 text-foreground"
             value={lessonFilter} 
             onChange={(e) => {
               const val = e.target.value;
               setLessonFilter(val === 'all' ? 'all' : parseInt(val, 10));
             }}
           >
-            <option value="all">Semua Materi</option>
+            <option value="all" className="bg-background text-foreground">Semua Materi</option>
             {Array.from({ length: maxLesson }, (_, i) => i + 1).map(l => (
-              <option key={l} value={l}>Lesson {l}</option>
+              <option key={l} value={l} className="bg-background text-foreground text-xs font-bold">Lesson {l}</option>
             ))}
           </select>
+          <div className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors">
+            <ChevronDown size={18} />
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayedItems.map((kanji) => (
           <motion.div
             key={kanji.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            style={{ willChange: 'opacity' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ willChange: 'opacity, transform' }}
           >
-            <Card className="group overflow-hidden border-white/10 h-full">
-              <CardContent className="p-6 flex gap-5">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center justify-center w-16 h-16 rounded-2xl text-3xl font-black transition-all duration-500 shadow-lg bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+            <Card className="group overflow-hidden border-white/10 h-full hover:scale-[1.02] transition-all duration-500">
+              <CardContent className="p-8 flex gap-6">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center justify-center w-20 h-20 rounded-[1.5rem] text-4xl font-black transition-all duration-500 shadow-xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3 shadow-primary/10 group-hover:shadow-primary/30">
                     {kanji.kanji}
                   </div>
-                  <AudioButton text={kanji.kanji} size={14} className="h-9 w-9 bg-white/5" />
+                  <AudioButton text={kanji.kanji} size={16} className="h-10 w-10 bg-white/5 border-none" />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-black text-lg truncate pr-2 tracking-tight">{kanji.meaning}</h4>
+                  <div className="flex justify-between items-start mb-3">
+                    <h4 className="font-black text-xl truncate pr-2 tracking-tight text-foreground uppercase italic">{kanji.meaning}</h4>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {kanji.kunyomi && (
                       <div className="flex flex-col">
-                        <span className="text-[9px] uppercase font-black text-orange-500/60 tracking-widest leading-none mb-1">Kun</span>
-                        <span className="text-sm font-bold leading-tight">
-                          {kanji.kunyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.kunyomi_romaji})</span>
+                        <span className="text-[10px] uppercase font-black text-orange-500/60 tracking-widest leading-none mb-1.5">Kun</span>
+                        <span className="text-sm font-bold leading-tight flex flex-wrap gap-1 items-center">
+                          {kanji.kunyomi} 
+                          <span className="text-[10px] font-black text-muted-foreground opacity-40 lowercase italic tracking-normal ml-1">({kanji.kunyomi_romaji})</span>
                         </span>
                       </div>
                     )}
                     {kanji.onyomi && (
                       <div className="flex flex-col">
-                        <span className="text-[9px] uppercase font-black text-blue-500/60 tracking-widest leading-none mb-1">On</span>
-                        <span className="text-sm font-bold leading-tight">
-                          {kanji.onyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.onyomi_romaji})</span>
+                        <span className="text-[10px] uppercase font-black text-blue-500/60 tracking-widest leading-none mb-1.5">On</span>
+                        <span className="text-sm font-bold leading-tight flex flex-wrap gap-1 items-center">
+                          {kanji.onyomi} 
+                          <span className="text-[10px] font-black text-muted-foreground opacity-40 lowercase italic tracking-normal ml-1">({kanji.onyomi_romaji})</span>
                         </span>
                       </div>
                     )}
                   </div>
-                  <div className="mt-auto pt-4 flex justify-end">
-                    <Badge variant="outline" className="text-[10px] px-2 h-5 opacity-40 font-black border-white/20">L{kanji.lesson}</Badge>
+                  <div className="mt-auto pt-6 flex justify-end">
+                    <Badge variant="outline" className="text-[10px] px-3 h-6 opacity-30 font-black border-white/20 tracking-tighter rounded-full">LEVEL N4-L{kanji.lesson}</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -146,23 +146,19 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
         ))}
       </div>
 
-      {/* Sentinel element for infinite scroll */}
-      <div 
-        ref={loaderRef} 
-        className="h-40 flex items-center justify-center"
-      >
+      <div ref={loaderRef} className="h-40 flex items-center justify-center">
         {displayLimit < filteredList.length && (
-          <div className="flex items-center gap-3 text-primary/50 font-black text-xs uppercase tracking-[0.3em] bg-white/5 px-8 py-4 rounded-2xl border border-white/5">
+          <div className="flex items-center gap-3 text-primary/50 font-black text-[10px] uppercase tracking-[0.4em] bg-white/5 px-10 py-5 rounded-full border border-white/5 shadow-xl animate-pulse">
             <Loader2 className="w-5 h-5 animate-spin" />
-            Auto-loading...
+            Synchronizing...
           </div>
         )}
       </div>
       
       {filteredList.length === 0 && (
-        <div className="text-center py-20 text-muted-foreground bg-white/5 rounded-[2.5rem] border-2 border-dashed border-white/10">
-          <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p className="text-lg font-medium">Kanji tidak ditemukan.</p>
+        <div className="text-center py-24 text-muted-foreground bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10 shadow-inner">
+          <Search className="w-16 h-16 mx-auto mb-6 opacity-10 animate-bounce" />
+          <p className="text-2xl font-black uppercase tracking-tighter opacity-40">Kanji tidak ditemukan.</p>
         </div>
       )}
     </div>
