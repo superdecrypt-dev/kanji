@@ -155,7 +155,9 @@ function App() {
                 </div>
               </div>
 
-              {mode === 'list' ? (
+              {mode === 'aisensei' ? (
+                <AiSensei />
+              ) : mode === 'list' ? (
                  <KanjiList kanjiList={kanjiList} />
               ) : (
                 <div className="space-y-10">
