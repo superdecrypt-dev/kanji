@@ -5,6 +5,7 @@ import { Search, CheckCircle2, Filter } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AudioButton } from './AudioPlayer';
 
 interface KanjiListProps {
   kanjiList: Kanji[];
@@ -81,8 +82,11 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
               >
                 <Card className={`group overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 ${isMastered ? 'bg-success/5 ring-1 ring-success/20' : ''}`}>
                   <CardContent className="p-4 flex gap-4">
-                    <div className={`flex items-center justify-center w-16 h-16 rounded-xl text-3xl font-bold transition-colors ${isMastered ? 'bg-success text-white' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'}`}>
-                      {kanji.kanji}
+                    <div className="flex flex-col items-center gap-2">
+                      <div className={`flex items-center justify-center w-16 h-16 rounded-xl text-3xl font-bold transition-colors ${isMastered ? 'bg-success text-white' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'}`}>
+                        {kanji.kanji}
+                      </div>
+                      <AudioButton text={kanji.kanji} size={14} className="h-8 w-8" />
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <div className="flex justify-between items-start">

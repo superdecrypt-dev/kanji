@@ -46,14 +46,13 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
               <Badge variant="outline" className="opacity-50 font-black">L{kanji.lesson}</Badge>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center h-full">
               <motion.span 
                 className="text-9xl font-bold text-foreground"
                 layoutId="kanji-text"
               >
                 {kanji.kanji}
               </motion.span>
-              <AudioButton text={kanji.kanji} size={24} className="mt-4" />
             </div>
             
             <div className="absolute bottom-6 text-muted-foreground flex items-center gap-2 text-sm font-medium">
