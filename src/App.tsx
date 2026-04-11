@@ -190,7 +190,6 @@ function App() {
                       <Flashcard 
                          key={filteredKanji[currentCardIndex].id}
                          kanji={filteredKanji[currentCardIndex]} 
-                         onNext={handleNextCard}
                       />
                       <div className="flex gap-6 w-full max-w-sm">
                         <Button 

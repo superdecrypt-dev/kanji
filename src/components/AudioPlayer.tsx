@@ -1,48 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from './ui/button';
 
 export function speak(text: string) {
-  if (!window.speechSynthesis) {
-    console.error("Speech synthesis not supported in this browser.");
-    return;
-  }
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
   
-  // Cancel any ongoing speech
   window.speechSynthesis.cancel();
-  
-  // Create utterance
   const utterance = new SpeechSynthesisUtterance(text);
-  
-  // Find a Japanese voice
   const voices = window.speechSynthesis.getVoices();
-  // Filter for Japanese voices
-  const jaVoices = voices.filter(v => v.lang.startsWith('ja'));
+  const preferredVoice = voices.find(v => v.lang.startsWith('ja')) || voices[0];
   
-  // Prefer "Google 日本語" on Android if available, otherwise take the first Japanese voice
-  const preferredVoice = jaVoices.find(v => v.name.includes('Google')) || jaVoices[0];
-  
-  if (preferredVoice) {
-    utterance.voice = preferredVoice;
-  }
-  
+  if (preferredVoice) utterance.voice = preferredVoice;
   utterance.lang = 'ja-JP';
   utterance.rate = 0.85;
-  utterance.pitch = 1.0;
-  utterance.volume = 1.0;
-
-  // Some browsers need a tiny delay after cancel()
-  setTimeout(() => {
-    window.speechSynthesis.speak(utterance);
-  }, 50);
-}
-
-// Pre-load voices
-if (typeof window !== 'undefined' && window.speechSynthesis) {
-  window.speechSynthesis.getVoices();
-  if (window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-  }
+  
+  window.speechSynthesis.speak(utterance);
 }
 
 interface AudioButtonProps {
@@ -51,40 +23,43 @@ interface AudioButtonProps {
   className?: string;
 }
 
-export const AudioButton: React.FC<AudioButtonProps> = ({ text, size = 16, className = "" }) => {
+export const AudioButton: React.FC<AudioButtonProps> = ({ text, size = 18, className = "" }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const isSupported = typeof window !== 'undefined' && !!window.speechSynthesis;
+  const [isSupported, setIsSupported] = useState(false);
+
+  useEffect(() => {
+    const checkSupport = () => {
+      setIsSupported(!!(window.speechSynthesis));
+    };
+    checkSupport();
+    if (window.speechSynthesis?.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = checkSupport;
+    }
+  }, []);
 
   const handleSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isSupported) return;
-
     setIsPlaying(true);
     speak(text);
-    
-    // Visual feedback duration
-    setTimeout(() => setIsPlaying(false), 1000);
+    setTimeout(() => setIsPlaying(false), 800);
   };
-
-  if (!isSupported) {
-    return (
-      <Button variant="ghost" size="icon" disabled className="opacity-20">
-        <VolumeX size={size} />
-      </Button>
-    );
-  }
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      className={`h-10 w-10 rounded-full transition-all duration-200 ${
-        isPlaying ? 'bg-primary text-white scale-110' : 'hover:bg-primary/10 text-primary'
+      className={`h-12 w-12 rounded-2xl transition-all duration-300 ${
+        isPlaying ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/20' : 'bg-white/5 hover:bg-white/10 text-primary border border-white/10'
       } ${className}`}
       onClick={handleSpeak}
-      title="Putar Suara"
+      disabled={!isSupported}
     >
-      <Volume2 size={size} className={isPlaying ? 'animate-pulse' : ''} />
+      {isSupported ? (
+        <Volume2 size={size} className={isPlaying ? 'animate-pulse' : ''} />
+      ) : (
+        <VolumeX size={size} className="opacity-20" />
+      )}
     </Button>
   );
 };
