@@ -42,13 +42,16 @@ const AiSensei: React.FC = () => {
         body: JSON.stringify({ message: userMessage, history: messages }),
       });
 
-      if (!response.ok) throw new Error('Gagal menghubungi Sensei');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Gagal menghubungi Sensei');
+      }
 
       const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response || 'Sensei tidak bisa memberikan jawaban saat ini.' }]);
     } catch (error) {
       console.error(error);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Gomen nasai (Maaf), saya sedang mengalami gangguan koneksi. Coba lagi nanti ya!' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Gomen nasai (Maaf), saya sedang mengalami gangguan koneksi atau model yang Anda pilih tidak tersedia. Coba lagi nanti ya!' }]);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +92,7 @@ const AiSensei: React.FC = () => {
                     ? 'bg-primary text-white rounded-tr-sm' 
                     : 'bg-white/10 backdrop-blur-md border border-white/5 text-foreground rounded-tl-sm'
                 }`}>
-                  {msg.content.split('\n').map((line, i) => (
+                  {String(msg.content || '').split('\n').map((line, i) => (
                     <span key={i}>
                       {line}
                       <br />
