@@ -131,7 +131,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
                         <span className="text-[10px] uppercase font-black text-blue-500/60 tracking-widest leading-none mb-1.5">On</span>
                         <span className="text-sm font-bold leading-tight flex flex-wrap gap-1 items-center">
                           {kanji.onyomi} 
-                          <span className="text-[10px] font-black text-muted-foreground opacity-40 lowercase italic tracking-normal ml-1">({kanji.onyomi_romaji})</span>
+                          <span className="text-[10px] font-black text-muted-foreground opacity-80 lowercase italic tracking-normal ml-1">({kanji.onyomi_romaji})</span>
                         </span>
                       </div>
                     )}

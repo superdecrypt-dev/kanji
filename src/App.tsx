@@ -46,7 +46,7 @@ function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 relative overflow-hidden flex">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-150 relative overflow-hidden flex">
       {/* Decorative Orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
@@ -112,16 +112,9 @@ function App() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-white/10 space-y-4">
-          <Button 
-            variant="secondary" 
-            className="w-full justify-start gap-4 h-14 rounded-2xl border border-white/10"
-            onClick={toggleTheme}
-          >
-            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            <span className="font-black text-xs uppercase tracking-widest">
-              {theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
-            </span>
-          </Button>
+          <div className="flex items-center justify-between px-4 py-2 mb-2">
+             <span className="text-[10px] font-black uppercase tracking-widest text-primary">N4 Mastery</span>
+          </div>
         </div>
       </motion.aside>
 

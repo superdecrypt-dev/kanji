@@ -83,7 +83,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji }) => {
                 <div className="text-left">
                   <p className="text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] mb-1.5 opacity-70">Onyomi</p>
                   <p className="text-xl font-bold leading-tight">{kanji.onyomi || '-'}</p>
-                  {kanji.onyomi_romaji && <p className="text-[10px] text-primary/70 font-black mt-1.5 italic tracking-wide">{kanji.onyomi_romaji}</p>}
+                  {kanji.onyomi_romaji && <p className="text-[10px] text-foreground opacity-80 font-black mt-1.5 italic tracking-wide">{kanji.onyomi_romaji}</p>}
                 </div>
                 {kanji.onyomi && <AudioButton text={kanji.onyomi.replace(/\//g, ',')} className="h-11 w-11" />}
               </div>
