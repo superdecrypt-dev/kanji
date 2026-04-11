@@ -1,11 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import type { Kanji } from '../data';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Loader2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { motion } from 'framer-motion';
 import { AudioButton } from './AudioPlayer';
-import { Button } from './ui/button';
 
 interface KanjiListProps {
   kanjiList: Kanji[];
@@ -15,6 +14,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lessonFilter, setLessonFilter] = useState<number | 'all'>('all');
   const [displayLimit, setDisplayLimit] = useState(20);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   const maxLesson = useMemo(() => Math.max(...kanjiList.map(k => k.lesson)), [kanjiList]);
 
@@ -33,16 +33,23 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
     });
   }, [kanjiList, lessonFilter, searchTerm]);
 
-  // Show more items when scrolling
+  // Infinite Scroll using Intersection Observer
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 800) {
-        setDisplayLimit(prev => Math.min(prev + 20, filteredList.length));
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [filteredList.length]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && displayLimit < filteredList.length) {
+          setDisplayLimit((prev) => Math.min(prev + 20, filteredList.length));
+        }
+      },
+      { threshold: 0.1, rootMargin: '200px' }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [displayLimit, filteredList.length]);
 
   // Reset limit when searching
   useEffect(() => {
@@ -131,17 +138,18 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
         ))}
       </div>
 
-      {filteredList.length > displayLimit && (
-        <div className="text-center py-10">
-          <Button 
-            variant="ghost" 
-            onClick={() => setDisplayLimit(prev => prev + 50)}
-            className="text-primary font-black animate-pulse"
-          >
-            Memuat lebih banyak kanji...
-          </Button>
-        </div>
-      )}
+      {/* Sentinel element for infinite scroll */}
+      <div 
+        ref={loaderRef} 
+        className="h-20 flex items-center justify-center"
+      >
+        {displayLimit < filteredList.length && (
+          <div className="flex items-center gap-2 text-muted-foreground animate-pulse font-black text-xs uppercase tracking-widest">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Memuat lebih banyak...
+          </div>
+        )}
+      </div>
       
       {filteredList.length === 0 && (
         <div className="text-center py-20 text-muted-foreground bg-white/5 rounded-[2.5rem] border-2 border-dashed border-white/10">
