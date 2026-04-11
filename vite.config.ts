@@ -8,22 +8,26 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons.svg'],
+      includeAssets: ['favicon.svg'],
       manifest: {
         name: 'Kanji Study N4',
         short_name: 'Kanji',
-        description: 'Aplikasi Belajar Kanji N4 Bahasa Indonesia',
+        description: 'Master 248 Kanji JLPT N4 - Bahasa Indonesia',
         theme_color: '#457b9d',
+        background_color: '#f8fafc',
+        display: 'standalone',
         icons: [
           {
             src: 'favicon.svg',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
           },
           {
             src: 'favicon.svg',
             sizes: '512x512',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
           }
         ]
       }
