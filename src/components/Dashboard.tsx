@@ -64,19 +64,19 @@ const Dashboard: React.FC<DashboardProps> = ({ kanjiList, progress, onNavigate, 
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
         {[
-          { label: 'Baru', value: stats.newKanji, icon: Target, color: 'text-primary', bg: 'bg-primary/10' },
-          { label: 'Belajar', value: stats.learning, icon: BookOpen, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-          { label: 'Review', value: stats.reviewDue, icon: Clock, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-          { label: 'Hafal', value: stats.mastered, icon: Trophy, color: 'text-success', bg: 'bg-success/10' },
+          { label: 'Baru', value: stats.newKanji, icon: Target, color: 'text-primary', bg: 'bg-primary/20' },
+          { label: 'Belajar', value: stats.learning, icon: BookOpen, color: 'text-purple-500', bg: 'bg-purple-500/20' },
+          { label: 'Review', value: stats.reviewDue, icon: Clock, color: 'text-orange-500', bg: 'bg-orange-500/20' },
+          { label: 'Hafal', value: stats.mastered, icon: Trophy, color: 'text-success', bg: 'bg-success/20' },
         ].map((stat, i) => (
           <motion.div key={i} variants={itemVariants}>
-            <Card className="overflow-hidden border-none shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl">
-              <CardContent className="p-8 flex flex-col items-center text-center space-y-4">
-                <div className={`p-4 rounded-2xl ${stat.bg}`}>
-                  <stat.icon className={`w-8 h-8 ${stat.color}`} />
+            <Card className="group overflow-hidden border-glass-border/40 bg-glass/20 backdrop-blur-2xl shadow-2xl hover:bg-glass/40">
+              <CardContent className="p-8 flex flex-col items-center text-center space-y-5">
+                <div className={`p-5 rounded-3xl ${stat.bg} group-hover:scale-110 transition-transform duration-500 shadow-inner`}>
+                  <stat.icon className={`w-10 h-10 ${stat.color} drop-shadow-sm`} />
                 </div>
-                <div className="text-3xl font-black">{stat.value}</div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black">{stat.label}</p>
+                <div className="text-4xl font-black tracking-tighter">{stat.value}</div>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-70">{stat.label}</p>
               </CardContent>
             </Card>
           </motion.div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Kanji } from '../data';
 import type { ProgressState } from '../store/useProgress';
 import { Search, CheckCircle2, Filter } from 'lucide-react';
@@ -6,6 +6,7 @@ import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AudioButton } from './AudioPlayer';
+import { Button } from './ui/button';
 
 interface KanjiListProps {
   kanjiList: Kanji[];
@@ -15,6 +16,7 @@ interface KanjiListProps {
 const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lessonFilter, setLessonFilter] = useState<number | 'all'>('all');
+  const [displayLimit, setDisplayLimit] = useState(30);
 
   const maxLesson = useMemo(() => Math.max(...kanjiList.map(k => k.lesson)), [kanjiList]);
 
@@ -32,87 +34,105 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
     });
   }, [kanjiList, lessonFilter, searchTerm]);
 
+  // Show more items when scrolling near the bottom
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        setDisplayLimit(prev => Math.min(prev + 30, filteredList.length));
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [filteredList.length]);
+
+  // Reset limit when searching or filtering
+  useEffect(() => {
+    setDisplayLimit(30);
+  }, [searchTerm, lessonFilter]);
+
+  const displayedItems = filteredList.slice(0, displayLimit);
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 bg-card p-4 rounded-2xl border shadow-sm">
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row gap-4 bg-white/5 backdrop-blur-2xl p-6 rounded-[2rem] border-2 border-white/10 shadow-2xl">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5 opacity-50" />
           <input 
             type="text" 
             placeholder="Cari kanji, arti, atau romaji..." 
-            className="w-full pl-10 pr-4 py-2 bg-secondary/20 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all"
+            className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-muted-foreground/50 font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-3">
-          <Filter className="text-muted-foreground w-5 h-5" />
+          <Filter className="text-muted-foreground w-5 h-5 opacity-50" />
           <select 
-            className="bg-secondary/20 border-none rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+            className="bg-white/5 border border-white/10 rounded-2xl px-6 py-3 outline-none focus:ring-2 focus:ring-primary cursor-pointer font-bold"
             value={lessonFilter} 
             onChange={(e) => {
               const val = e.target.value;
               setLessonFilter(val === 'all' ? 'all' : parseInt(val, 10));
             }}
           >
-            <option value="all">Semua Pelajaran</option>
+            <option value="all">Semua Materi</option>
             {Array.from({ length: maxLesson }, (_, i) => i + 1).map(l => (
-              <option key={l} value={l}>Pelajaran {l}</option>
+              <option key={l} value={l}>Lesson {l}</option>
             ))}
           </select>
         </div>
       </div>
 
       <motion.div 
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         layout
       >
         <AnimatePresence mode="popLayout">
-          {filteredList.map((kanji) => {
+          {displayedItems.map((kanji, index) => {
             const p = progress[kanji.id];
             const isMastered = p?.level === 5;
             return (
               <motion.div
                 key={kanji.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.2) }}
               >
-                <Card className={`group overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 ${isMastered ? 'bg-success/5 ring-1 ring-success/20' : ''}`}>
-                  <CardContent className="p-4 flex gap-4">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className={`flex items-center justify-center w-16 h-16 rounded-xl text-3xl font-bold transition-colors ${isMastered ? 'bg-success text-white' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'}`}>
+                <Card className={`group overflow-hidden border-white/10 ${isMastered ? 'ring-2 ring-success/30' : ''}`}>
+                  <CardContent className="p-6 flex gap-5">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className={`flex items-center justify-center w-16 h-16 rounded-2xl text-3xl font-black transition-all duration-500 shadow-lg ${isMastered ? 'bg-success text-white' : 'bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110'}`}>
                         {kanji.kanji}
                       </div>
-                      <AudioButton text={kanji.kanji} size={14} className="h-8 w-8" />
+                      <AudioButton text={kanji.kanji} size={14} className="h-9 w-9 bg-white/5" />
                     </div>
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-lg truncate pr-2">{kanji.meaning}</h4>
+                    <div className="flex-1 min-w-0 flex flex-col">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-black text-lg truncate pr-2 tracking-tight">{kanji.meaning}</h4>
                         {isMastered && <CheckCircle2 className="w-5 h-5 text-success shrink-0" />}
                       </div>
-                      <div className="flex flex-col gap-2 mt-2">
+                      <div className="space-y-3">
                         {kanji.kunyomi && (
                           <div className="flex flex-col">
-                            <span className="text-[9px] uppercase font-black text-orange-500/70 tracking-tighter">Kun</span>
-                            <span className="text-xs font-bold leading-tight">
-                              {kanji.kunyomi} <span className="text-[10px] font-medium text-muted-foreground">({kanji.kunyomi_romaji})</span>
+                            <span className="text-[9px] uppercase font-black text-orange-500/60 tracking-widest leading-none mb-1">Kun</span>
+                            <span className="text-sm font-bold leading-tight">
+                              {kanji.kunyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.kunyomi_romaji})</span>
                             </span>
                           </div>
                         )}
                         {kanji.onyomi && (
                           <div className="flex flex-col">
-                            <span className="text-[9px] uppercase font-black text-blue-500/70 tracking-tighter">On</span>
-                            <span className="text-xs font-bold leading-tight">
-                              {kanji.onyomi} <span className="text-[10px] font-medium text-muted-foreground">({kanji.onyomi_romaji})</span>
+                            <span className="text-[9px] uppercase font-black text-blue-500/60 tracking-widest leading-none mb-1">On</span>
+                            <span className="text-sm font-bold leading-tight">
+                              {kanji.onyomi} <span className="text-[10px] font-medium text-muted-foreground opacity-60">({kanji.onyomi_romaji})</span>
                             </span>
                           </div>
                         )}
                       </div>
-                      <div className="mt-auto pt-2 flex justify-end">
-                        <Badge variant="outline" className="text-[10px] px-1.5 h-5 opacity-50 font-black">L{kanji.lesson}</Badge>
+                      <div className="mt-4 pt-3 border-t border-white/5 flex justify-end">
+                        <Badge variant="outline" className="text-[10px] px-2 h-5 opacity-40 font-black border-white/20">L{kanji.lesson}</Badge>
                       </div>
                     </div>
                   </CardContent>
@@ -122,6 +142,18 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
           })}
         </AnimatePresence>
       </motion.div>
+
+      {filteredList.length > displayLimit && (
+        <div className="text-center py-10">
+          <Button 
+            variant="ghost" 
+            onClick={() => setDisplayLimit(prev => prev + 50)}
+            className="text-primary font-black animate-pulse"
+          >
+            Mencari lebih banyak kanji...
+          </Button>
+        </div>
+      )}
       
       {filteredList.length === 0 && (
         <motion.div 

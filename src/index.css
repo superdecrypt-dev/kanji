@@ -27,44 +27,59 @@
   
   --color-card: var(--surface-color);
   --color-card-foreground: var(--text-color);
+  
+  --color-glass: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
 
   --radius-lg: 12px;
   --radius-md: 8px;
   --radius-sm: 6px;
+  --radius-3xl: 32px;
 }
 
 :root {
-  --bg-color: #f8fafc;
-  --surface-color: #ffffff;
-  --text-color: #1d3557;
-  --text-secondary: #457b9d;
+  --bg-color: #f1f5f9;
+  --surface-color: rgba(255, 255, 255, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --text-color: #0f172a;
+  --text-secondary: #475569;
   --primary: #457b9d;
   --primary-hover: #1d3557;
-  --secondary: #f1f5f9;
+  --secondary: rgba(241, 245, 249, 0.5);
   --accent: #e63946;
   --accent-hover: #d62828;
   --success: #2a9d8f;
-  --border-color: #e2e8f0;
+  --border-color: rgba(226, 232, 240, 0.5);
 }
 
 [data-theme='dark'] {
-  --bg-color: #0f172a;
-  --surface-color: #1e293b;
+  --bg-color: #020617;
+  --surface-color: rgba(30, 41, 59, 0.4);
+  --glass-bg: rgba(15, 23, 42, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --text-color: #f8fafc;
   --text-secondary: #94a3b8;
   --primary: #38bdf8;
   --primary-hover: #7dd3fc;
-  --secondary: #1e293b;
+  --secondary: rgba(30, 41, 59, 0.5);
   --accent: #f87171;
   --accent-hover: #fca5a5;
   --success: #34d399;
-  --border-color: #334155;
+  --border-color: rgba(51, 65, 85, 0.5);
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased min-h-screen transition-colors duration-300;
+    @apply bg-background text-foreground antialiased min-h-screen transition-colors duration-300 selection:bg-primary/30;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(69, 123, 157, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(69, 123, 157, 0.05) 0px, transparent 50%);
   }
+}
+
+.glass-card {
+  @apply bg-glass backdrop-blur-xl border border-glass-border shadow-xl;
 }
 
 .perspective-1000 {
