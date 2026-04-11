@@ -77,7 +77,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
                   <p className="text-lg font-medium leading-tight">{kanji.kunyomi || '-'}</p>
                   {kanji.kunyomi_romaji && <p className="text-xs text-primary/70 font-bold">{kanji.kunyomi_romaji}</p>}
                 </div>
-                {kanji.kunyomi && <AudioButton text={kanji.kunyomi.split(' / ')[0].replace(/-/g, '')} />}
+                {kanji.kunyomi && <AudioButton text={kanji.kunyomi.replace(/\//g, ',').replace(/-/g, '')} />}
               </div>
               <div className="bg-secondary/30 p-3 rounded-xl flex items-center justify-between">
                 <div className="text-left">
@@ -85,7 +85,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
                   <p className="text-lg font-medium leading-tight">{kanji.onyomi || '-'}</p>
                   {kanji.onyomi_romaji && <p className="text-xs text-primary/70 font-bold">{kanji.onyomi_romaji}</p>}
                 </div>
-                {kanji.onyomi && <AudioButton text={kanji.onyomi.split(' / ')[0].replace(/-/g, '')} />}
+                {kanji.onyomi && <AudioButton text={kanji.onyomi.replace(/\//g, ',').replace(/-/g, '')} />}
               </div>
             </div>
 
