@@ -4,7 +4,6 @@ import Flashcard from './components/Flashcard';
 import AdvancedQuiz from './components/AdvancedQuiz';
 import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
-import { useProgress } from './store/useProgress';
 import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,8 +22,6 @@ function App() {
     return 'light';
   });
 
-  const { progress, metadata, updateKanji, markMastered, isLoaded } = useProgress();
-
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -40,17 +37,7 @@ function App() {
   const handleNextCard = () => setCurrentCardIndex((prev) => (prev + 1) % filteredKanji.length);
   const handlePrevCard = () => setCurrentCardIndex((prev) => (prev - 1 + filteredKanji.length) % filteredKanji.length);
 
-  const handleQuizResult = (kanjiId: number, isCorrect: boolean) => {
-    updateKanji(kanjiId, isCorrect);
-  };
-
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
-
-  if (!isLoaded) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>
-  );
 
   const navItems = [
     { id: 'list', label: 'Daftar Kanji', icon: List },
@@ -125,9 +112,6 @@ function App() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-white/10 space-y-4">
-          <div className="flex items-center justify-between px-4 py-2 mb-2">
-             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Streak: {metadata.streak} 🔥</span>
-          </div>
           <Button 
             variant="secondary" 
             className="w-full justify-start gap-4 h-14 rounded-2xl border border-white/10"
@@ -165,7 +149,7 @@ function App() {
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3 }}
             >
-              {/* Header Title for Context */}
+              {/* Header Title */}
               <div className="mb-10 max-lg:hidden flex items-center justify-between">
                 <div>
                   <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase">
@@ -179,7 +163,7 @@ function App() {
               </div>
 
               {mode === 'list' ? (
-                 <KanjiList kanjiList={kanjiList} progress={progress} />
+                 <KanjiList kanjiList={kanjiList} />
               ) : (
                 <div className="space-y-10">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border-2 border-white/10 shadow-2xl">
@@ -206,8 +190,6 @@ function App() {
                       <Flashcard 
                          key={filteredKanji[currentCardIndex].id}
                          kanji={filteredKanji[currentCardIndex]} 
-                         progress={progress[filteredKanji[currentCardIndex].id]}
-                         onMarkMastered={() => markMastered(filteredKanji[currentCardIndex].id)}
                          onNext={handleNextCard}
                       />
                       <div className="flex gap-6 w-full max-w-sm">
@@ -227,7 +209,7 @@ function App() {
                       </div>
                     </div>
                   ) : (
-                    <AdvancedQuiz key={selectedLesson} kanjiList={filteredKanji} progress={progress} onResult={handleQuizResult} />
+                    <AdvancedQuiz key={selectedLesson} kanjiList={filteredKanji} />
                   )}
                 </div>
               )}

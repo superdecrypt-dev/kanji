@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { Kanji } from '../data';
-import type { ProgressState } from '../store/useProgress';
-import { Search, CheckCircle2, Filter } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,10 +9,9 @@ import { Button } from './ui/button';
 
 interface KanjiListProps {
   kanjiList: Kanji[];
-  progress: ProgressState;
 }
 
-const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
+const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lessonFilter, setLessonFilter] = useState<number | 'all'>('all');
   const [displayLimit, setDisplayLimit] = useState(30);
@@ -89,8 +87,6 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
       >
         <AnimatePresence mode="popLayout">
           {displayedItems.map((kanji, index) => {
-            const p = progress[kanji.id];
-            const isMastered = p?.level === 5;
             return (
               <motion.div
                 key={kanji.id}
@@ -100,10 +96,10 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.2) }}
               >
-                <Card className={`group overflow-hidden border-white/10 ${isMastered ? 'ring-2 ring-success/30' : ''}`}>
+                <Card className="group overflow-hidden border-white/10">
                   <CardContent className="p-6 flex gap-5">
                     <div className="flex flex-col items-center gap-3">
-                      <div className={`flex items-center justify-center w-16 h-16 rounded-2xl text-3xl font-black transition-all duration-500 shadow-lg ${isMastered ? 'bg-success text-white' : 'bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110'}`}>
+                      <div className="flex items-center justify-center w-16 h-16 rounded-2xl text-3xl font-black transition-all duration-500 shadow-lg bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110">
                         {kanji.kanji}
                       </div>
                       <AudioButton text={kanji.kanji} size={14} className="h-9 w-9 bg-white/5" />
@@ -111,7 +107,6 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
                     <div className="flex-1 min-w-0 flex flex-col">
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="font-black text-lg truncate pr-2 tracking-tight">{kanji.meaning}</h4>
-                        {isMastered && <CheckCircle2 className="w-5 h-5 text-success shrink-0" />}
                       </div>
                       <div className="space-y-3">
                         {kanji.kunyomi && (

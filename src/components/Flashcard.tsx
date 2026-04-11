@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import type { Kanji } from '../data';
-import type { KanjiProgress } from '../store/useProgress';
-import { CheckCircle2, RefreshCcw } from 'lucide-react';
+import { RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -9,15 +8,11 @@ import { AudioButton } from './AudioPlayer';
 
 interface FlashcardProps {
   kanji: Kanji;
-  progress?: KanjiProgress;
-  onMarkMastered: () => void;
   onNext: () => void;
 }
 
-const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, onNext }) => {
+const Flashcard: React.FC<FlashcardProps> = ({ kanji, onNext }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-
-  const isMastered = progress?.level === 5;
 
   return (
     <div className="flex flex-col items-center w-full max-w-sm mx-auto space-y-8">
@@ -41,11 +36,9 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
         >
           {/* Front Side */}
           <div className="absolute inset-0 backface-hidden bg-white/10 backdrop-blur-2xl border-2 border-white/20 rounded-[2.5rem] shadow-2xl flex flex-col items-center justify-center p-6 overflow-hidden">
-            {/* Gloss effect */}
             <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
             
             <div className="absolute top-6 right-6 flex gap-2">
-              {isMastered && <CheckCircle2 className="text-success w-7 h-7" />}
               <Badge variant="outline" className="opacity-50 font-black border-white/20">L{kanji.lesson}</Badge>
             </div>
             
@@ -93,10 +86,6 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
                 {kanji.onyomi && <AudioButton text={kanji.onyomi.replace(/\//g, ',').replace(/-/g, '')} className="h-10 w-10 bg-white/5" />}
               </div>
             </div>
-
-            {progress && progress.level > 0 && !isMastered && (
-              <Badge variant="secondary" className="mt-4 bg-primary/10 text-primary border-none font-black">SRS LEVEL {progress.level}</Badge>
-            )}
           </div>
         </motion.div>
       </div>
@@ -109,18 +98,9 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji, progress, onMarkMastered, 
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             className="flex gap-4 w-full"
           >
-             {!isMastered && (
-               <Button 
-                 variant="success"
-                 className="flex-[2] gap-3 shadow-xl h-16 rounded-2xl text-lg"
-                 onClick={(e) => { e.stopPropagation(); onMarkMastered(); onNext(); }}
-               >
-                 <CheckCircle2 size={22} /> Tandai Hafal
-               </Button>
-             )}
              <Button 
                variant="outline"
-               className="flex-1 h-16 rounded-2xl border-2 text-lg"
+               className="flex-1 h-16 rounded-2xl border-2 text-lg font-black uppercase tracking-widest"
                onClick={(e) => { e.stopPropagation(); onNext(); }}
              >
                Lanjut
