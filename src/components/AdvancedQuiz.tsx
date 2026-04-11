@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import type { Kanji } from '../data';
-import './Quiz.css';
+import { Card, CardContent } from './ui/card';
+import { Button } from './ui/button';
+import { motion } from 'framer-motion';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface AdvancedQuizProps {
   kanjiList: Kanji[];
@@ -76,6 +79,7 @@ function createNewQuestion(kanjiList: Kanji[]): QuizState {
 const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, onResult }) => {
   const [quizState, setQuizState] = useState<QuizState>(() => createNewQuestion(kanjiList));
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [isWrong, setIsWrong] = useState(false);
 
   const { currentKanji, options, mode, selectedAnswer } = quizState;
 
@@ -93,6 +97,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, onResult }) => {
     const isCorrect = option === correctAnswer;
     
     setQuizState(prev => ({ ...prev, selectedAnswer: option }));
+    if (!isCorrect) setIsWrong(true);
     
     setScore(prev => ({
       total: prev.total + 1,
@@ -103,10 +108,11 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, onResult }) => {
 
     setTimeout(() => {
       setQuizState(createNewQuestion(kanjiList));
+      setIsWrong(false);
     }, 1500);
   };
 
-  if (!currentKanji) return <div>Loading...</div>;
+  if (!currentKanji) return <div className="text-center py-20">Loading...</div>;
 
   let questionText = '';
   let questionDisplay = '';
@@ -139,37 +145,60 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, onResult }) => {
   }
 
   return (
-    <div className="quiz-container">
-      <div className="score-board">
-        Score: {score.correct} / {score.total}
-      </div>
-      
-      <div className="quiz-card">
-        <h2 className="quiz-question">{questionText}</h2>
-        <div className={`quiz-display ${mode.includes('ToKanji') ? 'text-mode' : 'kanji-mode'}`}>
-          {questionDisplay}
+    <div className="max-w-2xl mx-auto space-y-8 py-4">
+      <div className="flex justify-between items-center px-2">
+        <div className="bg-primary/10 text-primary px-4 py-1.5 rounded-full font-bold text-sm">
+          Skor: {score.correct} / {score.total}
+        </div>
+        <div className="text-muted-foreground text-sm font-medium">
+          {Math.round((score.correct / (score.total || 1)) * 100)}% Akurasi
         </div>
       </div>
+      
+      <motion.div
+        key={currentKanji.id + mode}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+      >
+        <Card className={`overflow-hidden border-2 transition-colors duration-300 ${selectedAnswer ? (isWrong ? 'border-destructive/50' : 'border-success/50') : 'border-border'}`}>
+          <CardContent className="p-10 text-center space-y-6">
+            <p className="text-muted-foreground font-medium uppercase tracking-widest text-xs">{questionText}</p>
+            <motion.div 
+              animate={isWrong ? { x: [-10, 10, -10, 10, 0] } : {}}
+              className={`font-bold leading-tight ${mode.includes('ToKanji') ? 'text-4xl sm:text-5xl text-foreground' : 'text-8xl sm:text-9xl text-primary'}`}
+            >
+              {questionDisplay}
+            </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-      <div className="options-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {options.map((option, index) => {
-          let btnClass = 'option-btn';
-          if (selectedAnswer !== null) {
-            if (option === correctAnswer) {
-              btnClass += ' correct';
-            } else if (option === selectedAnswer) {
-              btnClass += ' incorrect';
-            }
+          const isCorrect = option === correctAnswer;
+          const isSelected = option === selectedAnswer;
+          
+          let btnVariant: 'outline' | 'success' | 'destructive' = 'outline';
+          if (selectedAnswer) {
+            if (isCorrect) btnVariant = 'success';
+            else if (isSelected) btnVariant = 'destructive';
           }
+
           return (
-            <button 
+            <Button 
               key={index} 
-              className={btnClass}
+              variant={btnVariant}
+              className={`h-16 text-lg font-medium transition-all duration-200 border-2 ${!selectedAnswer && 'hover:border-primary hover:bg-primary/5'}`}
               onClick={() => handleAnswerClick(option)}
               disabled={selectedAnswer !== null}
             >
-              {option}
-            </button>
+              <div className="flex items-center gap-3">
+                {selectedAnswer && isCorrect && <CheckCircle2 className="w-5 h-5" />}
+                {selectedAnswer && isSelected && !isCorrect && <XCircle className="w-5 h-5" />}
+                {option}
+              </div>
+            </Button>
           );
         })}
       </div>

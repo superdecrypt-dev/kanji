@@ -1,3 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-border: var(--border-color);
+  --color-input: var(--border-color);
+  --color-ring: var(--primary);
+  --color-background: var(--bg-color);
+  --color-foreground: var(--text-color);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--text-color);
+  
+  --color-destructive: var(--accent);
+  --color-destructive-foreground: #ffffff;
+  
+  --color-muted: var(--bg-color);
+  --color-muted-foreground: var(--text-secondary);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: #ffffff;
+  
+  --color-success: var(--success);
+  --color-success-foreground: #ffffff;
+  
+  --color-card: var(--surface-color);
+  --color-card-foreground: var(--text-color);
+
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
+}
+
 :root {
   --bg-color: #f8fafc;
   --surface-color: #ffffff;
@@ -5,24 +40,11 @@
   --text-secondary: #457b9d;
   --primary: #457b9d;
   --primary-hover: #1d3557;
-  --secondary: #a8dadc;
+  --secondary: #f1f5f9;
   --accent: #e63946;
   --accent-hover: #d62828;
   --success: #2a9d8f;
   --border-color: #e2e8f0;
-  
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: var(--text-color);
-  background-color: var(--bg-color);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 [data-theme='dark'] {
@@ -32,29 +54,39 @@
   --text-secondary: #94a3b8;
   --primary: #38bdf8;
   --primary-hover: #7dd3fc;
-  --secondary: #334155;
+  --secondary: #1e293b;
   --accent: #f87171;
   --accent-hover: #fca5a5;
   --success: #34d399;
   --border-color: #334155;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  min-height: 100vh;
-  min-width: 320px;
-  transition: background-color 0.3s, color 0.3s;
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen transition-colors duration-300;
+  }
 }
 
-#root {
-  width: 100%;
+.perspective-1000 {
+  perspective: 1000px;
 }
 
-* {
-  box-sizing: border-box;
+.preserve-3d {
+  transform-style: preserve-3d;
 }
 
-button {
-  font-family: inherit;
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
