@@ -23,9 +23,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       { role: 'user', content: message }
     ];
 
-    // Memanggil model Llama-3 dari Cloudflare AI
-    // @cf/meta/llama-3-8b-instruct adalah model yang sangat pintar, cepat, dan gratis di Cloudflare
-    const response = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+    // Memanggil model Gemma-4 dari Cloudflare AI
+    const response = await env.AI.run('@cf/google/gemma-4-26b-a4b-it', {
       messages: formattedMessages
     });
 
