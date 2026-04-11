@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { Kanji } from '../data';
 import type { ProgressState } from '../store/useProgress';
-import { BookOpen, Trophy, Clock, Target, Zap, Trash2, AlertTriangle, Share2 } from 'lucide-react';
+import { BookOpen, Trophy, Clock, Target, Zap, Trash2, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
 import { Button } from './ui/button';
@@ -37,11 +37,6 @@ const Dashboard: React.FC<DashboardProps> = ({ kanjiList, progress, onNavigate, 
 
     return { mastered, learning, newKanji, reviewDue };
   }, [kanjiList, progress]);
-
-  const handleShare = () => {
-    const text = `Saya sudah menguasai ${stats.mastered} dari 248 Kanji N4! Ayo belajar bareng di: ${window.location.href}`;
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -103,16 +98,6 @@ const Dashboard: React.FC<DashboardProps> = ({ kanjiList, progress, onNavigate, 
           onClick={() => onNavigate('quiz')}
         >
           <Zap className="w-8 h-8 text-orange-500 fill-orange-500" /> Ambil Kuis
-        </Button>
-      </motion.div>
-
-      <motion.div variants={itemVariants} className="flex justify-center pt-2">
-        <Button 
-          variant="ghost" 
-          onClick={handleShare}
-          className="text-primary font-bold gap-2 hover:bg-primary/5"
-        >
-          <Share2 className="w-5 h-5" /> Bagikan Progres ke WhatsApp
         </Button>
       </motion.div>
 
