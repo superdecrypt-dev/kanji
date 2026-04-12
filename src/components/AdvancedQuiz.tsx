@@ -298,13 +298,39 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
     const targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
     const modes: QuizMode[] = ['kanjiToMeaning', 'kanjiToReading'];
     const currentMode = modes[Math.floor(Math.random() * modes.length)];
-    let correctAnswer = currentMode === 'kanjiToMeaning' ? targetKanji.meaning : (targetKanji.onyomi || targetKanji.kunyomi || targetKanji.meaning);
+    
+    let correctAnswer = '';
+    if (currentMode === 'kanjiToMeaning') {
+      correctAnswer = targetKanji.meaning;
+    } else {
+      // Randomly pick between Onyomi and Kunyomi if both exist
+      const availableReadings = [];
+      if (targetKanji.onyomi) availableReadings.push(targetKanji.onyomi);
+      if (targetKanji.kunyomi) availableReadings.push(targetKanji.kunyomi);
+      
+      if (availableReadings.length > 1) {
+        correctAnswer = availableReadings[Math.floor(Math.random() * availableReadings.length)];
+      } else {
+        correctAnswer = availableReadings[0] || targetKanji.meaning;
+      }
+    }
     
     const wrongAnswers = new Set<string>();
     while (wrongAnswers.size < 3) {
       const randomWrong = kanjiList[Math.floor(Math.random() * kanjiList.length)];
       if (randomWrong.id === targetKanji.id) continue;
-      const wrongText = currentMode === 'kanjiToMeaning' ? randomWrong.meaning : (randomWrong.onyomi || randomWrong.kunyomi || randomWrong.meaning);
+      
+      let wrongText = '';
+      if (currentMode === 'kanjiToMeaning') {
+        wrongText = randomWrong.meaning;
+      } else {
+        // Distractors should also be a mix of On/Kun from other kanji
+        const rReadings = [];
+        if (randomWrong.onyomi) rReadings.push(randomWrong.onyomi);
+        if (randomWrong.kunyomi) rReadings.push(randomWrong.kunyomi);
+        wrongText = rReadings.length > 0 ? rReadings[Math.floor(Math.random() * rReadings.length)] : randomWrong.meaning;
+      }
+      
       if (wrongText && wrongText !== correctAnswer) wrongAnswers.add(wrongText);
     }
     const allOptions = [correctAnswer, ...Array.from(wrongAnswers)].sort(() => Math.random() - 0.5);
