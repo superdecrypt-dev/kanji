@@ -3,7 +3,6 @@ import type { Kanji } from '../data';
 import { RefreshCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from './ui/badge';
-import { AudioButton } from './AudioPlayer';
 
 interface FlashcardProps {
   kanji: Kanji;
@@ -77,7 +76,6 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji }) => {
                   <p className="text-xl font-bold leading-tight">{kanji.kunyomi || '-'}</p>
                   {kanji.kunyomi_romaji && <p className="text-[10px] text-foreground opacity-100 font-black mt-1.5 italic tracking-wide">{kanji.kunyomi_romaji}</p>}
                 </div>
-                {kanji.kunyomi && <AudioButton text={kanji.kunyomi.replace(/\//g, ',')} className="h-11 w-11" />}
               </div>
               <div className="bg-white/10 backdrop-blur-md border border-white/10 p-5 rounded-[2rem] flex items-center justify-between shadow-inner hover:bg-white/20 transition-all group">
                 <div className="text-left">
@@ -85,7 +83,6 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji }) => {
                   <p className="text-xl font-bold leading-tight">{kanji.onyomi || '-'}</p>
                   {kanji.onyomi_romaji && <p className="text-[10px] text-foreground opacity-100 font-black mt-1.5 italic tracking-wide">{kanji.onyomi_romaji}</p>}
                 </div>
-                {kanji.onyomi && <AudioButton text={kanji.onyomi.replace(/\//g, ',')} className="h-11 w-11" />}
               </div>
             </div>
 
