@@ -22,15 +22,31 @@ interface QuizState {
 function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentWords: string[]): QuizState {
   if (type === 'kanji') {
     if (kanjiList.length === 0) return { currentWord: null, options: [], mode: 'kanjiToMeaning', selectedAnswer: null };
-    const targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+    
+    // Prevent immediate repeats
+    let targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+    let tries = 0;
+    while (recentWords.includes(targetKanji.kanji) && tries < 15 && kanjiList.length > 1) {
+      targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+      tries++;
+    }
+
     const modes: QuizMode[] = ['kanjiToMeaning', 'kanjiToReading'];
     const currentMode = modes[Math.floor(Math.random() * modes.length)];
     
+    // Collect ALL valid alternative readings and meanings
+    const allValidReadings = [targetKanji.onyomi, targetKanji.kunyomi]
+      .filter(Boolean)
+      .flatMap(r => r!.split(/[,/]/).map(s => s.trim()));
+    
+    const allValidMeanings = targetKanji.meaning
+      .split(/[,/]/)
+      .map(m => m.trim().toLowerCase());
+
     let correctAnswer = '';
     if (currentMode === 'kanjiToMeaning') {
       correctAnswer = targetKanji.meaning;
     } else {
-      // Randomly pick between Onyomi and Kunyomi if both exist
       const availableReadings = [];
       if (targetKanji.onyomi) availableReadings.push(targetKanji.onyomi);
       if (targetKanji.kunyomi) availableReadings.push(targetKanji.kunyomi);
@@ -43,9 +59,6 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
     }
     
     const wrongAnswers = new Set<string>();
-    const targetReadings = [targetKanji.onyomi, targetKanji.kunyomi].filter(Boolean);
-    const targetMeanings = targetKanji.meaning.split('/').map(m => m.trim().toLowerCase());
-
     while (wrongAnswers.size < 3) {
       const randomWrong = kanjiList[Math.floor(Math.random() * kanjiList.length)];
       if (randomWrong.id === targetKanji.id) continue;
@@ -53,8 +66,11 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       let wrongText = '';
       if (currentMode === 'kanjiToMeaning') {
         wrongText = randomWrong.meaning;
-        // Ensure the wrong meaning doesn't accidentally match the target meaning
-        const isActuallyCorrect = targetMeanings.some(m => wrongText.toLowerCase().includes(m));
+        const isActuallyCorrect = allValidMeanings.some(m => 
+          wrongText.toLowerCase() === m || 
+          wrongText.toLowerCase().includes(m) || 
+          m.includes(wrongText.toLowerCase())
+        );
         if (isActuallyCorrect) continue;
       } else {
         const rReadings = [];
@@ -62,8 +78,11 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
         if (randomWrong.kunyomi) rReadings.push(randomWrong.kunyomi);
         wrongText = rReadings.length > 0 ? rReadings[Math.floor(Math.random() * rReadings.length)] : randomWrong.meaning;
         
-        // CRITICAL FIX: Ensure the wrong reading isn't actually a valid alternative reading for the target
-        const isActuallyCorrect = targetReadings.some(r => r === wrongText || (r && r.includes(wrongText)));
+        const isActuallyCorrect = allValidReadings.some(r => 
+          r === wrongText || 
+          wrongText.includes(r) || 
+          r.includes(wrongText)
+        );
         if (isActuallyCorrect) continue;
       }
       
