@@ -114,9 +114,6 @@ function App() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-white/10 space-y-4">
-          <div className="flex items-center justify-between px-4 py-2 mb-2">
-             <span className="text-[10px] font-black uppercase tracking-widest text-primary">N4 Mastery</span>
-          </div>
         </div>
       </motion.aside>
 
@@ -217,4 +214,4 @@ function App() {
   );
 }
 
-export default App;;
+export default App;
