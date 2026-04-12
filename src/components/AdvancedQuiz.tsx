@@ -10,6 +10,8 @@ interface AdvancedQuizProps {
   kanjiList: Kanji[];
 }
 
+type QuizType = 'kanji' | 'jukugo';
+type QuestionMode = 'meaning' | 'reading' | 'mixed';
 type QuizMode = 'kanjiToMeaning' | 'kanjiToReading';
 
 interface QuizState {
@@ -19,19 +21,15 @@ interface QuizState {
   selectedAnswer: string | null;
 }
 
-/**
- * Utility to split strings like "セイ / ショウ" into ["セイ", "ショウ"]
- */
 const splitJapaneseStr = (str: string | undefined | null): string[] => {
   if (!str) return [];
   return str.split(/[,/]/).map(s => s.trim()).filter(Boolean);
 };
 
-function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentWords: string[]): QuizState {
+function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: string[], questionMode: QuestionMode = 'mixed'): QuizState {
   if (type === 'kanji') {
     if (kanjiList.length === 0) return { currentWord: null, options: [], mode: 'kanjiToMeaning', selectedAnswer: null };
     
-    // Prevent immediate repeats
     let targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
     let tries = 0;
     while (recentWords.includes(targetKanji.kanji) && tries < 15 && kanjiList.length > 1) {
@@ -39,8 +37,14 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       tries++;
     }
 
-    const modes: QuizMode[] = ['kanjiToMeaning', 'kanjiToReading'];
-    const currentMode = modes[Math.floor(Math.random() * modes.length)];
+    let currentMode: QuizMode;
+    if (questionMode === 'meaning') {
+      currentMode = 'kanjiToMeaning';
+    } else if (questionMode === 'reading') {
+      currentMode = 'kanjiToReading';
+    } else {
+      currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
+    }
     
     const allValidReadings = [...splitJapaneseStr(targetKanji.onyomi), ...splitJapaneseStr(targetKanji.kunyomi)];
     const allValidMeanings = splitJapaneseStr(targetKanji.meaning).map(m => m.toLowerCase());
@@ -65,18 +69,13 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       let wrongText = '';
       if (currentMode === 'kanjiToMeaning') {
         wrongText = randomWrong.meaning;
-        // Validation for Meaning
         const isActuallyCorrect = allValidMeanings.some(m => 
           wrongText.toLowerCase().includes(m) || m.includes(wrongText.toLowerCase())
         );
         if (isActuallyCorrect) continue;
       } else {
-        const rReadings = [];
-        if (randomWrong.onyomi) rReadings.push(randomWrong.onyomi);
-        if (randomWrong.kunyomi) rReadings.push(randomWrong.kunyomi);
+        const rReadings = [...splitJapaneseStr(randomWrong.onyomi), ...splitJapaneseStr(randomWrong.kunyomi)];
         wrongText = rReadings.length > 0 ? rReadings[Math.floor(Math.random() * rReadings.length)] : randomWrong.meaning;
-        
-        // Validation for Reading
         const wrongParts = splitJapaneseStr(wrongText);
         const isActuallyCorrect = wrongParts.some(wp => allValidReadings.includes(wp));
         if (isActuallyCorrect) continue;
@@ -92,7 +91,6 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       selectedAnswer: null
     };
   } else {
-    // Jukugo logic (Local Database)
     let targetWord = jukugoList[Math.floor(Math.random() * jukugoList.length)];
     let tries = 0;
     while (recentWords.includes(targetWord.word) && tries < 10) {
@@ -100,8 +98,15 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       tries++;
     }
 
-    const modes: QuizMode[] = ['kanjiToMeaning', 'kanjiToReading'];
-    const currentMode = modes[Math.floor(Math.random() * modes.length)];
+    let currentMode: QuizMode;
+    if (questionMode === 'meaning') {
+      currentMode = 'kanjiToMeaning';
+    } else if (questionMode === 'reading') {
+      currentMode = 'kanjiToReading';
+    } else {
+      currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
+    }
+    
     let correctAnswer = currentMode === 'kanjiToMeaning' ? targetWord.meaning : targetWord.reading;
 
     const wrongAnswers = new Set<string>();
@@ -122,9 +127,10 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
 }
 
 const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
-  const [quizType, setQuizType] = useState<'kanji' | 'jukugo'>('kanji');
+  const [quizType, setQuizType] = useState<QuizType>('kanji');
+  const [questionMode, setQuestionMode] = useState<QuestionMode>('mixed');
   const [recentWords, setRecentWords] = useState<string[]>([]);
-  const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', []));
+  const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', [], 'mixed'));
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [isWrong, setIsWrong] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,8 +157,8 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
     }
   };
 
-  const loadNextQuestion = (type: 'kanji' | 'jukugo', currentRecent: string[]) => {
-    setQuizState(createNewQuestion(kanjiList, type, currentRecent));
+  const loadNextQuestion = (type: QuizType, currentRecent: string[], qMode: QuestionMode) => {
+    setQuizState(createNewQuestion(kanjiList, type, currentRecent, qMode));
     setIsLoading(false);
   };
 
@@ -173,17 +179,26 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
       setIsWrong(false);
       const newRecent = [...recentWords.slice(-14), quizState.currentWord!.word];
       setRecentWords(newRecent);
-      loadNextQuestion(quizType, newRecent);
+      loadNextQuestion(quizType, newRecent, questionMode);
     }, 1500);
   };
 
-  const switchQuizType = (newType: 'kanji' | 'jukugo') => {
+  const switchQuizType = (newType: QuizType) => {
     if (quizType === newType) return;
     setQuizType(newType);
     setScore({ correct: 0, total: 0 });
     setIsWrong(false);
     setRecentWords([]);
-    loadNextQuestion(newType, []);
+    loadNextQuestion(newType, [], questionMode);
+  };
+
+  const switchQuestionMode = (newMode: QuestionMode) => {
+    if (questionMode === newMode) return;
+    setQuestionMode(newMode);
+    setScore({ correct: 0, total: 0 });
+    setIsWrong(false);
+    setRecentWords([]);
+    loadNextQuestion(quizType, [], newMode);
   };
 
   if (!quizState || !quizState.currentWord) return <div className="text-center py-20">Memuat...</div>;
@@ -191,7 +206,6 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   const { currentWord, options, mode, selectedAnswer } = quizState;
   const questionText = mode === 'kanjiToMeaning' ? `Apa arti dari ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?` : `Cara baca ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?`;
 
-  // For the info box, find the best text to show as "Correct Answer"
   let infoCorrectAnswer = '';
   if (quizType === 'kanji') {
     const kanjiData = kanjiList.find(k => k.kanji === currentWord.word);
@@ -202,10 +216,16 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 py-4">
-      <div className="flex justify-center mb-6">
+      <div className="flex flex-col gap-4 items-center mb-6">
         <div className="flex p-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
           <button onClick={() => switchQuizType('kanji')} className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${quizType === 'kanji' ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}>Kuis Kanji</button>
           <button onClick={() => switchQuizType('jukugo')} className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${quizType === 'jukugo' ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}><BookOpen size={14} /> Jukugo (250+)</button>
+        </div>
+
+        <div className="flex p-1 bg-white/5 backdrop-blur-md border border-white/5 rounded-xl">
+          <button onClick={() => switchQuestionMode('meaning')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${questionMode === 'meaning' ? 'bg-white/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Arti</button>
+          <button onClick={() => switchQuestionMode('reading')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${questionMode === 'reading' ? 'bg-white/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Baca</button>
+          <button onClick={() => switchQuestionMode('mixed')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${questionMode === 'mixed' ? 'bg-white/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Campur</button>
         </div>
       </div>
 
