@@ -43,6 +43,9 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
     }
     
     const wrongAnswers = new Set<string>();
+    const targetReadings = [targetKanji.onyomi, targetKanji.kunyomi].filter(Boolean);
+    const targetMeanings = targetKanji.meaning.split('/').map(m => m.trim().toLowerCase());
+
     while (wrongAnswers.size < 3) {
       const randomWrong = kanjiList[Math.floor(Math.random() * kanjiList.length)];
       if (randomWrong.id === targetKanji.id) continue;
@@ -50,12 +53,18 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       let wrongText = '';
       if (currentMode === 'kanjiToMeaning') {
         wrongText = randomWrong.meaning;
+        // Ensure the wrong meaning doesn't accidentally match the target meaning
+        const isActuallyCorrect = targetMeanings.some(m => wrongText.toLowerCase().includes(m));
+        if (isActuallyCorrect) continue;
       } else {
-        // Distractors should also be a mix of On/Kun from other kanji
         const rReadings = [];
         if (randomWrong.onyomi) rReadings.push(randomWrong.onyomi);
         if (randomWrong.kunyomi) rReadings.push(randomWrong.kunyomi);
         wrongText = rReadings.length > 0 ? rReadings[Math.floor(Math.random() * rReadings.length)] : randomWrong.meaning;
+        
+        // CRITICAL FIX: Ensure the wrong reading isn't actually a valid alternative reading for the target
+        const isActuallyCorrect = targetReadings.some(r => r === wrongText || (r && r.includes(wrongText)));
+        if (isActuallyCorrect) continue;
       }
       
       if (wrongText && wrongText !== correctAnswer) wrongAnswers.add(wrongText);
