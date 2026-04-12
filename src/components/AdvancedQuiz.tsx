@@ -260,7 +260,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
         </Card>
       </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6">
         {options.map((option, index) => {
           const isSelected = option === selectedAnswer;
           const isCorrectResponse = checkIsCorrect(option, quizState);
@@ -272,11 +272,16 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
           }
           return (
             <motion.div key={index} whileHover={(!selectedAnswer && !isLoading) ? { scale: 1.02, y: -2 } : {}} whileTap={(!selectedAnswer && !isLoading) ? { scale: 0.98 } : {}}>
-              <Button variant={btnVariant} className={`w-full h-24 text-xl font-black transition-all duration-300 border-2 rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isCorrectResponse && !isSelected ? 'border-success/50 bg-success/10' : ''}`} onClick={() => handleAnswerClick(option)} disabled={selectedAnswer !== null || isLoading}>
-                <div className="flex items-center gap-4 px-2">
-                  {selectedAnswer && isCorrectResponse && <CheckCircle2 className="w-6 h-6" />}
-                  {selectedAnswer && isSelected && !isCorrectResponse && <XCircle className="w-6 h-6 animate-shake" />}
-                  <span className="truncate max-w-[200px]">{option}</span>
+              <Button 
+                variant={btnVariant} 
+                className={`w-full h-20 sm:h-24 text-base sm:text-xl font-black transition-all duration-300 border-2 rounded-[1.25rem] sm:rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isCorrectResponse && !isSelected ? 'border-success/50 bg-success/10' : ''}`} 
+                onClick={() => handleAnswerClick(option)} 
+                disabled={selectedAnswer !== null || isLoading}
+              >
+                <div className="flex items-center gap-2 sm:gap-4 px-1 sm:px-2">
+                  {selectedAnswer && isCorrectResponse && <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 shrink-0" />}
+                  {selectedAnswer && isSelected && !isCorrectResponse && <XCircle className="w-4 h-4 sm:w-6 sm:h-6 animate-shake shrink-0" />}
+                  <span className="break-words line-clamp-2 text-center">{option}</span>
                 </div>
               </Button>
             </motion.div>
