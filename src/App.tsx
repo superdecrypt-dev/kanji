@@ -77,7 +77,7 @@ function App() {
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
               <span className="text-white font-black text-xl">漢</span>
             </div>
-            <h1 className="text-2xl font-black tracking-tighter text-primary">Kanji N4</h1>
+            <h1 className="text-2xl font-black tracking-tighter text-primary">Kanji</h1>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)} className="lg:hidden rounded-full">
             <X className="w-6 h-6" />

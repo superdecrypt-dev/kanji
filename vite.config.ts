@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Kanji Study N4',
+        name: 'Kanji',
         short_name: 'Kanji',
         description: 'Master 248 Kanji JLPT N4 - Bahasa Indonesia',
         theme_color: '#457b9d',
