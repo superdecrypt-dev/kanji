@@ -3,7 +3,7 @@ import type { Kanji } from '../data';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, BookOpen } from 'lucide-react';
+import { CheckCircle2, XCircle, BookOpen, Loader2 } from 'lucide-react';
 import { jukugoList } from '../jukugoData';
 
 interface AdvancedQuizProps {
@@ -132,12 +132,35 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', []));
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [isWrong, setIsWrong] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadNextQuestion = (type: 'kanji' | 'jukugo', currentRecent: string[]) => {
+    setQuizState(createNewQuestion(kanjiList, type, currentRecent));
+    setIsLoading(false);
+  };
 
   const handleAnswerClick = (option: string) => {
-    if (!quizState || quizState.selectedAnswer !== null || !quizState.currentWord) return;
+    if (!quizState || quizState.selectedAnswer !== null || !quizState.currentWord || isLoading) return;
 
-    let correctAnswer = quizState.mode === 'kanjiToMeaning' ? quizState.currentWord.meaning : quizState.currentWord.reading;
-    const isCorrect = option === correctAnswer;
+    let isCorrect = false;
+
+    if (quizType === 'kanji') {
+      const kanjiData = kanjiList.find(k => k.kanji === quizState.currentWord?.word);
+      if (kanjiData) {
+        if (quizState.mode === 'kanjiToMeaning') {
+          const allMeanings = kanjiData.meaning.split(/[,/]/).map(m => m.trim().toLowerCase());
+          isCorrect = allMeanings.includes(option.toLowerCase()) || option === kanjiData.meaning;
+        } else {
+          const allReadings = [kanjiData.onyomi, kanjiData.kunyomi]
+            .filter(Boolean)
+            .flatMap(r => r!.split(/[,/]/).map(s => s.trim()));
+          isCorrect = allReadings.includes(option);
+        }
+      }
+    } else {
+      const correctAnswer = quizState.mode === 'kanjiToMeaning' ? quizState.currentWord.meaning : quizState.currentWord.reading;
+      isCorrect = option === correctAnswer;
+    }
     
     setQuizState(prev => prev ? { ...prev, selectedAnswer: option } : null);
     if (!isCorrect) setIsWrong(true);
@@ -151,7 +174,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
       setIsWrong(false);
       const newRecent = [...recentWords.slice(-14), quizState.currentWord!.word];
       setRecentWords(newRecent);
-      setQuizState(createNewQuestion(kanjiList, quizType, newRecent));
+      loadNextQuestion(quizType, newRecent);
     }, 1500);
   };
 
@@ -160,13 +183,23 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
     setQuizType(newType);
     setScore({ correct: 0, total: 0 });
     setIsWrong(false);
-    setQuizState(createNewQuestion(kanjiList, newType, []));
+    setRecentWords([]);
+    loadNextQuestion(newType, []);
   };
 
   if (!quizState || !quizState.currentWord) return <div className="text-center py-20">Memuat...</div>;
 
   const { currentWord, options, mode, selectedAnswer } = quizState;
   const questionText = mode === 'kanjiToMeaning' ? `Apa arti dari ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?` : `Cara baca ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?`;
+
+  // Display value for "Correct Answer" info box
+  let infoCorrectAnswer = '';
+  if (quizType === 'kanji') {
+    const kanjiData = kanjiList.find(k => k.kanji === currentWord.word);
+    infoCorrectAnswer = mode === 'kanjiToMeaning' ? kanjiData?.meaning || '' : (kanjiData?.onyomi || kanjiData?.kunyomi || '');
+  } else {
+    infoCorrectAnswer = mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading;
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 py-4">
@@ -186,12 +219,22 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
         <Card className={`overflow-hidden border-2 transition-all duration-500 bg-glass/10 backdrop-blur-3xl shadow-2xl ${selectedAnswer ? (isWrong ? 'border-destructive ring-8 ring-destructive/10' : 'border-success ring-8 ring-success/20') : 'border-white/10'}`}>
           <CardContent className="p-16 text-center space-y-8 relative overflow-hidden min-h-[300px] flex flex-col justify-center">
             <div className={`absolute inset-0 opacity-10 transition-colors duration-500 ${selectedAnswer ? (isWrong ? 'bg-destructive' : 'bg-success') : 'bg-primary'}`} />
-            <p className="text-muted-foreground font-black uppercase tracking-[0.4em] text-[10px] opacity-60 relative z-10">{questionText}</p>
-            <div className="font-black leading-tight tracking-tighter relative z-10 text-[5rem] sm:text-[7rem] text-primary drop-shadow-2xl">{currentWord.word}</div>
-            <AnimatePresence>{isWrong && selectedAnswer && (
+            
+            {isLoading ? (
+               <div className="flex flex-col items-center justify-center space-y-4 relative z-10">
+                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
+               </div>
+            ) : (
+              <>
+                <p className="text-muted-foreground font-black uppercase tracking-[0.4em] text-[10px] opacity-60 relative z-10">{questionText}</p>
+                <div className="font-black leading-tight tracking-tighter relative z-10 text-[5rem] sm:text-[7rem] text-primary drop-shadow-2xl">{currentWord.word}</div>
+              </>
+            )}
+
+            <AnimatePresence>{isWrong && selectedAnswer && !isLoading && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-success/20 border border-success/30 p-4 rounded-2xl relative z-10">
                 <p className="text-[10px] font-black uppercase text-success tracking-widest mb-1">Jawaban Benar:</p>
-                <p className="text-xl font-black text-success">{mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading}</p>
+                <p className="text-xl font-black text-success">{infoCorrectAnswer}</p>
               </motion.div>
             )}</AnimatePresence>
           </CardContent>
@@ -200,19 +243,36 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {options.map((option, index) => {
-          const isCorrect = option === (mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading);
           const isSelected = option === selectedAnswer;
+          
+          // Re-calculate correctness for visual feedback on buttons
+          let isOptionCorrect = false;
+          if (quizType === 'kanji') {
+            const kanjiData = kanjiList.find(k => k.kanji === currentWord.word);
+            if (kanjiData) {
+              if (mode === 'kanjiToMeaning') {
+                const allMeanings = kanjiData.meaning.split(/[,/]/).map(m => m.trim().toLowerCase());
+                isOptionCorrect = allMeanings.includes(option.toLowerCase()) || option === kanjiData.meaning;
+              } else {
+                const allReadings = [kanjiData.onyomi, kanjiData.kunyomi].filter(Boolean).flatMap(r => r!.split(/[,/]/).map(s => s.trim()));
+                isOptionCorrect = allReadings.includes(option);
+              }
+            }
+          } else {
+            isOptionCorrect = option === (mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading);
+          }
+
           let btnVariant: 'outline' | 'success' | 'destructive' | 'glass' = 'glass';
           if (selectedAnswer) {
-            if (isCorrect) btnVariant = 'success';
+            if (isOptionCorrect) btnVariant = 'success';
             else if (isSelected) btnVariant = 'destructive';
           }
           return (
-            <motion.div key={index} whileHover={!selectedAnswer ? { scale: 1.02, y: -2 } : {}} whileTap={!selectedAnswer ? { scale: 0.98 } : {}}>
-              <Button variant={btnVariant} className={`w-full h-24 text-xl font-black transition-all duration-300 border-2 rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isCorrect && !isSelected ? 'border-success/50 bg-success/10' : ''}`} onClick={() => handleAnswerClick(option)} disabled={selectedAnswer !== null}>
+            <motion.div key={index} whileHover={(!selectedAnswer && !isLoading) ? { scale: 1.02, y: -2 } : {}} whileTap={(!selectedAnswer && !isLoading) ? { scale: 0.98 } : {}}>
+              <Button variant={btnVariant} className={`w-full h-24 text-xl font-black transition-all duration-300 border-2 rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isOptionCorrect && !isSelected ? 'border-success/50 bg-success/10' : ''}`} onClick={() => handleAnswerClick(option)} disabled={selectedAnswer !== null || isLoading}>
                 <div className="flex items-center gap-4 px-2">
-                  {selectedAnswer && isCorrect && <CheckCircle2 className="w-6 h-6" />}
-                  {selectedAnswer && isSelected && !isCorrect && <XCircle className="w-6 h-6 animate-shake" />}
+                  {selectedAnswer && isOptionCorrect && <CheckCircle2 className="w-6 h-6" />}
+                  {selectedAnswer && isSelected && !isOptionCorrect && <XCircle className="w-6 h-6 animate-shake" />}
                   <span className="truncate max-w-[200px]">{option}</span>
                 </div>
               </Button>
