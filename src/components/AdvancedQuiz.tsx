@@ -19,6 +19,14 @@ interface QuizState {
   selectedAnswer: string | null;
 }
 
+/**
+ * Utility to split strings like "セイ / ショウ" into ["セイ", "ショウ"]
+ */
+const splitJapaneseStr = (str: string | undefined | null): string[] => {
+  if (!str) return [];
+  return str.split(/[,/]/).map(s => s.trim()).filter(Boolean);
+};
+
 function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentWords: string[]): QuizState {
   if (type === 'kanji') {
     if (kanjiList.length === 0) return { currentWord: null, options: [], mode: 'kanjiToMeaning', selectedAnswer: null };
@@ -34,14 +42,8 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
     const modes: QuizMode[] = ['kanjiToMeaning', 'kanjiToReading'];
     const currentMode = modes[Math.floor(Math.random() * modes.length)];
     
-    // Collect ALL valid alternative readings and meanings
-    const allValidReadings = [targetKanji.onyomi, targetKanji.kunyomi]
-      .filter(Boolean)
-      .flatMap(r => r!.split(/[,/]/).map(s => s.trim()));
-    
-    const allValidMeanings = targetKanji.meaning
-      .split(/[,/]/)
-      .map(m => m.trim().toLowerCase());
+    const allValidReadings = [...splitJapaneseStr(targetKanji.onyomi), ...splitJapaneseStr(targetKanji.kunyomi)];
+    const allValidMeanings = splitJapaneseStr(targetKanji.meaning).map(m => m.toLowerCase());
 
     let correctAnswer = '';
     if (currentMode === 'kanjiToMeaning') {
@@ -50,12 +52,9 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       const availableReadings = [];
       if (targetKanji.onyomi) availableReadings.push(targetKanji.onyomi);
       if (targetKanji.kunyomi) availableReadings.push(targetKanji.kunyomi);
-      
-      if (availableReadings.length > 1) {
-        correctAnswer = availableReadings[Math.floor(Math.random() * availableReadings.length)];
-      } else {
-        correctAnswer = availableReadings[0] || targetKanji.meaning;
-      }
+      correctAnswer = availableReadings.length > 0 
+        ? availableReadings[Math.floor(Math.random() * availableReadings.length)] 
+        : (targetKanji.onyomi || targetKanji.kunyomi || targetKanji.meaning);
     }
     
     const wrongAnswers = new Set<string>();
@@ -66,10 +65,9 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
       let wrongText = '';
       if (currentMode === 'kanjiToMeaning') {
         wrongText = randomWrong.meaning;
+        // Validation for Meaning
         const isActuallyCorrect = allValidMeanings.some(m => 
-          wrongText.toLowerCase() === m || 
-          wrongText.toLowerCase().includes(m) || 
-          m.includes(wrongText.toLowerCase())
+          wrongText.toLowerCase().includes(m) || m.includes(wrongText.toLowerCase())
         );
         if (isActuallyCorrect) continue;
       } else {
@@ -78,11 +76,9 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
         if (randomWrong.kunyomi) rReadings.push(randomWrong.kunyomi);
         wrongText = rReadings.length > 0 ? rReadings[Math.floor(Math.random() * rReadings.length)] : randomWrong.meaning;
         
-        const isActuallyCorrect = allValidReadings.some(r => 
-          r === wrongText || 
-          wrongText.includes(r) || 
-          r.includes(wrongText)
-        );
+        // Validation for Reading
+        const wrongParts = splitJapaneseStr(wrongText);
+        const isActuallyCorrect = wrongParts.some(wp => allValidReadings.includes(wp));
         if (isActuallyCorrect) continue;
       }
       
@@ -98,7 +94,6 @@ function createNewQuestion(kanjiList: Kanji[], type: 'kanji' | 'jukugo', recentW
   } else {
     // Jukugo logic (Local Database)
     let targetWord = jukugoList[Math.floor(Math.random() * jukugoList.length)];
-    // Prevent immediate repeats
     let tries = 0;
     while (recentWords.includes(targetWord.word) && tries < 10) {
       targetWord = jukugoList[Math.floor(Math.random() * jukugoList.length)];
@@ -134,6 +129,28 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   const [isWrong, setIsWrong] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const checkIsCorrect = (option: string, state: QuizState): boolean => {
+    if (!state.currentWord) return false;
+    
+    if (quizType === 'kanji') {
+      const kanjiData = kanjiList.find(k => k.kanji === state.currentWord?.word);
+      if (!kanjiData) return false;
+
+      if (state.mode === 'kanjiToMeaning') {
+        const allMeanings = splitJapaneseStr(kanjiData.meaning).map(m => m.toLowerCase());
+        const optParts = splitJapaneseStr(option).map(o => o.toLowerCase());
+        return optParts.some(op => allMeanings.includes(op)) || allMeanings.includes(option.toLowerCase());
+      } else {
+        const allReadings = [...splitJapaneseStr(kanjiData.onyomi), ...splitJapaneseStr(kanjiData.kunyomi)];
+        const optParts = splitJapaneseStr(option);
+        return optParts.some(op => allReadings.includes(op)) || allReadings.includes(option);
+      }
+    } else {
+      const targetCorrect = state.mode === 'kanjiToMeaning' ? state.currentWord.meaning : state.currentWord.reading;
+      return option === targetCorrect;
+    }
+  };
+
   const loadNextQuestion = (type: 'kanji' | 'jukugo', currentRecent: string[]) => {
     setQuizState(createNewQuestion(kanjiList, type, currentRecent));
     setIsLoading(false);
@@ -142,25 +159,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   const handleAnswerClick = (option: string) => {
     if (!quizState || quizState.selectedAnswer !== null || !quizState.currentWord || isLoading) return;
 
-    let isCorrect = false;
-
-    if (quizType === 'kanji') {
-      const kanjiData = kanjiList.find(k => k.kanji === quizState.currentWord?.word);
-      if (kanjiData) {
-        if (quizState.mode === 'kanjiToMeaning') {
-          const allMeanings = kanjiData.meaning.split(/[,/]/).map(m => m.trim().toLowerCase());
-          isCorrect = allMeanings.includes(option.toLowerCase()) || option === kanjiData.meaning;
-        } else {
-          const allReadings = [kanjiData.onyomi, kanjiData.kunyomi]
-            .filter(Boolean)
-            .flatMap(r => r!.split(/[,/]/).map(s => s.trim()));
-          isCorrect = allReadings.includes(option);
-        }
-      }
-    } else {
-      const correctAnswer = quizState.mode === 'kanjiToMeaning' ? quizState.currentWord.meaning : quizState.currentWord.reading;
-      isCorrect = option === correctAnswer;
-    }
+    const isCorrect = checkIsCorrect(option, quizState);
     
     setQuizState(prev => prev ? { ...prev, selectedAnswer: option } : null);
     if (!isCorrect) setIsWrong(true);
@@ -192,11 +191,11 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   const { currentWord, options, mode, selectedAnswer } = quizState;
   const questionText = mode === 'kanjiToMeaning' ? `Apa arti dari ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?` : `Cara baca ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?`;
 
-  // Display value for "Correct Answer" info box
+  // For the info box, find the best text to show as "Correct Answer"
   let infoCorrectAnswer = '';
   if (quizType === 'kanji') {
     const kanjiData = kanjiList.find(k => k.kanji === currentWord.word);
-    infoCorrectAnswer = mode === 'kanjiToMeaning' ? kanjiData?.meaning || '' : (kanjiData?.onyomi || kanjiData?.kunyomi || '');
+    infoCorrectAnswer = mode === 'kanjiToMeaning' ? kanjiData?.meaning || '' : (kanjiData?.onyomi && kanjiData?.kunyomi ? `${kanjiData.onyomi} / ${kanjiData.kunyomi}` : (kanjiData?.onyomi || kanjiData?.kunyomi || ''));
   } else {
     infoCorrectAnswer = mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading;
   }
@@ -244,35 +243,19 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {options.map((option, index) => {
           const isSelected = option === selectedAnswer;
-          
-          // Re-calculate correctness for visual feedback on buttons
-          let isOptionCorrect = false;
-          if (quizType === 'kanji') {
-            const kanjiData = kanjiList.find(k => k.kanji === currentWord.word);
-            if (kanjiData) {
-              if (mode === 'kanjiToMeaning') {
-                const allMeanings = kanjiData.meaning.split(/[,/]/).map(m => m.trim().toLowerCase());
-                isOptionCorrect = allMeanings.includes(option.toLowerCase()) || option === kanjiData.meaning;
-              } else {
-                const allReadings = [kanjiData.onyomi, kanjiData.kunyomi].filter(Boolean).flatMap(r => r!.split(/[,/]/).map(s => s.trim()));
-                isOptionCorrect = allReadings.includes(option);
-              }
-            }
-          } else {
-            isOptionCorrect = option === (mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading);
-          }
+          const isCorrectResponse = checkIsCorrect(option, quizState);
 
           let btnVariant: 'outline' | 'success' | 'destructive' | 'glass' = 'glass';
           if (selectedAnswer) {
-            if (isOptionCorrect) btnVariant = 'success';
+            if (isCorrectResponse) btnVariant = 'success';
             else if (isSelected) btnVariant = 'destructive';
           }
           return (
             <motion.div key={index} whileHover={(!selectedAnswer && !isLoading) ? { scale: 1.02, y: -2 } : {}} whileTap={(!selectedAnswer && !isLoading) ? { scale: 0.98 } : {}}>
-              <Button variant={btnVariant} className={`w-full h-24 text-xl font-black transition-all duration-300 border-2 rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isOptionCorrect && !isSelected ? 'border-success/50 bg-success/10' : ''}`} onClick={() => handleAnswerClick(option)} disabled={selectedAnswer !== null || isLoading}>
+              <Button variant={btnVariant} className={`w-full h-24 text-xl font-black transition-all duration-300 border-2 rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isCorrectResponse && !isSelected ? 'border-success/50 bg-success/10' : ''}`} onClick={() => handleAnswerClick(option)} disabled={selectedAnswer !== null || isLoading}>
                 <div className="flex items-center gap-4 px-2">
-                  {selectedAnswer && isOptionCorrect && <CheckCircle2 className="w-6 h-6" />}
-                  {selectedAnswer && isSelected && !isOptionCorrect && <XCircle className="w-6 h-6 animate-shake" />}
+                  {selectedAnswer && isCorrectResponse && <CheckCircle2 className="w-6 h-6" />}
+                  {selectedAnswer && isSelected && !isCorrectResponse && <XCircle className="w-6 h-6 animate-shake" />}
                   <span className="truncate max-w-[200px]">{option}</span>
                 </div>
               </Button>
