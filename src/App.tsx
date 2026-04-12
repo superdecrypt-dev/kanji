@@ -14,7 +14,7 @@ type AppMode = 'aisensei' | 'flashcards' | 'quiz' | 'list';
 function App() {
   const [mode, setMode] = useState<AppMode>('list');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedLesson, setSelectedLesson] = useState<number | 'all'>('all');
+  const [selectedLessons, setSelectedLessons] = useState<number[]>([]); // Empty array means 'All'
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
@@ -31,9 +31,9 @@ function App() {
   const maxLesson = useMemo(() => Math.max(...kanjiList.map(k => k.lesson)), []);
 
   const filteredKanji = useMemo(() => {
-    if (selectedLesson === 'all') return kanjiList;
-    return kanjiList.filter(k => k.lesson === selectedLesson);
-  }, [selectedLesson]);
+    if (selectedLessons.length === 0) return kanjiList;
+    return kanjiList.filter(k => selectedLessons.includes(k.lesson));
+  }, [selectedLessons]);
 
   const handleNextCard = () => setCurrentCardIndex((prev) => (prev + 1) % filteredKanji.length);
   const handlePrevCard = () => setCurrentCardIndex((prev) => (prev - 1 + filteredKanji.length) % filteredKanji.length);
@@ -160,12 +160,12 @@ function App() {
                  <KanjiList kanjiList={kanjiList} />
               ) : (
                 <div className="space-y-10">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6 bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border-2 border-white/10 shadow-2xl">
-                    <span className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] opacity-60">Materi Pelajaran:</span>
+                  <div className="flex flex-col items-center justify-center gap-6 bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-white/10 shadow-2xl">
+                    <span className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] opacity-60">Pilih Materi Pelajaran:</span>
                     <LessonSelector 
-                      selectedLesson={selectedLesson} 
-                      onSelectLesson={(lesson) => {
-                        setSelectedLesson(lesson);
+                      selectedLessons={selectedLessons} 
+                      onSelectLessons={(lessons) => {
+                        setSelectedLessons(lessons);
                         setCurrentCardIndex(0);
                       }} 
                       maxLesson={maxLesson} 
@@ -202,7 +202,7 @@ function App() {
                       </div>
                     </div>
                   ) : (
-                    <AdvancedQuiz key={selectedLesson} kanjiList={filteredKanji} />
+                    <AdvancedQuiz key={selectedLessons.join(',')} kanjiList={filteredKanji} />
                   )}
                 </div>
               )}
