@@ -50,7 +50,7 @@ export const AudioButton: React.FC<AudioButtonProps> = ({ text, size = 18, class
       variant="ghost"
       size="icon"
       className={`h-12 w-12 rounded-2xl transition-all duration-300 ${
-        isPlaying ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/30' : 'bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20'
+        isPlaying ? 'bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/30' : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md'
       } ${className}`}
       onClick={handleSpeak}
       disabled={!isSupported}

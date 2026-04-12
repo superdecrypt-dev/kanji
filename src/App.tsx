@@ -153,7 +153,7 @@ function App() {
                 </div>
                 <div className="bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10 flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">N4 Mastery System</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">System Online</span>
                 </div>
               </div>
 
@@ -217,4 +217,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;;

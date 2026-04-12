@@ -110,7 +110,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
                   <div className="flex items-center justify-center w-20 h-20 rounded-[1.5rem] text-4xl font-black transition-all duration-500 shadow-xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3 shadow-primary/10 group-hover:shadow-primary/30">
                     {kanji.kanji}
                   </div>
-                  <AudioButton text={kanji.kanji} size={16} className="h-10 w-10 bg-white/5 border-none" />
+                  <AudioButton text={kanji.kanji} size={16} className="h-10 w-10 shadow-md" />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col">
                   <div className="flex justify-between items-start mb-3">
