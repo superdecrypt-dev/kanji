@@ -130,7 +130,7 @@ function App() {
           </Button>
         </header>
 
-        <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 relative z-10">
+        <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 sm:px-6 sm:py-10 relative z-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={mode}
