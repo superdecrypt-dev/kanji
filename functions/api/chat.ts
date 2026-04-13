@@ -30,7 +30,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     formattedMessages.push({ role: 'user', content: finalMessageContent });
 
     // Memanggil model Qwen 2.5 7B Instruct dari Cloudflare AI
-    const response = await env.AI.run('@cf/openai/gpt-oss-20b', {
+    const response = await env.AI.run('@cf/meta/llama-4-scout-17b-16e-instruct', {
       messages: formattedMessages
     });
 
