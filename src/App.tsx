@@ -4,12 +4,11 @@ import Flashcard from './components/Flashcard';
 import AdvancedQuiz from './components/AdvancedQuiz';
 import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
-import AiSensei from './components/AiSensei';
-import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight, Bot } from 'lucide-react';
+import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppMode = 'aisensei' | 'flashcards' | 'quiz' | 'list';
+type AppMode = 'flashcards' | 'quiz' | 'list';
 
 function App() {
   const [mode, setMode] = useState<AppMode>('list');
@@ -41,7 +40,6 @@ function App() {
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   const navItems = [
-    { id: 'aisensei', label: 'AI Sensei', icon: Bot },
     { id: 'list', label: 'Daftar Kanji', icon: List },
     { id: 'flashcards', label: 'Flashcards', icon: Layers },
     { id: 'quiz', label: 'Latihan Kuis', icon: PlayCircle },
@@ -154,9 +152,7 @@ function App() {
                 </div>
               </div>
 
-              {mode === 'aisensei' ? (
-                <AiSensei />
-              ) : mode === 'list' ? (
+              {mode === 'list' ? (
                  <KanjiList kanjiList={kanjiList} />
               ) : (
                 <div className="space-y-10">
