@@ -4,11 +4,13 @@ import Flashcard from './components/Flashcard';
 import AdvancedQuiz from './components/AdvancedQuiz';
 import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
-import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight } from 'lucide-react';
+import TypingQuiz from './components/TypingQuiz';
+import SentenceQuiz from './components/SentenceQuiz';
+import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight, Keyboard, FileText } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppMode = 'flashcards' | 'quiz' | 'list';
+type AppMode = 'flashcards' | 'quiz' | 'typing' | 'sentences' | 'list';
 
 function App() {
   const [mode, setMode] = useState<AppMode>('list');
@@ -43,6 +45,8 @@ function App() {
     { id: 'list', label: 'Daftar Kanji', icon: List },
     { id: 'flashcards', label: 'Flashcards', icon: Layers },
     { id: 'quiz', label: 'Latihan Kuis', icon: PlayCircle },
+    { id: 'typing', label: 'Kuis Ketik', icon: Keyboard },
+    { id: 'sentences', label: 'Kalimat Rumpang', icon: FileText },
   ];
 
   return (
@@ -154,6 +158,10 @@ function App() {
 
               {mode === 'list' ? (
                  <KanjiList kanjiList={kanjiList} />
+              ) : mode === 'typing' ? (
+                 <TypingQuiz kanjiList={kanjiList} />
+              ) : mode === 'sentences' ? (
+                 <SentenceQuiz />
               ) : (
                 <div className="space-y-10">
                   <div className="flex flex-col items-center justify-center gap-6 bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-white/10 shadow-2xl">
