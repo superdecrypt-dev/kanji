@@ -58,7 +58,7 @@ const AiSensei: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-14rem)] max-w-xl mx-auto space-y-6">
+    <div className="flex flex-col h-[calc(100vh-14rem)] max-w-4xl mx-auto space-y-6">
       <Card className="flex-1 overflow-hidden bg-white/5 backdrop-blur-xl border-2 border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col">
         <CardContent className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar">
           <AnimatePresence initial={false}>
