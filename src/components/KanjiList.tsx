@@ -53,18 +53,18 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const displayedItems = useMemo(() => filteredList.slice(0, displayLimit), [filteredList, displayLimit]);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       {/* Premium Glass Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-6 bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border-2 border-white/10 shadow-2xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-4 sm:gap-6 bg-white/5 backdrop-blur-3xl p-5 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border-2 border-white/10 shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
         
         {/* Search Input */}
         <div className="relative flex-[2] group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary w-5 h-5 transition-transform group-focus-within:scale-110" />
+          <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary w-5 h-5 transition-transform group-focus-within:scale-110" />
           <input 
             type="text" 
-            placeholder="Cari kanji, arti, atau romaji..." 
-            className="w-full pl-14 pr-6 py-4 bg-white/5 border-2 border-white/10 rounded-2xl focus:border-primary/40 focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/40 font-bold text-sm uppercase tracking-wider"
+            placeholder="Cari kanji, arti..." 
+            className="w-full pl-12 sm:pl-14 pr-6 py-3 sm:py-4 bg-white/5 border-2 border-white/10 rounded-2xl focus:border-primary/40 focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/40 font-bold text-sm uppercase tracking-wider"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -72,11 +72,11 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
 
         {/* Filter Dropdown */}
         <div className="relative flex-1 group">
-          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-primary pointer-events-none transition-transform group-hover:scale-110">
+          <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary pointer-events-none transition-transform group-hover:scale-110">
             <Filter size={18} />
           </div>
           <select 
-            className="w-full pl-14 pr-12 py-4 bg-white/5 border-2 border-white/10 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 cursor-pointer appearance-none font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-white/10 text-foreground"
+            className="w-full pl-12 sm:pl-14 pr-12 py-3 sm:py-4 bg-white/5 border-2 border-white/10 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 cursor-pointer appearance-none font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-white/10 text-foreground"
             value={lessonFilter} 
             onChange={(e) => {
               const val = e.target.value;
@@ -88,13 +88,13 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
               <option key={l} value={l} className="bg-background text-foreground text-xs font-bold">Lesson {l}</option>
             ))}
           </select>
-          <div className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors">
+          <div className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors">
             <ChevronDown size={18} />
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {displayedItems.map((kanji) => (
           <motion.div
             key={kanji.id}
@@ -104,9 +104,9 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
             style={{ willChange: 'opacity, transform' }}
           >
             <Card className="group overflow-hidden border-white/10 h-full hover:scale-[1.02] transition-all duration-500">
-              <CardContent className="p-8 flex gap-6">
+              <CardContent className="p-5 sm:p-8 flex gap-4 sm:gap-6">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="flex items-center justify-center w-20 h-20 rounded-[1.5rem] text-4xl font-black transition-all duration-500 shadow-xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3 shadow-primary/10 group-hover:shadow-primary/30">
+                  <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-[1.5rem] text-3xl sm:text-4xl font-black transition-all duration-500 shadow-xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3 shadow-primary/10 group-hover:shadow-primary/30">
                     {kanji.kanji}
                   </div>
                 </div>

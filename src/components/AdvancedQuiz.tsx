@@ -236,24 +236,24 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
       
       <motion.div key={currentWord.word + mode} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <Card className={`overflow-hidden border-2 transition-all duration-500 bg-glass/10 backdrop-blur-3xl shadow-2xl ${selectedAnswer ? (isWrong ? 'border-destructive ring-8 ring-destructive/10' : 'border-success ring-8 ring-success/20') : 'border-white/10'}`}>
-          <CardContent className="p-16 text-center space-y-8 relative overflow-hidden min-h-[300px] flex flex-col justify-center">
+          <CardContent className="p-8 sm:p-12 lg:p-16 text-center space-y-6 sm:space-y-8 relative overflow-hidden min-h-[200px] sm:min-h-[300px] flex flex-col justify-center">
             <div className={`absolute inset-0 opacity-10 transition-colors duration-500 ${selectedAnswer ? (isWrong ? 'bg-destructive' : 'bg-success') : 'bg-primary'}`} />
             
             {isLoading ? (
                <div className="flex flex-col items-center justify-center space-y-4 relative z-10">
-                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                 <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-primary animate-spin" />
                </div>
             ) : (
               <>
-                <p className="text-muted-foreground font-black uppercase tracking-[0.4em] text-[10px] opacity-60 relative z-10">{questionText}</p>
-                <div className="font-black leading-tight tracking-tighter relative z-10 text-[5rem] sm:text-[7rem] text-primary drop-shadow-2xl">{currentWord.word}</div>
+                <p className="text-muted-foreground font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-[8px] sm:text-[10px] opacity-60 relative z-10">{questionText}</p>
+                <div className="font-black leading-tight tracking-tighter relative z-10 text-[4rem] sm:text-[7rem] text-primary drop-shadow-2xl">{currentWord.word}</div>
               </>
             )}
 
             <AnimatePresence>{isWrong && selectedAnswer && !isLoading && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-success/20 border border-success/30 p-4 rounded-2xl relative z-10">
-                <p className="text-[10px] font-black uppercase text-success tracking-widest mb-1">Jawaban Benar:</p>
-                <p className="text-xl font-black text-success">{infoCorrectAnswer}</p>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-success/20 border border-success/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative z-10">
+                <p className="text-[8px] sm:text-[10px] font-black uppercase text-success tracking-widest mb-1">Jawaban Benar:</p>
+                <p className="text-lg sm:text-xl font-black text-success">{infoCorrectAnswer}</p>
               </motion.div>
             )}</AnimatePresence>
           </CardContent>
