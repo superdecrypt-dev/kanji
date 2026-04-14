@@ -97,15 +97,17 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
                 </h4>
                 <div className="mt-1.5 space-y-1">
                   {kanji.kunyomi && (
-                    <div className="flex items-baseline gap-1.5">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
                       <span className="text-[9px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider">Kun</span>
-                      <span className="text-xs font-medium text-muted-foreground truncate font-jp">{kanji.kunyomi}</span>
+                      <span className="text-xs font-medium text-muted-foreground font-jp">{kanji.kunyomi}</span>
+                      {kanji.kunyomi_romaji && <span className="text-[10px] text-muted-foreground/60 italic">({kanji.kunyomi_romaji})</span>}
                     </div>
                   )}
                   {kanji.onyomi && (
-                    <div className="flex items-baseline gap-1.5">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
                       <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">On</span>
-                      <span className="text-xs font-medium text-muted-foreground truncate font-jp">{kanji.onyomi}</span>
+                      <span className="text-xs font-medium text-muted-foreground font-jp">{kanji.onyomi}</span>
+                      {kanji.onyomi_romaji && <span className="text-[10px] text-muted-foreground/60 italic">({kanji.onyomi_romaji})</span>}
                     </div>
                   )}
                 </div>
