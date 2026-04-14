@@ -100,6 +100,7 @@ function App() {
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             <span>{theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}</span>
           </button>
+          <p className="text-[10px] text-muted-foreground/40 text-center mt-4">Made with ❤️ by Sigit Dwilaksono</p>
         </div>
       </aside>
 
@@ -246,6 +247,7 @@ function App() {
             </motion.div>
           </AnimatePresence>
         </main>
+        <p className="md:hidden text-[10px] text-muted-foreground/40 text-center py-4">Made with ❤️ by Sigit Dwilaksono</p>
       </div>
 
       {/* Mobile Bottom Navigation */}
