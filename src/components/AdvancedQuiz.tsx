@@ -3,9 +3,13 @@ import type { Kanji } from '../data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, BookOpen } from 'lucide-react';
 import { jukugoList } from '../jukugoData';
+import { pickAdaptiveKanji } from '../hooks/useProgress';
+import type { KanjiProgress } from '../hooks/useProgress';
 
 interface AdvancedQuizProps {
   kanjiList: Kanji[];
+  progress: Record<number, KanjiProgress>;
+  onAnswer: (kanjiId: number, isCorrect: boolean) => void;
 }
 
 type QuizType = 'kanji' | 'jukugo';
@@ -24,15 +28,23 @@ const splitJapaneseStr = (str: string | undefined | null): string[] => {
   return str.split(/[,/]/).map(s => s.trim()).filter(Boolean);
 };
 
-function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: string[], questionMode: QuestionMode = 'mixed'): QuizState {
+function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: string[], questionMode: QuestionMode = 'mixed', progressData?: Record<number, KanjiProgress>): QuizState {
   if (type === 'kanji') {
     if (kanjiList.length === 0) return { currentWord: null, options: [], mode: 'kanjiToMeaning', selectedAnswer: null };
     
-    let targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
-    let tries = 0;
-    while (recentWords.includes(targetKanji.kanji) && tries < 15 && kanjiList.length > 1) {
+    // Use adaptive selection if progress data available
+    const recentIds = kanjiList.filter(k => recentWords.includes(k.kanji)).map(k => k.id);
+    let targetKanji: Kanji;
+    if (progressData && Object.keys(progressData).length > 0) {
+      const picked = pickAdaptiveKanji(kanjiList, progressData, recentIds, 1);
+      targetKanji = picked[0] || kanjiList[Math.floor(Math.random() * kanjiList.length)];
+    } else {
       targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
-      tries++;
+      let tries = 0;
+      while (recentWords.includes(targetKanji.kanji) && tries < 15 && kanjiList.length > 1) {
+        targetKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+        tries++;
+      }
     }
 
     let currentMode: QuizMode;
@@ -111,11 +123,11 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
   }
 }
 
-const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
+const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progressData, onAnswer }) => {
   const [quizType, setQuizType] = useState<QuizType>('kanji');
   const [questionMode, setQuestionMode] = useState<QuestionMode>('mixed');
   const [recentWords, setRecentWords] = useState<string[]>([]);
-  const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', [], 'mixed'));
+  const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', [], 'mixed', progressData));
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [isWrong, setIsWrong] = useState(false);
 
@@ -140,7 +152,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   };
 
   const loadNextQuestion = (type: QuizType, currentRecent: string[], qMode: QuestionMode) => {
-    setQuizState(createNewQuestion(kanjiList, type, currentRecent, qMode));
+    setQuizState(createNewQuestion(kanjiList, type, currentRecent, qMode, progressData));
   };
 
   const handleAnswerClick = (option: string) => {
@@ -149,6 +161,13 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
     setQuizState(prev => prev ? { ...prev, selectedAnswer: option } : null);
     if (!isCorrect) setIsWrong(true);
     setScore(prev => ({ total: prev.total + 1, correct: prev.correct + (isCorrect ? 1 : 0) }));
+
+    // Record progress for kanji type
+    if (quizType === 'kanji') {
+      const kanjiData = kanjiList.find(k => k.kanji === quizState.currentWord?.word);
+      if (kanjiData) onAnswer(kanjiData.id, isCorrect);
+    }
+
     setTimeout(() => {
       setIsWrong(false);
       const newRecent = [...recentWords.slice(-14), quizState.currentWord!.word];
