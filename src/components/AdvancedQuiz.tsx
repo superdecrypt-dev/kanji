@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import type { Kanji } from '../data';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, BookOpen, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, BookOpen } from 'lucide-react';
 import { jukugoList } from '../jukugoData';
 
 interface AdvancedQuizProps {
@@ -38,13 +36,9 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     }
 
     let currentMode: QuizMode;
-    if (questionMode === 'meaning') {
-      currentMode = 'kanjiToMeaning';
-    } else if (questionMode === 'reading') {
-      currentMode = 'kanjiToReading';
-    } else {
-      currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
-    }
+    if (questionMode === 'meaning') currentMode = 'kanjiToMeaning';
+    else if (questionMode === 'reading') currentMode = 'kanjiToReading';
+    else currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
     
     const allValidReadings = [...splitJapaneseStr(targetKanji.onyomi), ...splitJapaneseStr(targetKanji.kunyomi)];
     const allValidMeanings = splitJapaneseStr(targetKanji.meaning).map(m => m.toLowerCase());
@@ -65,13 +59,10 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     while (wrongAnswers.size < 3) {
       const randomWrong = kanjiList[Math.floor(Math.random() * kanjiList.length)];
       if (randomWrong.id === targetKanji.id) continue;
-      
       let wrongText = '';
       if (currentMode === 'kanjiToMeaning') {
         wrongText = randomWrong.meaning;
-        const isActuallyCorrect = allValidMeanings.some(m => 
-          wrongText.toLowerCase().includes(m) || m.includes(wrongText.toLowerCase())
-        );
+        const isActuallyCorrect = allValidMeanings.some(m => wrongText.toLowerCase().includes(m) || m.includes(wrongText.toLowerCase()));
         if (isActuallyCorrect) continue;
       } else {
         const rReadings = [...splitJapaneseStr(randomWrong.onyomi), ...splitJapaneseStr(randomWrong.kunyomi)];
@@ -80,7 +71,6 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
         const isActuallyCorrect = wrongParts.some(wp => allValidReadings.includes(wp));
         if (isActuallyCorrect) continue;
       }
-      
       if (wrongText && wrongText !== correctAnswer) wrongAnswers.add(wrongText);
     }
     const allOptions = [correctAnswer, ...Array.from(wrongAnswers)].sort(() => Math.random() - 0.5);
@@ -99,16 +89,11 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     }
 
     let currentMode: QuizMode;
-    if (questionMode === 'meaning') {
-      currentMode = 'kanjiToMeaning';
-    } else if (questionMode === 'reading') {
-      currentMode = 'kanjiToReading';
-    } else {
-      currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
-    }
+    if (questionMode === 'meaning') currentMode = 'kanjiToMeaning';
+    else if (questionMode === 'reading') currentMode = 'kanjiToReading';
+    else currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
     
     let correctAnswer = currentMode === 'kanjiToMeaning' ? targetWord.meaning : targetWord.reading;
-
     const wrongAnswers = new Set<string>();
     while (wrongAnswers.size < 3) {
       const randomWrong = jukugoList[Math.floor(Math.random() * jukugoList.length)];
@@ -133,15 +118,12 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', [], 'mixed'));
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [isWrong, setIsWrong] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const checkIsCorrect = (option: string, state: QuizState): boolean => {
     if (!state.currentWord) return false;
-    
     if (quizType === 'kanji') {
       const kanjiData = kanjiList.find(k => k.kanji === state.currentWord?.word);
       if (!kanjiData) return false;
-
       if (state.mode === 'kanjiToMeaning') {
         const allMeanings = splitJapaneseStr(kanjiData.meaning).map(m => m.toLowerCase());
         const optParts = splitJapaneseStr(option).map(o => o.toLowerCase());
@@ -159,22 +141,14 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
 
   const loadNextQuestion = (type: QuizType, currentRecent: string[], qMode: QuestionMode) => {
     setQuizState(createNewQuestion(kanjiList, type, currentRecent, qMode));
-    setIsLoading(false);
   };
 
   const handleAnswerClick = (option: string) => {
-    if (!quizState || quizState.selectedAnswer !== null || !quizState.currentWord || isLoading) return;
-
+    if (!quizState || quizState.selectedAnswer !== null || !quizState.currentWord) return;
     const isCorrect = checkIsCorrect(option, quizState);
-    
     setQuizState(prev => prev ? { ...prev, selectedAnswer: option } : null);
     if (!isCorrect) setIsWrong(true);
-    
-    setScore(prev => ({
-      total: prev.total + 1,
-      correct: prev.correct + (isCorrect ? 1 : 0)
-    }));
-
+    setScore(prev => ({ total: prev.total + 1, correct: prev.correct + (isCorrect ? 1 : 0) }));
     setTimeout(() => {
       setIsWrong(false);
       const newRecent = [...recentWords.slice(-14), quizState.currentWord!.word];
@@ -201,10 +175,10 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
     loadNextQuestion(quizType, [], newMode);
   };
 
-  if (!quizState || !quizState.currentWord) return <div className="text-center py-20">Memuat...</div>;
+  if (!quizState || !quizState.currentWord) return <div className="text-center py-16 text-muted-foreground font-bold">Memuat...</div>;
 
   const { currentWord, options, mode, selectedAnswer } = quizState;
-  const questionText = mode === 'kanjiToMeaning' ? `Apa arti dari ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?` : `Cara baca ${quizType === 'kanji' ? 'Kanji' : 'Kosakata'} ini?`;
+  const questionText = mode === 'kanjiToMeaning' ? `Apa arti dari ${quizType === 'kanji' ? 'Kanji' : 'kata'} ini?` : `Cara baca ${quizType === 'kanji' ? 'Kanji' : 'kata'} ini?`;
 
   let infoCorrectAnswer = '';
   if (quizType === 'kanji') {
@@ -215,76 +189,118 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 py-4">
-      <div className="flex flex-col gap-4 items-center mb-6">
-        <div className="flex p-1.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
-          <button onClick={() => switchQuizType('kanji')} className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${quizType === 'kanji' ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}>Kuis Kanji</button>
-          <button onClick={() => switchQuizType('jukugo')} className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${quizType === 'jukugo' ? 'bg-primary text-white shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}><BookOpen size={14} /> Jukugo (250+)</button>
+    <div className="space-y-5 md:space-y-6" data-testid="advanced-quiz">
+      {/* Quiz Type & Mode Toggles */}
+      <div className="flex flex-col gap-3 items-center">
+        <div className="flex p-1 bg-secondary rounded-xl border border-border" data-testid="quiz-type-selector">
+          <button 
+            data-testid="quiz-type-kanji"
+            onClick={() => switchQuizType('kanji')} 
+            className={`px-4 md:px-6 py-2 rounded-lg text-xs font-bold transition-all ${quizType === 'kanji' ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            Kanji
+          </button>
+          <button 
+            data-testid="quiz-type-jukugo"
+            onClick={() => switchQuizType('jukugo')} 
+            className={`px-4 md:px-6 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${quizType === 'jukugo' ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <BookOpen size={13} /> Jukugo
+          </button>
         </div>
 
-        <div className="flex p-1 bg-white/5 backdrop-blur-md border border-white/5 rounded-xl">
-          <button onClick={() => switchQuestionMode('meaning')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${questionMode === 'meaning' ? 'bg-white/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Arti</button>
-          <button onClick={() => switchQuestionMode('reading')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${questionMode === 'reading' ? 'bg-white/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Baca</button>
-          <button onClick={() => switchQuestionMode('mixed')} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${questionMode === 'mixed' ? 'bg-white/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}>Campur</button>
+        <div className="flex p-1 bg-secondary rounded-lg border border-border" data-testid="question-mode-selector">
+          {(['meaning', 'reading', 'mixed'] as QuestionMode[]).map(m => (
+            <button 
+              key={m}
+              data-testid={`mode-${m}`}
+              onClick={() => switchQuestionMode(m)} 
+              className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${questionMode === m ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              {m === 'meaning' ? 'Arti' : m === 'reading' ? 'Baca' : 'Campur'}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="flex justify-between items-center px-6 bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl">
-        <div className="text-primary font-black text-sm uppercase tracking-widest">Skor: <span className="text-xl ml-2">{score.correct} / {score.total}</span></div>
-        <div className="text-muted-foreground text-xs font-black uppercase tracking-widest opacity-60">Akurasi: {Math.round((score.correct / (score.total || 1)) * 100)}%</div>
+      {/* Score */}
+      <div className="flex justify-between items-center px-4 py-3 bg-card border border-border rounded-xl" data-testid="quiz-score">
+        <div className="text-sm font-bold text-foreground">
+          Skor: <span className="text-lg ml-1 text-primary">{score.correct}</span><span className="text-muted-foreground">/{score.total}</span>
+        </div>
+        <div className="text-xs font-bold text-muted-foreground">
+          {Math.round((score.correct / (score.total || 1)) * 100)}% benar
+        </div>
       </div>
       
-      <motion.div key={currentWord.word + mode} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className={`overflow-hidden border-2 transition-all duration-500 bg-glass/10 backdrop-blur-3xl shadow-2xl ${selectedAnswer ? (isWrong ? 'border-destructive ring-8 ring-destructive/10' : 'border-success ring-8 ring-success/20') : 'border-white/10'}`}>
-          <CardContent className="p-8 sm:p-12 lg:p-16 text-center space-y-6 sm:space-y-8 relative overflow-hidden min-h-[200px] sm:min-h-[300px] flex flex-col justify-center">
-            <div className={`absolute inset-0 opacity-10 transition-colors duration-500 ${selectedAnswer ? (isWrong ? 'bg-destructive' : 'bg-success') : 'bg-primary'}`} />
-            
-            {isLoading ? (
-               <div className="flex flex-col items-center justify-center space-y-4 relative z-10">
-                 <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-primary animate-spin" />
-               </div>
-            ) : (
-              <>
-                <p className="text-muted-foreground font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-[8px] sm:text-[10px] opacity-60 relative z-10">{questionText}</p>
-                <div className="font-black leading-tight tracking-tighter relative z-10 text-[4rem] sm:text-[7rem] text-primary drop-shadow-2xl">{currentWord.word}</div>
-              </>
-            )}
+      {/* Question Card */}
+      <motion.div key={currentWord.word + mode} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+        <div className={`bg-card border-2 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-12 text-center transition-all duration-300 ${
+          selectedAnswer ? (isWrong ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : 'border-green-500 bg-green-50 dark:bg-green-950/20') : 'border-border'
+        }`} data-testid="quiz-question-card">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">{questionText}</p>
+          <motion.div 
+            animate={isWrong && selectedAnswer ? { x: [-8, 8, -8, 8, 0] } : {}}
+            transition={{ duration: 0.4 }}
+            className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary leading-none font-jp"
+            data-testid="quiz-kanji-display"
+          >
+            {currentWord.word}
+          </motion.div>
 
-            <AnimatePresence>{isWrong && selectedAnswer && !isLoading && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-success/20 border border-success/30 p-3 sm:p-4 rounded-xl sm:rounded-2xl relative z-10">
-                <p className="text-[8px] sm:text-[10px] font-black uppercase text-success tracking-widest mb-1">Jawaban Benar:</p>
-                <p className="text-lg sm:text-xl font-black text-success">{infoCorrectAnswer}</p>
+          <AnimatePresence>
+            {isWrong && selectedAnswer && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 p-3 rounded-xl"
+                data-testid="correct-answer-reveal"
+              >
+                <p className="text-[10px] font-bold uppercase text-green-700 dark:text-green-400 tracking-widest mb-1">Jawaban Benar</p>
+                <p className="text-lg font-bold text-green-900 dark:text-green-300 font-jp">{infoCorrectAnswer}</p>
               </motion.div>
-            )}</AnimatePresence>
-          </CardContent>
-        </Card>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-6">
+      {/* Answer Options */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-3" data-testid="quiz-options">
         {options.map((option, index) => {
           const isSelected = option === selectedAnswer;
-          const isCorrectResponse = checkIsCorrect(option, quizState);
-
-          let btnVariant: 'outline' | 'success' | 'destructive' | 'glass' = 'glass';
+          const isCorrectOption = checkIsCorrect(option, quizState);
+          
+          let borderColor = 'border-border';
+          let bgColor = 'bg-card hover:border-foreground/20';
+          let textColor = 'text-foreground';
+          
           if (selectedAnswer) {
-            if (isCorrectResponse) btnVariant = 'success';
-            else if (isSelected) btnVariant = 'destructive';
+            if (isCorrectOption) {
+              borderColor = 'border-green-500';
+              bgColor = 'bg-green-50 dark:bg-green-950/30';
+              textColor = 'text-green-900 dark:text-green-300';
+            } else if (isSelected) {
+              borderColor = 'border-red-500';
+              bgColor = 'bg-red-50 dark:bg-red-950/30';
+              textColor = 'text-red-900 dark:text-red-300';
+            } else {
+              bgColor = 'bg-card opacity-50';
+            }
           }
+
           return (
-            <motion.div key={index} whileHover={(!selectedAnswer && !isLoading) ? { scale: 1.02, y: -2 } : {}} whileTap={(!selectedAnswer && !isLoading) ? { scale: 0.98 } : {}}>
-              <Button 
-                variant={btnVariant} 
-                className={`w-full h-20 sm:h-24 text-base sm:text-xl font-black transition-all duration-300 border-2 rounded-[1.25rem] sm:rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isCorrectResponse && !isSelected ? 'border-success/50 bg-success/10' : ''}`} 
-                onClick={() => handleAnswerClick(option)} 
-                disabled={selectedAnswer !== null || isLoading}
-              >
-                <div className="flex items-center gap-2 sm:gap-4 px-1 sm:px-2">
-                  {selectedAnswer && isCorrectResponse && <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 shrink-0" />}
-                  {selectedAnswer && isSelected && !isCorrectResponse && <XCircle className="w-4 h-4 sm:w-6 sm:h-6 animate-shake shrink-0" />}
-                  <span className="break-words line-clamp-2 text-center">{option}</span>
-                </div>
-              </Button>
-            </motion.div>
+            <motion.button 
+              key={index}
+              data-testid={`quiz-option-${index}`}
+              whileTap={!selectedAnswer ? { scale: 0.98 } : {}}
+              className={`w-full text-left p-4 md:p-5 rounded-xl border-2 transition-all duration-200 flex items-center gap-3 ${borderColor} ${bgColor} ${textColor} ${!selectedAnswer ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+              onClick={() => handleAnswerClick(option)} 
+              disabled={selectedAnswer !== null}
+            >
+              {selectedAnswer && isCorrectOption && <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />}
+              {selectedAnswer && isSelected && !isCorrectOption && <XCircle className="w-5 h-5 text-red-600 shrink-0 animate-shake" />}
+              <span className="font-bold text-sm md:text-base break-words font-jp">{option}</span>
+            </motion.button>
           );
         })}
       </div>

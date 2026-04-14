@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, FileText } from 'lucide-react';
 import { sentenceList } from '../sentenceData';
@@ -16,112 +14,109 @@ const SentenceQuiz: React.FC = () => {
   const loadNewQuestion = () => {
     if (sentenceList.length === 0) return;
     const randomSentence = sentenceList[Math.floor(Math.random() * sentenceList.length)];
-    
-    // Pick 3 random wrong options
     const shuffledWrong = [...randomSentence.wrongOptions].sort(() => Math.random() - 0.5).slice(0, 3);
     const allOptions = [randomSentence.target, ...shuffledWrong].sort(() => Math.random() - 0.5);
-    
     setCurrentSentence(randomSentence);
     setOptions(allOptions);
     setSelectedAnswer(null);
     setIsWrong(false);
   };
 
-  useEffect(() => {
-    loadNewQuestion();
-  }, []);
+  useEffect(() => { loadNewQuestion(); }, []);
 
   const handleAnswerClick = (option: string) => {
     if (selectedAnswer !== null || !currentSentence) return;
-
     const isCorrect = option === currentSentence.target;
     setSelectedAnswer(option);
-    
-    if (!isCorrect) {
-      setIsWrong(true);
-    }
-    
-    setScore(prev => ({
-      total: prev.total + 1,
-      correct: prev.correct + (isCorrect ? 1 : 0)
-    }));
-
-    setTimeout(() => {
-      loadNewQuestion();
-    }, 2000);
+    if (!isCorrect) setIsWrong(true);
+    setScore(prev => ({ total: prev.total + 1, correct: prev.correct + (isCorrect ? 1 : 0) }));
+    setTimeout(() => loadNewQuestion(), 2000);
   };
 
-  if (!currentSentence) return <div className="text-center py-20">Memuat...</div>;
+  if (!currentSentence) return <div className="text-center py-16 text-muted-foreground font-bold">Memuat...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 py-4">
-      <div className="flex justify-between items-center px-6 bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl">
-        <div className="flex items-center gap-2 text-primary font-black text-sm uppercase tracking-widest">
-          <FileText size={18} /> Kalimat Rumpang
+    <div className="max-w-2xl mx-auto space-y-5 md:space-y-6" data-testid="sentence-quiz">
+      {/* Score Bar */}
+      <div className="flex justify-between items-center px-4 py-3 bg-card border border-border rounded-xl" data-testid="sentence-quiz-score">
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          <FileText size={16} className="text-primary" />
+          <span>Kalimat Rumpang</span>
         </div>
-        <div className="text-primary font-black text-sm uppercase tracking-widest">
-          Skor: <span className="text-xl ml-2">{score.correct} / {score.total}</span>
+        <div className="text-sm font-bold text-foreground">
+          <span className="text-primary">{score.correct}</span><span className="text-muted-foreground">/{score.total}</span>
         </div>
       </div>
 
-      <motion.div key={currentSentence.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className={`overflow-hidden border-2 transition-all duration-500 bg-glass/10 backdrop-blur-3xl shadow-2xl ${selectedAnswer ? (isWrong ? 'border-destructive ring-8 ring-destructive/10' : 'border-success ring-8 ring-success/20') : 'border-white/10'}`}>
-          <CardContent className="p-8 sm:p-12 text-center space-y-8 relative overflow-hidden min-h-[300px] flex flex-col justify-center">
-            <div className={`absolute inset-0 opacity-10 transition-colors duration-500 ${selectedAnswer ? (isWrong ? 'bg-destructive' : 'bg-success') : 'bg-primary'}`} />
-            
-            <p className="text-muted-foreground font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-[10px] opacity-60 relative z-10">Lengkapi Kalimat</p>
-            
-            <motion.div 
-              animate={isWrong ? { x: [-10, 10, -10, 10, 0] } : {}}
-              className="font-black leading-relaxed tracking-tighter relative z-10 text-3xl sm:text-4xl text-primary drop-shadow-2xl"
-            >
-              {currentSentence.sentence}
-            </motion.div>
+      {/* Sentence Card */}
+      <motion.div key={currentSentence.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+        <div className={`bg-card border-2 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 text-center transition-all duration-300 ${
+          selectedAnswer ? (isWrong ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : 'border-green-500 bg-green-50 dark:bg-green-950/20') : 'border-border'
+        }`} data-testid="sentence-question-card">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Lengkapi Kalimat</p>
+          
+          <motion.p 
+            animate={isWrong && selectedAnswer ? { x: [-8, 8, -8, 8, 0] } : {}}
+            className="text-xl sm:text-2xl md:text-3xl font-bold leading-relaxed text-foreground font-jp"
+            data-testid="sentence-display"
+          >
+            {currentSentence.sentence}
+          </motion.p>
 
-            {selectedAnswer && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-muted-foreground font-medium italic relative z-10 text-sm sm:text-base">
-                "{currentSentence.translation}"
+          {selectedAnswer && (
+            <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-muted-foreground italic mt-4" data-testid="sentence-translation">
+              "{currentSentence.translation}"
+            </motion.p>
+          )}
+
+          <AnimatePresence>
+            {isWrong && selectedAnswer && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 p-3 rounded-xl" data-testid="sentence-correct-answer">
+                <p className="text-[10px] font-bold uppercase text-green-700 dark:text-green-400 tracking-widest mb-1">Jawaban Benar</p>
+                <p className="text-lg font-bold text-green-900 dark:text-green-300 font-jp">{currentSentence.target}</p>
               </motion.div>
             )}
-
-            <AnimatePresence>
-              {isWrong && selectedAnswer && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-destructive/20 border border-destructive/30 p-4 rounded-xl relative z-10">
-                  <p className="text-[10px] font-black uppercase text-destructive tracking-widest mb-1">Jawaban Benar:</p>
-                  <p className="text-xl font-black text-destructive">{currentSentence.target}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </CardContent>
-        </Card>
+          </AnimatePresence>
+        </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-6">
+      {/* Answer Options */}
+      <div className="grid grid-cols-2 gap-2.5 md:gap-3" data-testid="sentence-options">
         {options.map((option, index) => {
           const isSelected = option === selectedAnswer;
           const isCorrect = option === currentSentence.target;
 
-          let btnVariant: 'outline' | 'success' | 'destructive' | 'glass' = 'glass';
+          let borderColor = 'border-border';
+          let bgColor = 'bg-card hover:border-foreground/20';
+          let textColor = 'text-foreground';
+          
           if (selectedAnswer) {
-            if (isCorrect) btnVariant = 'success';
-            else if (isSelected) btnVariant = 'destructive';
+            if (isCorrect) {
+              borderColor = 'border-green-500';
+              bgColor = 'bg-green-50 dark:bg-green-950/30';
+              textColor = 'text-green-900 dark:text-green-300';
+            } else if (isSelected) {
+              borderColor = 'border-red-500';
+              bgColor = 'bg-red-50 dark:bg-red-950/30';
+              textColor = 'text-red-900 dark:text-red-300';
+            } else {
+              bgColor = 'bg-card opacity-50';
+            }
           }
           
           return (
-            <motion.div key={index} whileHover={!selectedAnswer ? { scale: 1.02, y: -2 } : {}} whileTap={!selectedAnswer ? { scale: 0.98 } : {}}>
-              <Button 
-                variant={btnVariant} 
-                className={`w-full h-20 sm:h-24 text-xl sm:text-2xl font-black transition-all duration-300 border-2 rounded-[1.25rem] sm:rounded-[1.5rem] shadow-lg ${!selectedAnswer ? 'border-white/10 hover:border-primary/50' : 'disabled:opacity-100'} ${selectedAnswer && isCorrect && !isSelected ? 'border-success/50 bg-success/10' : ''}`} 
-                onClick={() => handleAnswerClick(option)} 
-                disabled={selectedAnswer !== null}
-              >
-                <div className="flex items-center justify-center gap-2 sm:gap-4 w-full">
-                  {selectedAnswer && isCorrect && <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 shrink-0 absolute left-4" />}
-                  {selectedAnswer && isSelected && !isCorrect && <XCircle className="w-4 h-4 sm:w-6 sm:h-6 animate-shake shrink-0 absolute left-4" />}
-                  <span>{option}</span>
-                </div>
-              </Button>
-            </motion.div>
+            <motion.button 
+              key={index}
+              data-testid={`sentence-option-${index}`}
+              whileTap={!selectedAnswer ? { scale: 0.98 } : {}}
+              className={`w-full p-4 md:p-5 rounded-xl border-2 transition-all duration-200 flex items-center justify-center gap-2 font-bold text-base sm:text-lg font-jp ${borderColor} ${bgColor} ${textColor} ${!selectedAnswer ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+              onClick={() => handleAnswerClick(option)} 
+              disabled={selectedAnswer !== null}
+            >
+              {selectedAnswer && isCorrect && <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />}
+              {selectedAnswer && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-red-600 shrink-0 animate-shake" />}
+              <span>{option}</span>
+            </motion.button>
           );
         })}
       </div>

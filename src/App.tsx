@@ -6,16 +6,22 @@ import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
 import TypingQuiz from './components/TypingQuiz';
 import SentenceQuiz from './components/SentenceQuiz';
-import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight, Keyboard, FileText, Shuffle, RefreshCcw } from 'lucide-react';
-import { Button } from './components/ui/button';
+import { Moon, Sun, List, Layers, PlayCircle, Keyboard, FileText, ChevronRight, Shuffle, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AppMode = 'flashcards' | 'quiz' | 'typing' | 'sentences' | 'list';
+type AppMode = 'list' | 'flashcards' | 'quiz' | 'typing' | 'sentences';
+
+const navItems = [
+  { id: 'list', label: 'Daftar', fullLabel: 'Daftar Kanji', icon: List },
+  { id: 'flashcards', label: 'Kartu', fullLabel: 'Flashcards', icon: Layers },
+  { id: 'quiz', label: 'Kuis', fullLabel: 'Latihan Kuis', icon: PlayCircle },
+  { id: 'typing', label: 'Ketik', fullLabel: 'Kuis Ketik', icon: Keyboard },
+  { id: 'sentences', label: 'Kalimat', fullLabel: 'Kalimat Rumpang', icon: FileText },
+];
 
 function App() {
   const [mode, setMode] = useState<AppMode>('list');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedLessons, setSelectedLessons] = useState<number[]>([]); // Empty array means 'All'
+  const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -36,7 +42,7 @@ function App() {
   const filteredKanji = useMemo(() => {
     let list = selectedLessons.length === 0 ? kanjiList : kanjiList.filter(k => selectedLessons.includes(k.lesson));
     if (isShuffled) {
-      void shuffleSeed; // Force dependency
+      void shuffleSeed;
       return [...list].sort(() => Math.random() - 0.5);
     }
     return list;
@@ -44,134 +50,106 @@ function App() {
 
   const handleNextCard = () => setCurrentCardIndex((prev) => (prev + 1) % filteredKanji.length);
   const handlePrevCard = () => setCurrentCardIndex((prev) => (prev - 1 + filteredKanji.length) % filteredKanji.length);
-
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
-  const navItems = [
-    { id: 'list', label: 'Daftar Kanji', icon: List },
-    { id: 'flashcards', label: 'Flashcards', icon: Layers },
-    { id: 'quiz', label: 'Latihan Kuis', icon: PlayCircle },
-    { id: 'typing', label: 'Kuis Ketik', icon: Keyboard },
-    { id: 'sentences', label: 'Kalimat Rumpang', icon: FileText },
-  ];
-
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-150 relative overflow-hidden flex">
-      {/* Decorative Orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] animate-pulse [animation-delay:2s]" />
-      </div>
-
-      {/* Sidebar Overlay (Mobile) */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
-      <motion.aside 
-        className={`fixed lg:sticky top-0 left-0 h-screen w-[280px] bg-white/5 backdrop-blur-3xl border-r border-white/10 z-50 flex flex-col p-6 transition-transform duration-500 lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-      >
-        <div className="flex items-center justify-between mb-12 px-2">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-              <span className="text-white font-black text-xl">漢</span>
-            </div>
-            <h1 className="text-2xl font-black tracking-tighter text-primary">Kanji</h1>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-150 flex" data-testid="app-container">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 border-r border-border bg-background z-40" data-testid="desktop-sidebar">
+        <div className="flex items-center gap-3 px-6 pt-8 pb-10">
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+            <span className="text-white font-bold text-xl font-jp">漢</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)} className="lg:hidden rounded-full">
-            <X className="w-6 h-6" />
-          </Button>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Kanji</h1>
         </div>
 
-        <nav className="flex-1 space-y-3">
+        <nav className="flex-1 px-3 space-y-1">
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => {
-                setMode(item.id as AppMode);
-                if (window.innerWidth < 1024) setIsSidebarOpen(false);
-              }}
-              className={`w-full relative flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-black transition-all duration-300 group ${
+              data-testid={`sidebar-nav-${item.id}`}
+              onClick={() => setMode(item.id as AppMode)}
+              className={`w-full relative flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all duration-200 group ${
                 mode === item.id 
-                  ? 'text-white' 
-                  : 'text-muted-foreground hover:bg-white/10 hover:text-foreground'
+                  ? 'text-primary bg-primary/8' 
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
               {mode === item.id && (
                 <motion.div
-                  layoutId="active-sidebar-nav"
-                  className="absolute inset-0 bg-primary shadow-lg shadow-primary/30 inner-glow"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  style={{ borderRadius: '1.25rem' }}
+                  layoutId="active-sidebar"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                 />
               )}
-              <item.icon className={`w-5 h-5 z-10 transition-transform duration-300 ${mode === item.id ? 'scale-110' : 'group-hover:scale-110'}`} />
-              <span className="relative z-10 flex-1 text-left">{item.label}</span>
-              {mode === item.id && <ChevronRight className="w-4 h-4 z-10 opacity-60" />}
+              <item.icon className={`w-5 h-5 transition-colors ${mode === item.id ? 'text-primary' : ''}`} />
+              <span className="flex-1 text-left">{item.fullLabel}</span>
+              {mode === item.id && <ChevronRight className="w-4 h-4 text-primary opacity-50" />}
             </button>
           ))}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-white/10 space-y-4">
+        <div className="px-4 pb-8 pt-4 border-t border-border">
+          <button
+            data-testid="desktop-theme-toggle"
+            onClick={toggleTheme}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"
+          >
+            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            <span>{theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}</span>
+          </button>
         </div>
-      </motion.aside>
+      </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto no-scrollbar relative">
+      {/* Main Content */}
+      <div className="flex-1 w-full min-h-screen pb-20 md:pb-0 md:pl-64" data-testid="main-content">
         {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 left-0 right-0 p-4 flex items-center justify-between bg-background/50 backdrop-blur-md border-b border-white/5 z-30">
-          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(true)} className="rounded-full w-12 h-12">
-            <Menu className="w-6 h-6" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-black tracking-tighter text-primary">Kanji</span>
+        <header className="md:hidden sticky top-0 z-30 px-4 py-3 flex items-center justify-between bg-background/90 backdrop-blur-lg border-b border-border" data-testid="mobile-header">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm font-jp">漢</span>
+            </div>
+            <span className="text-lg font-extrabold tracking-tight">{navItems.find(i => i.id === mode)?.fullLabel}</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full w-12 h-12">
-            {theme === 'light' ? <Moon className="w-6 h-6" /> : <Sun className="w-6 h-6" />}
-          </Button>
+          <button
+            data-testid="mobile-theme-toggle"
+            onClick={toggleTheme}
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-secondary transition-colors"
+          >
+            {theme === 'light' ? <Moon className="w-5 h-5 text-muted-foreground" /> : <Sun className="w-5 h-5 text-muted-foreground" />}
+          </button>
         </header>
 
-        <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 sm:px-6 sm:py-10 relative z-10">
+        <main className="max-w-4xl mx-auto w-full px-4 py-5 md:px-8 md:py-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={mode}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
             >
-              {/* Header Title */}
-              <div className="mb-10 max-lg:hidden flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase">
-                    {navItems.find(i => i.id === mode)?.label}
-                  </h2>
-                </div>
-                <div className="bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10 flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">System Online</span>
+              {/* Desktop Page Title */}
+              <div className="hidden md:flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-extrabold tracking-tight text-foreground">
+                  {navItems.find(i => i.id === mode)?.fullLabel}
+                </h2>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  {filteredKanji.length} Kanji
                 </div>
               </div>
 
               {mode === 'list' ? (
-                 <KanjiList kanjiList={kanjiList} />
+                <KanjiList kanjiList={kanjiList} />
               ) : mode === 'typing' ? (
-                 <TypingQuiz kanjiList={kanjiList} />
+                <TypingQuiz kanjiList={kanjiList} />
               ) : mode === 'sentences' ? (
-                 <SentenceQuiz />
+                <SentenceQuiz />
               ) : (
-                <div className="space-y-10">
-                  <div className="flex flex-col items-center justify-center gap-6 bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-white/10 shadow-2xl">
-                    <span className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] opacity-60">Pilih Materi Pelajaran:</span>
+                <div className="space-y-6 md:space-y-8">
+                  {/* Lesson Selector */}
+                  <div>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Pilih Pelajaran</p>
                     <LessonSelector 
                       selectedLessons={selectedLessons} 
                       onSelectLessons={(lessons) => {
@@ -183,19 +161,19 @@ function App() {
                   </div>
 
                   {filteredKanji.length === 0 ? (
-                    <div className="text-center py-20 bg-white/5 backdrop-blur-xl rounded-[2.5rem] border-2 border-dashed border-white/10 shadow-inner">
-                      <p className="text-2xl font-black text-muted-foreground/40 uppercase tracking-tighter">Kanji tidak ditemukan.</p>
+                    <div className="text-center py-16 border-2 border-dashed border-border rounded-2xl" data-testid="empty-state">
+                      <p className="text-lg font-bold text-muted-foreground">Kanji tidak ditemukan.</p>
                     </div>
                   ) : mode === 'flashcards' ? (
-                    <div className="flex flex-col items-center space-y-8">
+                    <div className="flex flex-col items-center space-y-5">
+                      {/* Card Counter & Controls */}
                       <div className="flex items-center gap-3">
-                        <div className="bg-primary/10 px-6 py-2.5 rounded-full text-[10px] font-black text-primary tracking-[0.3em] uppercase border border-primary/20">
-                          KARTU {currentCardIndex + 1} / {filteredKanji.length}
-                        </div>
-                        <Button 
-                          variant={isShuffled ? "default" : "outline"} 
-                          size="icon" 
-                          className={`rounded-full w-10 h-10 border-2 transition-all ${isShuffled ? 'bg-primary text-white shadow-lg shadow-primary/30 border-primary' : 'border-white/10 text-muted-foreground hover:text-foreground'}`}
+                        <span className="text-sm font-bold text-muted-foreground" data-testid="flashcard-counter">
+                          {currentCardIndex + 1} / {filteredKanji.length}
+                        </span>
+                        <button 
+                          data-testid="shuffle-btn"
+                          className={`w-9 h-9 flex items-center justify-center rounded-full border transition-all ${isShuffled ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'}`}
                           onClick={() => {
                             if (!isShuffled) {
                               setIsShuffled(true);
@@ -208,44 +186,49 @@ function App() {
                           title={isShuffled ? "Matikan Acak" : "Acak Kartu"}
                         >
                           <Shuffle className="w-4 h-4" />
-                        </Button>
+                        </button>
                         <AnimatePresence>
                           {isShuffled && (
-                            <motion.div initial={{ opacity: 0, scale: 0.8, x: -10 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.8, x: -10 }}>
-                              <Button 
-                                variant="outline" 
-                                size="icon" 
-                                className="rounded-full w-10 h-10 border-2 border-white/10 text-primary hover:bg-primary/10 transition-all"
-                                onClick={() => {
-                                  setShuffleSeed(Date.now());
-                                  setCurrentCardIndex(0);
-                                }}
-                                title="Acak Ulang"
-                              >
-                                <RefreshCcw className="w-4 h-4" />
-                              </Button>
-                            </motion.div>
+                            <motion.button 
+                              data-testid="reshuffle-btn"
+                              initial={{ opacity: 0, scale: 0.8 }} 
+                              animate={{ opacity: 1, scale: 1 }} 
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              className="w-9 h-9 flex items-center justify-center rounded-full border border-border text-primary hover:bg-primary/5 transition-all"
+                              onClick={() => {
+                                setShuffleSeed(Date.now());
+                                setCurrentCardIndex(0);
+                              }}
+                              title="Acak Ulang"
+                            >
+                              <RefreshCcw className="w-4 h-4" />
+                            </motion.button>
                           )}
                         </AnimatePresence>
                       </div>
+
+                      {/* Flashcard */}
                       <Flashcard 
-                         key={filteredKanji[currentCardIndex].id}
-                         kanji={filteredKanji[currentCardIndex]} 
+                        key={filteredKanji[currentCardIndex].id}
+                        kanji={filteredKanji[currentCardIndex]} 
                       />
-                      <div className="flex gap-6 w-full max-w-sm">
-                        <Button 
-                          variant="secondary" 
-                          className="flex-1 h-16 rounded-2xl font-black text-sm uppercase tracking-widest border border-white/10"
+
+                      {/* Navigation Buttons */}
+                      <div className="flex gap-3 w-full max-w-sm">
+                        <button 
+                          data-testid="flashcard-prev-btn"
+                          className="flex-1 h-12 md:h-14 rounded-xl font-bold text-sm border border-border bg-background hover:bg-secondary text-foreground transition-all active:scale-[0.98]"
                           onClick={handlePrevCard}
                         >
                           Sebelumnya
-                        </Button>
-                        <Button 
-                          className="flex-1 h-16 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
+                        </button>
+                        <button 
+                          data-testid="flashcard-next-btn"
+                          className="flex-1 h-12 md:h-14 rounded-xl font-bold text-sm bg-primary text-white hover:bg-primary/90 shadow-[0_4px_14px_0_rgba(229,57,53,0.3)] transition-all active:scale-[0.98]"
                           onClick={handleNextCard}
                         >
                           Lanjut
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -257,6 +240,32 @@ function App() {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-background/90 backdrop-blur-xl border-t border-border z-50 pb-safe" data-testid="mobile-bottom-nav">
+        <div className="flex items-center justify-around h-16">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              data-testid={`bottom-nav-${item.id}`}
+              onClick={() => setMode(item.id as AppMode)}
+              className={`flex flex-col items-center justify-center gap-1 min-w-[56px] py-1 transition-colors ${
+                mode === item.id ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              <item.icon className={`w-5 h-5 ${mode === item.id ? 'stroke-[2.5]' : ''}`} />
+              <span className={`text-[10px] font-bold ${mode === item.id ? 'text-primary' : ''}`}>{item.label}</span>
+              {mode === item.id && (
+                <motion.div
+                  layoutId="active-bottom-nav"
+                  className="absolute top-0 w-12 h-0.5 bg-primary rounded-full"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
