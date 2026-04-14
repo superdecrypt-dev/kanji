@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import type { Kanji } from '../data';
-import { Search, Filter, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { motion } from 'framer-motion';
+import LessonSelector from './LessonSelector';
 
 interface KanjiListProps {
   kanjiList: Kanji[];
@@ -11,7 +12,7 @@ interface KanjiListProps {
 
 const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [lessonFilter, setLessonFilter] = useState<number | 'all'>('all');
+  const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
   const [displayLimit, setDisplayLimit] = useState(20);
   const loaderRef = useRef<HTMLDivElement>(null);
 
@@ -20,7 +21,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
   const filteredList = useMemo(() => {
     const term = searchTerm.toLowerCase();
     return kanjiList.filter(k => {
-      const matchLesson = lessonFilter === 'all' || k.lesson === lessonFilter;
+      const matchLesson = selectedLessons.length === 0 || selectedLessons.includes(k.lesson);
       const matchSearch = !term || 
                           k.kanji.includes(term) || 
                           k.meaning.toLowerCase().includes(term) || 
@@ -30,7 +31,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
                           (k.onyomi_romaji && k.onyomi_romaji.includes(term));
       return matchLesson && matchSearch;
     });
-  }, [kanjiList, lessonFilter, searchTerm]);
+  }, [kanjiList, selectedLessons, searchTerm]);
 
   useEffect(() => {
     const scrollRoot = document.querySelector('main')?.parentElement;
@@ -48,18 +49,18 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
 
   useEffect(() => {
     setDisplayLimit(20);
-  }, [searchTerm, lessonFilter]);
+  }, [searchTerm, selectedLessons]);
 
   const displayedItems = useMemo(() => filteredList.slice(0, displayLimit), [filteredList, displayLimit]);
 
   return (
     <div className="space-y-6 sm:space-y-10">
       {/* Premium Glass Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-4 sm:gap-6 bg-white/5 backdrop-blur-3xl p-5 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border-2 border-white/10 shadow-2xl relative overflow-hidden">
+      <div className="flex flex-col gap-4 sm:gap-6 bg-white/5 backdrop-blur-3xl p-5 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border-2 border-white/10 shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
         
         {/* Search Input */}
-        <div className="relative flex-[2] group">
+        <div className="relative group w-full">
           <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary w-5 h-5 transition-transform group-focus-within:scale-110" />
           <input 
             type="text" 
@@ -70,27 +71,14 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList }) => {
           />
         </div>
 
-        {/* Filter Dropdown */}
-        <div className="relative flex-1 group">
-          <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary pointer-events-none transition-transform group-hover:scale-110">
-            <Filter size={18} />
-          </div>
-          <select 
-            className="w-full pl-12 sm:pl-14 pr-12 py-3 sm:py-4 bg-white/5 border-2 border-white/10 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 cursor-pointer appearance-none font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-white/10 text-foreground"
-            value={lessonFilter} 
-            onChange={(e) => {
-              const val = e.target.value;
-              setLessonFilter(val === 'all' ? 'all' : parseInt(val, 10));
-            }}
-          >
-            <option value="all" className="bg-background text-foreground">Semua Materi</option>
-            {Array.from({ length: maxLesson }, (_, i) => i + 1).map(l => (
-              <option key={l} value={l} className="bg-background text-foreground text-xs font-bold">Lesson {l}</option>
-            ))}
-          </select>
-          <div className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors">
-            <ChevronDown size={18} />
-          </div>
+        {/* Filter Selection */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          <span className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] opacity-60">Pilih Materi:</span>
+          <LessonSelector 
+            selectedLessons={selectedLessons} 
+            onSelectLessons={setSelectedLessons} 
+            maxLesson={maxLesson} 
+          />
         </div>
       </div>
 
