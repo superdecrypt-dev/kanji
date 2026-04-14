@@ -13,10 +13,12 @@ interface TypingQuizProps {
 }
 
 type QuestionMode = 'meaning' | 'reading' | 'mixed';
+type ReadingType = 'kunyomi' | 'onyomi';
 
 interface QuizState {
   kanji: Kanji;
   isMeaning: boolean;
+  readingType?: ReadingType; // only set when isMeaning is false
 }
 
 const splitJapaneseStr = (str: string | undefined | null): string[] => {
@@ -61,7 +63,21 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
     else if (useMode === 'reading') isMeaning = false;
     else isMeaning = Math.random() > 0.5;
 
-    setQuizState({ kanji: randomKanji, isMeaning });
+    // For reading questions, pick kunyomi or onyomi specifically
+    let readingType: ReadingType | undefined;
+    if (!isMeaning) {
+      const hasKun = !!randomKanji.kunyomi;
+      const hasOn = !!randomKanji.onyomi;
+      if (hasKun && hasOn) {
+        readingType = Math.random() > 0.5 ? 'kunyomi' : 'onyomi';
+      } else if (hasKun) {
+        readingType = 'kunyomi';
+      } else {
+        readingType = 'onyomi';
+      }
+    }
+
+    setQuizState({ kanji: randomKanji, isMeaning, readingType });
     setInput('');
     setIsWrong(false);
     setShowAnswer(false);
@@ -86,12 +102,19 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
       const validMeanings = splitJapaneseStr(quizState.kanji.meaning);
       isCorrect = validMeanings.some(m => m === userAns || m.includes(userAns) || userAns.includes(m));
     } else {
-      const validReadings = [
-        ...splitJapaneseStr(quizState.kanji.onyomi_romaji), 
-        ...splitJapaneseStr(quizState.kanji.kunyomi_romaji),
-        ...splitJapaneseStr(quizState.kanji.onyomi),
-        ...splitJapaneseStr(quizState.kanji.kunyomi)
-      ];
+      // Validate against specific reading type
+      let validReadings: string[];
+      if (quizState.readingType === 'kunyomi') {
+        validReadings = [
+          ...splitJapaneseStr(quizState.kanji.kunyomi_romaji),
+          ...splitJapaneseStr(quizState.kanji.kunyomi),
+        ];
+      } else {
+        validReadings = [
+          ...splitJapaneseStr(quizState.kanji.onyomi_romaji),
+          ...splitJapaneseStr(quizState.kanji.onyomi),
+        ];
+      }
       isCorrect = validReadings.some(r => r === userAns);
     }
 
@@ -143,7 +166,9 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
       if (meaning.length <= 2) return meaning[0] + '...';
       return meaning.substring(0, Math.ceil(meaning.length / 3)) + '...';
     } else {
-      const reading = quizState.kanji.kunyomi_romaji || quizState.kanji.onyomi_romaji || '';
+      const reading = quizState.readingType === 'kunyomi' 
+        ? (quizState.kanji.kunyomi_romaji || quizState.kanji.kunyomi || '')
+        : (quizState.kanji.onyomi_romaji || quizState.kanji.onyomi || '');
       if (!reading) return '...';
       const first = reading.split(/[,/]/)[0].trim();
       return first.substring(0, Math.ceil(first.length / 3)) + '...';
@@ -152,11 +177,16 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
 
   if (!quizState) return <div className="text-center py-16 text-muted-foreground font-bold">Memuat...</div>;
 
-  const { kanji, isMeaning } = quizState;
-  const questionLabel = isMeaning ? 'Ketik Arti (Bahasa Indonesia)' : 'Ketik Cara Baca (Romaji/Kana)';
+  const { kanji, isMeaning, readingType } = quizState;
+  const questionLabel = isMeaning 
+    ? 'Ketik Arti (Bahasa Indonesia)' 
+    : `Ketik ${readingType === 'kunyomi' ? 'Kunyomi' : 'Onyomi'} (Romaji/Kana)`;
+  
   const correctAnswersDisplay = isMeaning 
     ? kanji.meaning 
-    : [kanji.kunyomi_romaji, kanji.onyomi_romaji].filter(Boolean).join(' / ');
+    : readingType === 'kunyomi'
+      ? [kanji.kunyomi, kanji.kunyomi_romaji ? `(${kanji.kunyomi_romaji})` : ''].filter(Boolean).join(' ')
+      : [kanji.onyomi, kanji.onyomi_romaji ? `(${kanji.onyomi_romaji})` : ''].filter(Boolean).join(' ');
 
   const p = progressData[kanji.id];
   const level = getMasteryLevel(p);
