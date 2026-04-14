@@ -8,7 +8,7 @@ import TypingQuiz from './components/TypingQuiz';
 import SentenceQuiz from './components/SentenceQuiz';
 import { Moon, Sun, List, Layers, PlayCircle, Keyboard, FileText, ChevronRight, Shuffle, RefreshCcw, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useProgress, getMasteryLevel, getMasteryColor } from './hooks/useProgress';
+import { useProgress } from './hooks/useProgress';
 
 type AppMode = 'list' | 'flashcards' | 'quiz' | 'typing' | 'sentences';
 
