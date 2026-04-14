@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Kanji } from '../data';
-import { Card, CardContent } from './ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard } from 'lucide-react';
 
@@ -23,6 +22,7 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
   const [input, setInput] = useState('');
   const [isWrong, setIsWrong] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isCorrectAnim, setIsCorrectAnim] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -34,6 +34,7 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
     setInput('');
     setIsWrong(false);
     setShowAnswer(false);
+    setIsCorrectAnim(false);
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
@@ -44,7 +45,7 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!quizState || !input.trim() || showAnswer) return;
+    if (!quizState || !input.trim() || showAnswer || isCorrectAnim) return;
 
     const userAns = input.trim().toLowerCase();
     let isCorrect = false;
@@ -68,8 +69,7 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
     }));
 
     if (isCorrect) {
-      // Flash green, next question
-      setInput('BENAR! ✅');
+      setIsCorrectAnim(true);
       setTimeout(() => loadNewQuestion(), 800);
     } else {
       setIsWrong(true);
@@ -78,68 +78,75 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
     }
   };
 
-  if (!quizState) return <div className="text-center py-20">Memuat...</div>;
+  if (!quizState) return <div className="text-center py-16 text-muted-foreground font-bold">Memuat...</div>;
 
   const { kanji, isMeaning } = quizState;
   const questionLabel = isMeaning ? 'Ketik Arti (Bahasa Indonesia)' : 'Ketik Cara Baca (Romaji/Kana)';
-  
   const correctAnswersDisplay = isMeaning 
     ? kanji.meaning 
     : [kanji.onyomi_romaji, kanji.kunyomi_romaji].filter(Boolean).join(' / ');
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 py-4">
-      <div className="flex justify-between items-center px-6 bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-2xl">
-        <div className="flex items-center gap-2 text-primary font-black text-sm uppercase tracking-widest">
-          <Keyboard size={18} /> Hardcore Recall
+    <div className="max-w-2xl mx-auto space-y-5 md:space-y-6" data-testid="typing-quiz">
+      {/* Score Bar */}
+      <div className="flex justify-between items-center px-4 py-3 bg-card border border-border rounded-xl" data-testid="typing-quiz-score">
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          <Keyboard size={16} className="text-primary" />
+          <span>Hardcore Recall</span>
         </div>
-        <div className="text-primary font-black text-sm uppercase tracking-widest">
-          Skor: <span className="text-xl ml-2">{score.correct} / {score.total}</span>
+        <div className="text-sm font-bold text-foreground">
+          <span className="text-primary">{score.correct}</span><span className="text-muted-foreground">/{score.total}</span>
         </div>
       </div>
 
-      <motion.div key={kanji.id + (isMeaning ? 'm' : 'r')} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className={`overflow-hidden border-2 transition-all duration-500 bg-glass/10 backdrop-blur-3xl shadow-2xl ${showAnswer ? 'border-destructive ring-8 ring-destructive/10' : (input === 'BENAR! ✅' ? 'border-success ring-8 ring-success/20' : 'border-white/10')}`}>
-          <CardContent className="p-8 sm:p-12 lg:p-16 text-center space-y-8 relative overflow-hidden min-h-[300px] flex flex-col justify-center">
-            <div className={`absolute inset-0 opacity-10 transition-colors duration-500 ${showAnswer ? 'bg-destructive' : (input === 'BENAR! ✅' ? 'bg-success' : 'bg-primary')}`} />
-            
-            <p className="text-muted-foreground font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-[10px] opacity-60 relative z-10">{questionLabel}</p>
-            
-            <motion.div 
-              animate={isWrong ? { x: [-10, 10, -10, 10, 0] } : {}}
-              className="font-black leading-tight tracking-tighter relative z-10 text-[6rem] sm:text-[8rem] text-primary drop-shadow-2xl"
-            >
-              {kanji.kanji}
-            </motion.div>
+      {/* Question Card */}
+      <motion.div key={kanji.id + (isMeaning ? 'm' : 'r')} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+        <div className={`bg-card border-2 rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-12 text-center transition-all duration-300 ${
+          showAnswer ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : (isCorrectAnim ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : 'border-border')
+        }`} data-testid="typing-question-card">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">{questionLabel}</p>
+          
+          <motion.div 
+            animate={isWrong ? { x: [-8, 8, -8, 8, 0] } : {}}
+            className="text-5xl sm:text-6xl md:text-8xl font-bold text-primary leading-none font-jp mb-6"
+            data-testid="typing-kanji-display"
+          >
+            {kanji.kanji}
+          </motion.div>
 
-            <AnimatePresence>
-              {showAnswer && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-destructive/20 border border-destructive/30 p-4 rounded-xl relative z-10">
-                  <p className="text-[10px] font-black uppercase text-destructive tracking-widest mb-1">Jawaban Benar:</p>
-                  <p className="text-xl font-black text-destructive">{correctAnswersDisplay}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <AnimatePresence>
+            {isCorrectAnim && (
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-green-600 dark:text-green-400 font-bold text-lg mb-4" data-testid="correct-feedback">
+                Benar!
+              </motion.div>
+            )}
+            {showAnswer && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 p-3 rounded-xl mb-4" data-testid="wrong-answer-reveal">
+                <p className="text-[10px] font-bold uppercase text-red-700 dark:text-red-400 tracking-widest mb-1">Jawaban Benar</p>
+                <p className="text-lg font-bold text-red-900 dark:text-red-300 font-jp">{correctAnswersDisplay}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            <form onSubmit={handleSubmit} className="relative z-10 w-full max-w-md mx-auto mt-8">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={showAnswer || input === 'BENAR! ✅'}
-                placeholder="Ketik jawaban di sini..."
-                className={`w-full text-center text-xl font-bold px-6 py-4 rounded-2xl bg-white/5 border-2 outline-none transition-all placeholder:text-muted-foreground/30 ${
-                  showAnswer ? 'border-destructive/50 text-destructive' : 
-                  (input === 'BENAR! ✅' ? 'border-success text-success bg-success/10' : 'border-white/20 focus:border-primary focus:ring-4 focus:ring-primary/20 text-foreground')
-                }`}
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck="false"
-              />
-            </form>
-          </CardContent>
-        </Card>
+          <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={showAnswer || isCorrectAnim}
+              placeholder="Ketik jawaban..."
+              data-testid="typing-input"
+              className={`w-full text-center text-lg font-bold px-4 py-3.5 rounded-xl bg-background border-2 outline-none transition-all placeholder:text-muted-foreground/40 ${
+                showAnswer ? 'border-red-400 text-red-600' : 
+                (isCorrectAnim ? 'border-green-500 text-green-600' : 'border-border focus:border-foreground focus:ring-2 focus:ring-foreground/5 text-foreground')
+              }`}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+          </form>
+        </div>
       </motion.div>
     </div>
   );

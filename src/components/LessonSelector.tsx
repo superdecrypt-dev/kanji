@@ -17,25 +17,26 @@ const LessonSelector: React.FC<LessonSelectorProps> = ({
 
   const toggleLesson = (lesson: number) => {
     if (selectedLessons.includes(lesson)) {
-      const newSelection = selectedLessons.filter(l => l !== lesson);
-      onSelectLessons(newSelection);
+      onSelectLessons(selectedLessons.filter(l => l !== lesson));
     } else {
       onSelectLessons([...selectedLessons, lesson]);
     }
   };
 
-  const selectAll = () => {
-    onSelectLessons([]);
-  };
+  const selectAll = () => onSelectLessons([]);
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 max-w-xl">
+    <div 
+      className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar snap-x md:flex-wrap md:overflow-visible md:pb-0"
+      data-testid="lesson-selector"
+    >
       <button
+        data-testid="lesson-select-all"
         onClick={selectAll}
-        className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border-2 ${
+        className={`inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-bold transition-all snap-center select-none cursor-pointer whitespace-nowrap border ${
           isAllSelected 
-            ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30' 
-            : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:border-white/20'
+            ? 'bg-foreground text-background border-foreground' 
+            : 'bg-background text-foreground border-border hover:border-foreground/30'
         }`}
       >
         Semua
@@ -45,12 +46,13 @@ const LessonSelector: React.FC<LessonSelectorProps> = ({
         return (
           <motion.button
             key={lesson}
+            data-testid={`lesson-${lesson}`}
             whileTap={{ scale: 0.95 }}
             onClick={() => toggleLesson(lesson)}
-            className={`px-4 py-2.5 rounded-2xl text-[10px] font-black transition-all duration-300 border-2 ${
+            className={`inline-flex items-center justify-center px-3.5 py-2 rounded-full text-sm font-medium transition-all snap-center select-none cursor-pointer whitespace-nowrap border ${
               isSelected 
-                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30' 
-                : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:border-white/20'
+                ? 'bg-foreground text-background border-foreground' 
+                : 'bg-background text-foreground border-border hover:border-foreground/30'
             }`}
           >
             L{lesson}

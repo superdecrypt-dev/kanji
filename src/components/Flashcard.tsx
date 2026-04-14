@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import type { Kanji } from '../data';
 import { RefreshCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Badge } from './ui/badge';
 
 interface FlashcardProps {
   kanji: Kanji;
@@ -11,17 +10,20 @@ interface FlashcardProps {
 const Flashcard: React.FC<FlashcardProps> = ({ kanji }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const handleFlip = () => setIsFlipped(!isFlipped);
+
   return (
-    <div className="flex flex-col items-center w-full max-w-sm mx-auto px-4">
+    <div className="flex flex-col items-center w-full max-w-sm mx-auto" data-testid="flashcard">
       <div 
-        className="relative w-full h-[400px] sm:h-[500px] cursor-pointer perspective-1000"
-        onClick={() => setIsFlipped(!isFlipped)}
+        className="relative w-full aspect-[3/4] max-h-[60vh] cursor-pointer perspective-1000"
+        onClick={handleFlip}
         role="button"
         tabIndex={0}
+        data-testid="flashcard-flip-area"
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setIsFlipped(!isFlipped);
+            handleFlip();
           }
         }}
       >
@@ -29,65 +31,56 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji }) => {
           className="w-full h-full relative preserve-3d"
           initial={false}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ duration: 0.7, type: 'spring', stiffness: 200, damping: 25 }}
+          transition={{ duration: 0.6, type: 'spring', stiffness: 200, damping: 25 }}
         >
           {/* Front Side */}
-          <div className="absolute inset-0 backface-hidden bg-white/10 backdrop-blur-3xl border-2 border-white/20 rounded-[3rem] shadow-2xl flex flex-col items-center justify-center p-6 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
-            
-            <div className="absolute top-6 right-6 sm:top-8 sm:right-8 flex gap-2">
-              <Badge variant="outline" className="opacity-50 font-black border-white/20 px-4 py-1 rounded-full text-[10px]">LEVEL N4-L{kanji.lesson}</Badge>
+          <div className="absolute inset-0 backface-hidden bg-card border border-border rounded-2xl md:rounded-3xl flex flex-col items-center justify-center p-6 overflow-hidden shadow-sm">
+            <div className="absolute top-4 right-4 md:top-6 md:right-6">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">N4-L{kanji.lesson}</span>
             </div>
             
-            <div className="flex items-center justify-center h-full relative z-10">
-              <motion.span 
-                className="text-[8rem] sm:text-[12rem] font-bold text-foreground drop-shadow-2xl"
-                layoutId="kanji-text"
-              >
-                {kanji.kanji}
-              </motion.span>
-            </div>
+            <span className="text-[6rem] sm:text-[8rem] md:text-[10rem] font-bold text-foreground leading-none font-jp" data-testid="flashcard-kanji">
+              {kanji.kanji}
+            </span>
             
-            <div className="absolute bottom-6 sm:bottom-10 text-muted-foreground/60 flex items-center gap-3 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em]">
-              <RefreshCcw className="w-4 h-4 animate-spin-slow" /> Ketuk untuk melihat arti
+            <div className="absolute bottom-5 md:bottom-8 text-muted-foreground flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest">
+              <RefreshCcw className="w-3.5 h-3.5" /> Ketuk untuk balik
             </div>
           </div>
 
-          {/* Back Side - IMPROVED SPACING */}
+          {/* Back Side */}
           <div 
-            className="absolute inset-0 backface-hidden bg-white/10 backdrop-blur-[40px] border-2 border-primary/30 rounded-[3rem] shadow-2xl flex flex-col items-center p-6 sm:p-8 text-center overflow-hidden"
+            className="absolute inset-0 backface-hidden bg-card border border-primary/20 rounded-2xl md:rounded-3xl flex flex-col items-center p-5 sm:p-7 overflow-hidden shadow-sm"
             style={{ transform: 'rotateY(180deg)' }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
-
-            {/* Header Section */}
-            <div className="mt-4 sm:mt-6 mb-6 sm:mb-8 space-y-2 relative z-10">
-              <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.5em] text-primary/60 font-black">Terjemahan</span>
-              <h3 className="text-2xl sm:text-3xl font-black text-foreground tracking-tighter leading-tight max-w-[240px] sm:max-w-[280px] mx-auto uppercase">
+            {/* Meaning */}
+            <div className="mt-4 sm:mt-6 mb-4 sm:mb-6 text-center" data-testid="flashcard-meaning">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Arti</p>
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-foreground tracking-tight leading-tight">
                 {kanji.meaning}
               </h3>
             </div>
 
-            {/* Content Section with more gap */}
-            <div className="w-full space-y-3 sm:space-y-5 relative z-10">
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 p-4 sm:p-5 rounded-2xl sm:rounded-[2rem] flex items-center justify-between shadow-inner hover:bg-white/20 transition-all group">
+            {/* Readings */}
+            <div className="w-full space-y-2.5 sm:space-y-3 flex-1">
+              <div className="bg-secondary/50 border border-border p-3.5 sm:p-4 rounded-xl">
                 <div className="text-left">
-                  <p className="text-[8px] sm:text-[9px] font-black text-orange-500 uppercase tracking-[0.3em] mb-1 sm:mb-1.5 opacity-70">Kunyomi</p>
-                  <p className="text-lg sm:text-xl font-bold leading-tight">{kanji.kunyomi || '-'}</p>
-                  {kanji.kunyomi_romaji && <p className="text-[9px] sm:text-[10px] text-foreground opacity-100 font-black mt-1 sm:mt-1.5 italic tracking-wide">{kanji.kunyomi_romaji}</p>}
+                  <p className="text-[9px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-widest mb-1">Kunyomi</p>
+                  <p className="text-base sm:text-lg font-bold font-jp">{kanji.kunyomi || '-'}</p>
+                  {kanji.kunyomi_romaji && <p className="text-xs text-muted-foreground font-medium mt-1 italic">{kanji.kunyomi_romaji}</p>}
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 p-4 sm:p-5 rounded-2xl sm:rounded-[2rem] flex items-center justify-between shadow-inner hover:bg-white/20 transition-all group">
+              <div className="bg-secondary/50 border border-border p-3.5 sm:p-4 rounded-xl">
                 <div className="text-left">
-                  <p className="text-[8px] sm:text-[9px] font-black text-blue-500 uppercase tracking-[0.3em] mb-1 sm:mb-1.5 opacity-70">Onyomi</p>
-                  <p className="text-lg sm:text-xl font-bold leading-tight">{kanji.onyomi || '-'}</p>
-                  {kanji.onyomi_romaji && <p className="text-[9px] sm:text-[10px] text-foreground opacity-100 font-black mt-1 sm:mt-1.5 italic tracking-wide">{kanji.onyomi_romaji}</p>}
+                  <p className="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Onyomi</p>
+                  <p className="text-base sm:text-lg font-bold font-jp">{kanji.onyomi || '-'}</p>
+                  {kanji.onyomi_romaji && <p className="text-xs text-muted-foreground font-medium mt-1 italic">{kanji.onyomi_romaji}</p>}
                 </div>
               </div>
             </div>
 
-            <div className="mt-auto mb-4 opacity-20">
-              <RefreshCcw className="w-6 h-6 mx-auto" />
+            <div className="mt-3 opacity-30">
+              <RefreshCcw className="w-5 h-5 mx-auto" />
             </div>
           </div>
         </motion.div>
