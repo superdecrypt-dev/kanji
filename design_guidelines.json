@@ -1,0 +1,159 @@
+{
+  "theme": "light",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) — Customized for Japanese Washi & Ink Aesthetic",
+  "reasoning": "The application needs extreme clarity for Kanji recognition. Washy, low-contrast grays make learning difficult. We use stark white backgrounds, dense ink-black text, and signal red (Hanko) accents for high functional visibility and a traditional-yet-modern aesthetic.",
+  "colors": {
+    "background": {
+      "hex": "#FDFCFB",
+      "tailwind": "bg-[#FDFCFB]",
+      "description": "Warm stark white (Washi paper)"
+    },
+    "surface": {
+      "hex": "#FFFFFF",
+      "tailwind": "bg-white",
+      "description": "Pure white for cards and modals"
+    },
+    "primary": {
+      "hex": "#E53935",
+      "tailwind": "bg-[#E53935]",
+      "description": "Vermilion/Hanko Red for primary CTAs and active states"
+    },
+    "primary_hover": {
+      "hex": "#D32F2F",
+      "tailwind": "bg-[#D32F2F]",
+      "description": "Darker red for hover states"
+    },
+    "text_main": {
+      "hex": "#0A0A0A",
+      "tailwind": "text-[#0A0A0A]",
+      "description": "Dense ink black for primary text and Kanji"
+    },
+    "text_muted": {
+      "hex": "#525252",
+      "tailwind": "text-[#525252]",
+      "description": "Charcoal for secondary text and overlines"
+    },
+    "border": {
+      "hex": "#E5E5E5",
+      "tailwind": "border-black/10",
+      "description": "Sharp, subtle borders to separate content without heavy shadows"
+    },
+    "success": {
+      "tailwind": "bg-green-50 border-green-500 text-green-900"
+    },
+    "error": {
+      "tailwind": "bg-red-50 border-red-500 text-red-900"
+    }
+  },
+  "typography": {
+    "headings": {
+      "font": "Cabinet Grotesk, sans-serif",
+      "tailwind": "font-sans font-bold tracking-tight text-[#0A0A0A]",
+      "sizes": {
+        "h1": "text-4xl md:text-5xl",
+        "h2": "text-2xl md:text-3xl",
+        "h3": "text-xl md:text-2xl"
+      }
+    },
+    "body": {
+      "font": "Inter, sans-serif",
+      "tailwind": "font-sans text-base text-[#0A0A0A] leading-relaxed"
+    },
+    "kanji": {
+      "font": "Noto Sans JP, sans-serif",
+      "tailwind": "font-sans font-bold tracking-tight",
+      "description": "Explicitly use Japanese font stack for accurate stroke rendering."
+    },
+    "overlines": {
+      "tailwind": "text-xs font-bold uppercase tracking-[0.2em] text-[#525252]"
+    },
+    "instructions": "DO NOT use Inter for headings. Use Inter ONLY for body. Ensure extreme contrast between text sizes to establish visual hierarchy. Avoid gray-on-gray."
+  },
+  "layout_and_spacing": {
+    "global_padding": "px-4 md:px-8 lg:px-12",
+    "mobile_bottom_nav": {
+      "tailwind": "fixed bottom-0 left-0 w-full h-16 bg-white/90 backdrop-blur-xl border-t border-black/10 z-50 flex items-center justify-around pb-safe md:hidden",
+      "description": "CRITICAL FIX: Replaces sidebar on mobile. Provides persistent access to Dictionary, Flashcards, Quiz."
+    },
+    "sidebar_desktop": {
+      "tailwind": "hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 border-r border-black/10 bg-[#FDFCFB]",
+      "description": "Only visible on tablet/desktop sizes."
+    },
+    "main_content_area": {
+      "tailwind": "w-full min-h-screen pb-20 md:pb-0 md:pl-64 pt-6 md:pt-12",
+      "description": "Accounts for mobile bottom nav and desktop sidebar."
+    },
+    "bento_grid": {
+      "tailwind": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6",
+      "description": "Use for dictionary lists or dashboard overviews."
+    }
+  },
+  "components": {
+    "lesson_selector": {
+      "mobile": "flex overflow-x-auto whitespace-nowrap gap-2 pb-4 hide-scrollbar snap-x items-center max-w-full",
+      "desktop": "flex flex-wrap gap-2 mb-8",
+      "pill_base": "inline-flex items-center justify-center px-4 py-2 rounded-full border border-black/10 text-sm font-medium transition-all snap-center select-none cursor-pointer",
+      "pill_active": "bg-[#0A0A0A] text-white border-[#0A0A0A] shadow-md",
+      "pill_inactive": "bg-white text-[#0A0A0A] hover:bg-neutral-100",
+      "description": "CRITICAL FIX: Convert the long vertical list on mobile into a horizontally scrollable row of pills to eliminate vertical space waste."
+    },
+    "flashcard": {
+      "container": "relative w-full max-w-sm mx-auto aspect-[3/4] max-h-[60vh] perspective-1000",
+      "card_inner": "w-full h-full transition-transform duration-500 transform-style-3d relative",
+      "card_face": "absolute inset-0 w-full h-full backface-hidden bg-white border border-black/10 rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.04)] flex flex-col items-center justify-center p-8",
+      "kanji_text": "text-[6rem] sm:text-[8rem] leading-none font-bold text-[#0A0A0A] mb-4",
+      "meaning_text": "text-2xl font-bold text-[#0A0A0A] tracking-tight",
+      "reading_text": "text-lg text-[#525252] mt-2 font-mono",
+      "description": "CRITICAL FIX: Use 'aspect-[3/4]' and 'max-h-[60vh]' to ensure the card never overflows the mobile screen vertically. Content must stay inside."
+    },
+    "quiz_button": {
+      "base": "w-full text-left p-4 md:p-6 rounded-2xl border transition-all duration-200 flex items-center justify-between group cursor-pointer",
+      "default": "border-black/10 bg-white hover:border-black/30 shadow-sm hover:shadow-md",
+      "selected": "border-[#0A0A0A] bg-neutral-50 ring-1 ring-[#0A0A0A]",
+      "correct": "border-green-500 bg-green-50 text-green-900",
+      "incorrect": "border-red-500 bg-red-50 text-red-900",
+      "description": "Big, touch-friendly targets for multiple choice."
+    },
+    "primary_button": {
+      "tailwind": "w-full md:w-auto inline-flex items-center justify-center px-8 py-4 bg-[#E53935] text-white font-bold rounded-xl shadow-[0_4px_14px_0_rgba(229,57,53,0.39)] hover:shadow-[0_6px_20px_rgba(229,57,53,0.23)] hover:bg-[#D32F2F] transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-lg tracking-tight",
+      "description": "Use for 'Start Quiz', 'Next Card', 'Submit Answer'. On mobile, consider fixing this to the bottom of the screen just above the nav if it's the primary action."
+    },
+    "input_field": {
+      "tailwind": "w-full bg-white border border-black/10 rounded-xl px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-[#0A0A0A] focus:border-transparent transition-all placeholder-neutral-400",
+      "description": "For typing and sentence quizzes. Large and extremely clear."
+    }
+  },
+  "motion": {
+    "flashcard_flip": "Use framer-motion: animate={{ rotateY: isFlipped ? 180 : 0 }}. Ensure container has 'perspective: 1000px'.",
+    "page_transition": "Subtle fade-in and slide-up for content changes: initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}",
+    "list_stagger": "When showing lists of Kanji or quiz choices, stagger the entrance by 0.05s."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "category": "hero_background",
+        "url": "https://static.prod-images.emergentagent.com/jobs/104aa5ca-6cd9-4866-8830-664af4c2c0c6/images/3dba2c7bdd25b672781008e3aa011c4d67bca1b25b8e4ee282e4a097da578aac.png",
+        "description": "Minimalist abstract 3D composition with Japanese washi paper texture, stark white background, a single bold brushstroke of black ink, and a small vermilion red geometric accent. Use as a subtle top-of-page background image with opacity overlay."
+      },
+      {
+        "category": "empty_state",
+        "url": "https://static.prod-images.emergentagent.com/jobs/104aa5ca-6cd9-4866-8830-664af4c2c0c6/images/270993c0da1170edd3e97b21681b01167e3ed106eefb900868670902a4a72ba2.png",
+        "description": "A clean, modern workspace desk with an open notebook showing Japanese characters. Use for 'No lessons selected' or 'Quiz finished' empty states."
+      }
+    ]
+  },
+  "accessibility": {
+    "focus_states": "focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:outline-none",
+    "contrast": "Text contrast must meet or exceed 4.5:1. Primary text must be solid black (#0A0A0A). Avoid light grays.",
+    "test_ids": "Every actionable button, link, and input MUST include a data-testid attribute (e.g., data-testid='start-quiz-btn').",
+    "touch_targets": "All mobile buttons and list items must be at least 48px tall."
+  },
+  "solutions_summary": {
+    "mobile_lesson_selector": "Switched from a vertical block to a horizontal scrolling pill row, freeing up 60% of vertical mobile viewport.",
+    "mobile_bottom_nav": "Added a fixed bottom navigation bar on mobile devices (hidden on desktop). Sidebar is hidden on mobile.",
+    "flashcard_cutoff": "Restricted flashcard height using max-h-[60vh] and aspect-ratio CSS. Absolute positioning of faces ensures text stays contained.",
+    "quiz_scrolling": "Horizontal lesson selector resolves the scrolling issue. Hiding the selector during an active quiz eliminates it entirely.",
+    "washed_out_light_theme": "Applied Swiss High-Contrast styling: Stark white background, pure ink black text, and 1px sharp borders instead of murky drop shadows.",
+    "button_placement": "Primary actions moved to prominent, predictable locations (bottom of screen on mobile, right-aligned on desktop). Targets increased to 48px minimum."
+  }
+}
