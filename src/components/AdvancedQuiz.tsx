@@ -284,7 +284,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
       </motion.div>
 
       {/* Answer Options */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-3" data-testid="quiz-options">
+      <div className="grid grid-cols-2 gap-2.5 md:gap-3" data-testid="quiz-options">
         {options.map((option, index) => {
           const isSelected = option === selectedAnswer;
           const isCorrectOption = checkIsCorrect(option, quizState);
