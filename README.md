@@ -1,45 +1,94 @@
-# Kanji N4 Study App
+# Kanji
 
-Aplikasi web modern untuk mempelajari 248 Kanji JLPT N4 dengan sistem **Spaced Repetition (SRS)**, antarmuka premium, dan dukungan Bahasa Indonesia sepenuhnya.
+Aplikasi web untuk mempelajari **248 Kanji JLPT N4** dengan antarmuka modern, responsif, dan dukungan Bahasa Indonesia sepenuhnya.
 
-## ✨ Fitur Utama
-
--   📊 **Dashboard Progres:** Pantau jumlah Kanji yang baru, sedang dipelajari, dan sudah dihafal.
--   🎴 **Flashcards 3D:** Menghafal Kanji dengan animasi kartu membalik yang interaktif.
--   🎮 **Kuis Lanjutan:** Berbagai mode kuis (Kanji ke Arti, Cara Baca ke Kanji, dsb) untuk menguji pemahaman.
--   📖 **Daftar Kanji Lengkap:** Referensi cepat dengan fitur pencarian dan filter per pelajaran (Lesson 1-22).
--   🇮🇩 **Bahasa Indonesia:** Arti Kanji dan instruksi aplikasi menggunakan Bahasa Indonesia yang akurat.
--   🌓 **Mode Gelap:** Tampilan yang nyaman di mata untuk belajar kapan saja.
-
-## 🛠️ Tech Stack
-
--   **Frontend:** React 19, TypeScript, Vite
--   **Styling:** Tailwind CSS, shadcn/ui
--   **Animation:** Framer Motion
--   **Icons:** Lucide React
+**Live:** [kanji.pages.dev](https://kanji.pages.dev)
 
 ---
 
-## 🚀 Cara Deploy ke Cloudflare Pages
+## Fitur
 
-Ikuti langkah-langkah berikut untuk mengaktifkan website ini secara publik menggunakan Cloudflare Pages:
+### Daftar Kanji
+- Referensi lengkap 248 Kanji N4 dengan arti, Kunyomi, Onyomi, dan Romaji
+- Pencarian berdasarkan kanji, arti, atau cara baca
+- Filter per pelajaran (L1–L22)
+- Contoh kalimat per Kanji (Jepang, cara baca, terjemahan Indonesia)
+- Indikator status penguasaan di setiap kartu
 
-1.  **Masuk ke Dashboard Cloudflare:** Login di [dash.cloudflare.com](https://dash.cloudflare.com/).
-2.  **Buka Workers & Pages:** Pilih menu **Workers & Pages** di sidebar kiri.
-3.  **Buat Aplikasi Baru:** Klik **Create application** > Tab **Pages** > **Connect to Git**.
-4.  **Hubungkan GitHub:** Pilih akun GitHub Anda dan pilih repositori `kanji`.
-5.  **Konfigurasi Build:**
-    -   **Framework preset:** `Vite`
-    -   **Build command:** `npm run build`
-    -   **Build output directory:** `dist`
-    -   **Node.js version:** Pastikan menggunakan versi terbaru (Cloudflare biasanya otomatis menggunakan versi yang kompatibel).
-6.  **Simpan dan Deploy:** Klik **Save and Deploy**. Website Anda akan aktif dalam 1-2 menit di URL `*.pages.dev`.
+### Flashcards
+- Kartu membalik dengan animasi 3D
+- Navigasi Sebelumnya / Lanjut
+- Mode acak (shuffle) dan acak ulang
+- Filter per pelajaran
+
+### Latihan Kuis (Pilihan Ganda)
+- Mode Kanji dan Jukugo (250+ kata majemuk)
+- Tipe soal: Arti, Baca, atau Campur
+- Jawaban Jukugo menggunakan Hiragana/Katakana
+- Kuis adaptif — Kanji yang sering salah muncul lebih sering
+
+### Kuis Ketik
+- Pertanyaan spesifik Kunyomi atau Onyomi
+- Tipe soal: Arti, Baca, atau Campur
+- Filter per pelajaran
+- Tombol Petunjuk (menampilkan huruf awal jawaban)
+- Tombol Lewati
+- Kuis adaptif
+
+### Kalimat Rumpang
+- 30+ soal melengkapi kalimat Jepang
+- Pilihan ganda dengan feedback benar/salah
+
+### Umum
+- Responsif (HP & PC/Laptop)
+- Navigasi bawah (mobile) dan sidebar (desktop)
+- Mode Gelap / Terang
+- Progress tracking otomatis via LocalStorage
+- Status penguasaan: Belum → Belajar → Mengulang → Dikuasai
 
 ---
 
-## 💻 Pengembangan Lokal
+## Sistem Progress
 
-Jika Anda ingin menjalankan aplikasi ini di komputer/HP sendiri (via Termux):
+Status dihitung otomatis dari jawaban kuis:
+
+| Status | Syarat |
+|---|---|
+| **Belum** | Belum pernah menjawab |
+| **Belajar** | Benar kurang dari 3 kali |
+| **Mengulang** | Benar 3–7 kali |
+| **Dikuasai** | Benar 8+ kali dengan akurasi ≥ 80% |
+
+Kanji yang masih lemah akan muncul lebih sering di kuis (adaptif).
+
+---
+
+## Tech Stack
+
+- **Framework:** React 19 + TypeScript
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS 4
+- **Animasi:** Framer Motion
+- **Ikon:** Lucide React
+- **Font:** DM Sans, Noto Sans JP
+- **Hosting:** Cloudflare Pages
+
+---
+
+## Deploy ke Cloudflare Pages
+
+1. Login ke [dash.cloudflare.com](https://dash.cloudflare.com/)
+2. Buka **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**
+3. Pilih repositori `superdecrypt-dev/kanji`
+4. Konfigurasi build:
+   - **Framework preset:** Vite
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+5. Klik **Save and Deploy**
+
+---
+
+## Pengembangan Lokal
 
 ```bash
 # Clone repositori
@@ -53,9 +102,41 @@ npm install
 npm run dev
 ```
 
-Buka `http://localhost:5173` di browser Anda.
+Buka `http://localhost:5173` di browser.
 
 ---
 
-## 📝 Catatan Data
-Data Kanji bersumber dari daftar standar JLPT N4 yang telah diterjemahkan secara manual ke Bahasa Indonesia untuk akurasi terbaik. Progres belajar Anda disimpan secara otomatis di **LocalStorage** browser masing-masing.
+## Struktur Proyek
+
+```
+src/
+├── App.tsx                    # Komponen utama + navigasi + progress bar
+├── data.ts                    # Data 248 Kanji N4
+├── jukugoData.ts              # Data 250+ kata majemuk (Jukugo)
+├── sentenceData.ts            # Data soal kalimat rumpang
+├── exampleSentences.ts        # Contoh kalimat per Kanji
+├── hooks/
+│   └── useProgress.ts         # Hook progress tracking & kuis adaptif
+├── components/
+│   ├── KanjiList.tsx          # Daftar Kanji dengan search & filter
+│   ├── Flashcard.tsx          # Kartu flashcard dengan animasi flip
+│   ├── AdvancedQuiz.tsx       # Kuis pilihan ganda (Kanji + Jukugo)
+│   ├── TypingQuiz.tsx         # Kuis ketik
+│   ├── SentenceQuiz.tsx       # Kuis kalimat rumpang
+│   ├── LessonSelector.tsx     # Pemilih pelajaran (horizontal scroll)
+│   └── ui/                    # Komponen UI dasar (Button, Card, dll)
+└── index.css                  # Tema & style global
+```
+
+---
+
+## Catatan Data
+
+- Data Kanji bersumber dari daftar standar JLPT N4, diterjemahkan ke Bahasa Indonesia
+- Contoh kalimat disertai cara baca (Hiragana) dan terjemahan Indonesia
+- Data Jukugo menggunakan Hiragana untuk cara baca
+- Progres belajar disimpan di **LocalStorage** browser
+
+---
+
+Made with ❤️ by Sigit Dwilaksono
