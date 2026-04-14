@@ -13,8 +13,8 @@ type AppMode = 'list' | 'flashcards' | 'quiz' | 'typing' | 'sentences';
 
 const navItems = [
   { id: 'list', label: 'Daftar', fullLabel: 'Daftar Kanji', icon: List },
-  { id: 'flashcards', label: 'Kartu', fullLabel: 'Kartu Kanji', icon: Layers },
-  { id: 'quiz', label: 'Kuis', fullLabel: 'Kuis Pilgan', icon: PlayCircle },
+  { id: 'flashcards', label: 'Kartu', fullLabel: 'Flashcards', icon: Layers },
+  { id: 'quiz', label: 'Kuis', fullLabel: 'Latihan Kuis', icon: PlayCircle },
   { id: 'typing', label: 'Ketik', fullLabel: 'Kuis Ketik', icon: Keyboard },
   { id: 'sentences', label: 'Kalimat', fullLabel: 'Kalimat Rumpang', icon: FileText },
 ];
