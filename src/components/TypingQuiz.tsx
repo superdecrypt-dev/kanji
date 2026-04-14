@@ -2,9 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { Kanji } from '../data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard } from 'lucide-react';
+import { pickAdaptiveKanji } from '../hooks/useProgress';
+import type { KanjiProgress } from '../hooks/useProgress';
 
 interface TypingQuizProps {
   kanjiList: Kanji[];
+  progress: Record<number, KanjiProgress>;
+  onAnswer: (kanjiId: number, isCorrect: boolean) => void;
 }
 
 interface QuizState {
@@ -17,18 +21,25 @@ const splitJapaneseStr = (str: string | undefined | null): string[] => {
   return str.split(/[,/]/).map(s => s.trim().toLowerCase()).filter(Boolean);
 };
 
-const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
+const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressData, onAnswer }) => {
   const [quizState, setQuizState] = useState<QuizState | null>(null);
   const [input, setInput] = useState('');
   const [isWrong, setIsWrong] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isCorrectAnim, setIsCorrectAnim] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [recentIds, setRecentIds] = useState<number[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const loadNewQuestion = () => {
     if (kanjiList.length === 0) return;
-    const randomKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+    let randomKanji: Kanji;
+    if (progressData && Object.keys(progressData).length > 0) {
+      const picked = pickAdaptiveKanji(kanjiList, progressData, recentIds, 1);
+      randomKanji = picked[0] || kanjiList[Math.floor(Math.random() * kanjiList.length)];
+    } else {
+      randomKanji = kanjiList[Math.floor(Math.random() * kanjiList.length)];
+    }
     const isMeaning = Math.random() > 0.5;
     setQuizState({ kanji: randomKanji, isMeaning });
     setInput('');
@@ -67,6 +78,10 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
       total: prev.total + 1,
       correct: prev.correct + (isCorrect ? 1 : 0)
     }));
+
+    // Record progress
+    onAnswer(quizState.kanji.id, isCorrect);
+    setRecentIds(prev => [...prev.slice(-14), quizState.kanji.id]);
 
     if (isCorrect) {
       setIsCorrectAnim(true);

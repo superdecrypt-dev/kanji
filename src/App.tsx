@@ -6,8 +6,9 @@ import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
 import TypingQuiz from './components/TypingQuiz';
 import SentenceQuiz from './components/SentenceQuiz';
-import { Moon, Sun, List, Layers, PlayCircle, Keyboard, FileText, ChevronRight, Shuffle, RefreshCcw } from 'lucide-react';
+import { Moon, Sun, List, Layers, PlayCircle, Keyboard, FileText, ChevronRight, Shuffle, RefreshCcw, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProgress, getMasteryLevel, getMasteryColor } from './hooks/useProgress';
 
 type AppMode = 'list' | 'flashcards' | 'quiz' | 'typing' | 'sentences';
 
@@ -25,6 +26,7 @@ function App() {
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const { progress, recordAnswer, getOverallStats, resetProgress } = useProgress();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') as 'light' | 'dark' || 'light';
@@ -139,10 +141,15 @@ function App() {
                 </div>
               </div>
 
+              {/* Progress Summary */}
+              {mode !== 'list' && (
+                <ProgressBar stats={getOverallStats()} totalKanji={kanjiList.length} onReset={resetProgress} />
+              )}
+
               {mode === 'list' ? (
-                <KanjiList kanjiList={kanjiList} />
+                <KanjiList kanjiList={kanjiList} progress={progress} />
               ) : mode === 'typing' ? (
-                <TypingQuiz kanjiList={kanjiList} />
+                <TypingQuiz kanjiList={kanjiList} progress={progress} onAnswer={recordAnswer} />
               ) : mode === 'sentences' ? (
                 <SentenceQuiz />
               ) : (
@@ -232,7 +239,7 @@ function App() {
                       </div>
                     </div>
                   ) : (
-                    <AdvancedQuiz key={selectedLessons.join(',')} kanjiList={filteredKanji} />
+                    <AdvancedQuiz key={selectedLessons.join(',')} kanjiList={filteredKanji} progress={progress} onAnswer={recordAnswer} />
                   )}
                 </div>
               )}
@@ -266,6 +273,41 @@ function App() {
           ))}
         </div>
       </nav>
+    </div>
+  );
+}
+
+function ProgressBar({ stats, totalKanji, onReset }: { stats: ReturnType<ReturnType<typeof useProgress>['getOverallStats']>; totalKanji: number; onReset: () => void }) {
+  const { mastered, reviewing, learning, accuracy } = stats;
+  const newCount = totalKanji - mastered - reviewing - learning;
+  const masteredPct = (mastered / totalKanji) * 100;
+  const reviewingPct = (reviewing / totalKanji) * 100;
+  const learningPct = (learning / totalKanji) * 100;
+
+  if (mastered + reviewing + learning === 0) return null;
+
+  return (
+    <div className="mb-6 p-4 bg-card border border-border rounded-xl" data-testid="progress-bar">
+      <div className="flex items-center justify-between mb-2.5">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Progress Belajar</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold text-muted-foreground">{accuracy}% akurasi</span>
+          <button onClick={onReset} className="text-muted-foreground/50 hover:text-destructive transition-colors" title="Reset Progress" data-testid="reset-progress-btn">
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+      <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden flex">
+        {masteredPct > 0 && <div className="bg-green-500 h-full transition-all duration-500" style={{ width: `${masteredPct}%` }} />}
+        {reviewingPct > 0 && <div className="bg-blue-500 h-full transition-all duration-500" style={{ width: `${reviewingPct}%` }} />}
+        {learningPct > 0 && <div className="bg-orange-500 h-full transition-all duration-500" style={{ width: `${learningPct}%` }} />}
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5 text-[10px] font-bold">
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500" />Dikuasai {mastered}</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500" />Mengulang {reviewing}</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500" />Belajar {learning}</span>
+        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-neutral-300 dark:bg-neutral-600" />Belum {newCount}</span>
+      </div>
     </div>
   );
 }
