@@ -136,7 +136,3 @@ src/
 - Contoh kalimat disertai cara baca (Hiragana) dan terjemahan Indonesia
 - Data Jukugo menggunakan Hiragana untuk cara baca
 - Progres belajar disimpan di **LocalStorage** browser
-
----
-
-Made with ❤️ by Sigit Dwilaksono
