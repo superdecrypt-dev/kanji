@@ -6,7 +6,7 @@ import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
 import TypingQuiz from './components/TypingQuiz';
 import SentenceQuiz from './components/SentenceQuiz';
-import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight, Keyboard, FileText } from 'lucide-react';
+import { Moon, Sun, Layers, PlayCircle, List, Menu, X, ChevronRight, Keyboard, FileText, Shuffle, RefreshCcw } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,6 +16,8 @@ function App() {
   const [mode, setMode] = useState<AppMode>('list');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedLessons, setSelectedLessons] = useState<number[]>([]); // Empty array means 'All'
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
@@ -32,9 +34,13 @@ function App() {
   const maxLesson = useMemo(() => Math.max(...kanjiList.map(k => k.lesson)), []);
 
   const filteredKanji = useMemo(() => {
-    if (selectedLessons.length === 0) return kanjiList;
-    return kanjiList.filter(k => selectedLessons.includes(k.lesson));
-  }, [selectedLessons]);
+    let list = selectedLessons.length === 0 ? kanjiList : kanjiList.filter(k => selectedLessons.includes(k.lesson));
+    if (isShuffled) {
+      void shuffleSeed; // Force dependency
+      return [...list].sort(() => Math.random() - 0.5);
+    }
+    return list;
+  }, [selectedLessons, isShuffled, shuffleSeed]);
 
   const handleNextCard = () => setCurrentCardIndex((prev) => (prev + 1) % filteredKanji.length);
   const handlePrevCard = () => setCurrentCardIndex((prev) => (prev - 1 + filteredKanji.length) % filteredKanji.length);
@@ -181,9 +187,46 @@ function App() {
                       <p className="text-2xl font-black text-muted-foreground/40 uppercase tracking-tighter">Kanji tidak ditemukan.</p>
                     </div>
                   ) : mode === 'flashcards' ? (
-                    <div className="flex flex-col items-center space-y-10">
-                      <div className="bg-primary/10 px-6 py-2 rounded-full text-[10px] font-black text-primary tracking-[0.3em] uppercase border border-primary/20">
-                        KARTU {currentCardIndex + 1} / {filteredKanji.length}
+                    <div className="flex flex-col items-center space-y-8">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary/10 px-6 py-2.5 rounded-full text-[10px] font-black text-primary tracking-[0.3em] uppercase border border-primary/20">
+                          KARTU {currentCardIndex + 1} / {filteredKanji.length}
+                        </div>
+                        <Button 
+                          variant={isShuffled ? "default" : "outline"} 
+                          size="icon" 
+                          className={`rounded-full w-10 h-10 border-2 transition-all ${isShuffled ? 'bg-primary text-white shadow-lg shadow-primary/30 border-primary' : 'border-white/10 text-muted-foreground hover:text-foreground'}`}
+                          onClick={() => {
+                            if (!isShuffled) {
+                              setIsShuffled(true);
+                              setShuffleSeed(Date.now());
+                            } else {
+                              setIsShuffled(false);
+                            }
+                            setCurrentCardIndex(0);
+                          }}
+                          title={isShuffled ? "Matikan Acak" : "Acak Kartu"}
+                        >
+                          <Shuffle className="w-4 h-4" />
+                        </Button>
+                        <AnimatePresence>
+                          {isShuffled && (
+                            <motion.div initial={{ opacity: 0, scale: 0.8, x: -10 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.8, x: -10 }}>
+                              <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="rounded-full w-10 h-10 border-2 border-white/10 text-primary hover:bg-primary/10 transition-all"
+                                onClick={() => {
+                                  setShuffleSeed(Date.now());
+                                  setCurrentCardIndex(0);
+                                }}
+                                title="Acak Ulang"
+                              >
+                                <RefreshCcw className="w-4 h-4" />
+                              </Button>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                       <Flashcard 
                          key={filteredKanji[currentCardIndex].id}
