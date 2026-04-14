@@ -92,7 +92,7 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList }) => {
       <div className="flex justify-between items-center px-4 py-3 bg-card border border-border rounded-xl" data-testid="typing-quiz-score">
         <div className="flex items-center gap-2 text-sm font-bold text-foreground">
           <Keyboard size={16} className="text-primary" />
-          <span>Hardcore Recall</span>
+          <span>Kuis Ketik</span>
         </div>
         <div className="text-sm font-bold text-foreground">
           <span className="text-primary">{score.correct}</span><span className="text-muted-foreground">/{score.total}</span>

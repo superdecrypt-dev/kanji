@@ -205,7 +205,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList }) => {
             onClick={() => switchQuizType('jukugo')} 
             className={`px-4 md:px-6 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${quizType === 'jukugo' ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
-            <BookOpen size={13} /> Jukugo
+            <BookOpen size={13} /> Kata Majemuk
           </button>
         </div>
 
