@@ -278,6 +278,7 @@ function App() {
 }
 
 function ProgressBar({ stats, totalKanji, onReset }: { stats: ReturnType<ReturnType<typeof useProgress>['getOverallStats']>; totalKanji: number; onReset: () => void }) {
+  const [showInfo, setShowInfo] = useState(false);
   const { mastered, reviewing, learning, accuracy } = stats;
   const newCount = totalKanji - mastered - reviewing - learning;
   const masteredPct = (mastered / totalKanji) * 100;
@@ -289,7 +290,16 @@ function ProgressBar({ stats, totalKanji, onReset }: { stats: ReturnType<ReturnT
   return (
     <div className="mb-6 p-4 bg-card border border-border rounded-xl" data-testid="progress-bar">
       <div className="flex items-center justify-between mb-2.5">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Progress Belajar</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Progress Belajar</span>
+          <button 
+            onClick={() => setShowInfo(!showInfo)} 
+            className="w-5 h-5 flex items-center justify-center rounded-full border border-border text-muted-foreground/50 hover:text-foreground hover:border-foreground/30 transition-colors text-[10px] font-bold"
+            data-testid="progress-info-btn"
+          >
+            ?
+          </button>
+        </div>
         <div className="flex items-center gap-3">
           <span className="text-xs font-bold text-muted-foreground">{accuracy}% akurasi</span>
           <button onClick={onReset} className="text-muted-foreground/50 hover:text-destructive transition-colors" title="Reset Progress" data-testid="reset-progress-btn">
@@ -297,6 +307,18 @@ function ProgressBar({ stats, totalKanji, onReset }: { stats: ReturnType<ReturnT
           </button>
         </div>
       </div>
+
+      {showInfo && (
+        <div className="mb-3 p-3 bg-secondary/50 border border-border rounded-lg text-xs text-muted-foreground space-y-1.5" data-testid="progress-info-panel">
+          <p className="font-bold text-foreground text-[11px]">Cara kerja status:</p>
+          <p><span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-neutral-300 dark:bg-neutral-600" /><strong>Belum</strong></span> — Belum pernah menjawab</p>
+          <p><span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /><strong>Belajar</strong></span> — Benar kurang dari 3 kali</p>
+          <p><span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /><strong>Mengulang</strong></span> — Benar 3–7 kali</p>
+          <p><span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /><strong>Dikuasai</strong></span> — Benar 8+ kali dengan akurasi ≥ 80%</p>
+          <p className="text-muted-foreground/60 italic pt-1">Status dihitung otomatis dari jawaban kuis.</p>
+        </div>
+      )}
+
       <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden flex">
         {masteredPct > 0 && <div className="bg-green-500 h-full transition-all duration-500" style={{ width: `${masteredPct}%` }} />}
         {reviewingPct > 0 && <div className="bg-blue-500 h-full transition-all duration-500" style={{ width: `${reviewingPct}%` }} />}
