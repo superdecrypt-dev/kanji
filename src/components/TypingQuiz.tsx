@@ -23,7 +23,12 @@ interface QuizState {
 
 const splitJapaneseStr = (str: string | undefined | null): string[] => {
   if (!str) return [];
-  return str.split(/[,/]/).map(s => s.trim().toLowerCase()).filter(Boolean);
+  const normalized = str.toLowerCase();
+  // Pisahkan berdasarkan , / ( ) [ ] dan hapus yang kosong
+  const parts = normalized.split(/[,/()\[\]]/).map(s => s.trim()).filter(Boolean);
+  // Tambahkan versi tanpa tanda kurung sama sekali
+  const cleanVersion = normalized.replace(/[()\[\]]/g, '').trim();
+  return Array.from(new Set([...parts, cleanVersion])).filter(Boolean);
 };
 
 const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressData, onAnswer }) => {
