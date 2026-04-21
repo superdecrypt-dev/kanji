@@ -12,6 +12,11 @@ import { useProgress } from './hooks/useProgress';
 
 type AppMode = 'list' | 'flashcards' | 'quiz' | 'typing' | 'sentences';
 
+const seededValue = (seed: number, id: number) => {
+  const value = Math.sin(seed * 1000 + id * 97.13) * 10000;
+  return value - Math.floor(value);
+};
+
 const navItems = [
   { id: 'list', label: 'Daftar', fullLabel: 'Daftar Kanji', icon: List },
   { id: 'flashcards', label: 'Kartu', fullLabel: 'Flashcards', icon: Layers },
@@ -42,10 +47,12 @@ function App() {
   const maxLesson = useMemo(() => Math.max(...kanjiList.map(k => k.lesson)), []);
 
   const filteredKanji = useMemo(() => {
-    let list = selectedLessons.length === 0 ? kanjiList : kanjiList.filter(k => selectedLessons.includes(k.lesson));
+    const list = selectedLessons.length === 0 ? kanjiList : kanjiList.filter(k => selectedLessons.includes(k.lesson));
     if (isShuffled) {
-      void shuffleSeed;
-      return [...list].sort(() => Math.random() - 0.5);
+      return [...list]
+        .map((item) => ({ item, score: seededValue(shuffleSeed, item.id) }))
+        .sort((a, b) => a.score - b.score)
+        .map(({ item }) => item);
     }
     return list;
   }, [selectedLessons, isShuffled, shuffleSeed]);

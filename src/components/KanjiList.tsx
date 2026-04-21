@@ -36,8 +36,19 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
     });
   }, [kanjiList, selectedLessons, searchTerm]);
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setDisplayLimit(20);
+  };
+
+  const handleLessonChange = (lessons: number[]) => {
+    setSelectedLessons(lessons);
+    setDisplayLimit(20);
+  };
+
+  const scrollRoot = document.querySelector('main')?.parentElement;
+
   useEffect(() => {
-    const scrollRoot = document.querySelector('main')?.parentElement;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && displayLimit < filteredList.length) {
@@ -48,11 +59,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
     );
     if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [displayLimit, filteredList.length]);
-
-  useEffect(() => {
-    setDisplayLimit(20);
-  }, [searchTerm, selectedLessons]);
+  }, [displayLimit, filteredList.length, scrollRoot]);
 
   const displayedItems = useMemo(() => filteredList.slice(0, displayLimit), [filteredList, displayLimit]);
 
@@ -68,13 +75,13 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
             data-testid="kanji-search-input"
             className="w-full pl-11 pr-4 py-3 md:py-3.5 bg-card border border-border rounded-xl focus:border-foreground focus:ring-2 focus:ring-foreground/5 outline-none transition-all placeholder:text-muted-foreground/60 font-medium text-sm"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
 
         <LessonSelector 
           selectedLessons={selectedLessons} 
-          onSelectLessons={setSelectedLessons} 
+          onSelectLessons={handleLessonChange} 
           maxLesson={maxLesson} 
         />
       </div>

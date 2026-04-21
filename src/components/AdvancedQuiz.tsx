@@ -55,17 +55,16 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     const allValidReadings = [...splitJapaneseStr(targetKanji.onyomi), ...splitJapaneseStr(targetKanji.kunyomi)];
     const allValidMeanings = splitJapaneseStr(targetKanji.meaning).map(m => m.toLowerCase());
 
-    let correctAnswer = '';
-    if (currentMode === 'kanjiToMeaning') {
-      correctAnswer = targetKanji.meaning;
-    } else {
+    const correctAnswer = currentMode === 'kanjiToMeaning'
+      ? targetKanji.meaning
+      : (() => {
       const availableReadings = [];
       if (targetKanji.onyomi) availableReadings.push(targetKanji.onyomi);
       if (targetKanji.kunyomi) availableReadings.push(targetKanji.kunyomi);
-      correctAnswer = availableReadings.length > 0 
-        ? availableReadings[Math.floor(Math.random() * availableReadings.length)] 
+      return availableReadings.length > 0
+        ? availableReadings[Math.floor(Math.random() * availableReadings.length)]
         : (targetKanji.onyomi || targetKanji.kunyomi || targetKanji.meaning);
-    }
+      })();
     
     const wrongAnswers = new Set<string>();
     while (wrongAnswers.size < 3) {
@@ -105,7 +104,7 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     else if (questionMode === 'reading') currentMode = 'kanjiToReading';
     else currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
     
-    let correctAnswer = currentMode === 'kanjiToMeaning' ? targetWord.meaning : targetWord.reading;
+    const correctAnswer = currentMode === 'kanjiToMeaning' ? targetWord.meaning : targetWord.reading;
     const wrongAnswers = new Set<string>();
     while (wrongAnswers.size < 3) {
       const randomWrong = jukugoList[Math.floor(Math.random() * jukugoList.length)];

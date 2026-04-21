@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import type { Kanji } from '../data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, SkipForward } from 'lucide-react';
@@ -25,16 +25,58 @@ const splitJapaneseStr = (str: string | undefined | null): string[] => {
   if (!str) return [];
   const normalized = str.toLowerCase();
   // Pisahkan berdasarkan , / ( ) [ ] dan hapus yang kosong
-  const parts = normalized.split(/[,/()\[\]]/).map(s => s.trim()).filter(Boolean);
+  const parts = normalized.split(/[,/()[\]]/).map(s => s.trim()).filter(Boolean);
   // Tambahkan versi tanpa tanda kurung sama sekali
-  const cleanVersion = normalized.replace(/[()\[\]]/g, '').trim();
+  const cleanVersion = normalized.replace(/[()[\]]/g, '').trim();
   return Array.from(new Set([...parts, cleanVersion])).filter(Boolean);
+};
+
+const createQuestion = (
+  kanjiList: Kanji[],
+  questionMode: QuestionMode,
+  progressData: Record<number, KanjiProgress>,
+  recentIds: number[],
+  selectedLessons: number[]
+): QuizState | null => {
+  const filteredKanji = selectedLessons.length === 0
+    ? kanjiList
+    : kanjiList.filter(k => selectedLessons.includes(k.lesson));
+
+  if (filteredKanji.length === 0) return null;
+
+  let randomKanji: Kanji;
+  if (progressData && Object.keys(progressData).length > 0) {
+    const picked = pickAdaptiveKanji(filteredKanji, progressData, recentIds, 1);
+    randomKanji = picked[0] || filteredKanji[Math.floor(Math.random() * filteredKanji.length)];
+  } else {
+    randomKanji = filteredKanji[Math.floor(Math.random() * filteredKanji.length)];
+  }
+
+  let isMeaning: boolean;
+  if (questionMode === 'meaning') isMeaning = true;
+  else if (questionMode === 'reading') isMeaning = false;
+  else isMeaning = Math.random() > 0.5;
+
+  let readingType: ReadingType | undefined;
+  if (!isMeaning) {
+    const hasKun = !!randomKanji.kunyomi;
+    const hasOn = !!randomKanji.onyomi;
+    if (hasKun && hasOn) {
+      readingType = Math.random() > 0.5 ? 'kunyomi' : 'onyomi';
+    } else if (hasKun) {
+      readingType = 'kunyomi';
+    } else {
+      readingType = 'onyomi';
+    }
+  }
+
+  return { kanji: randomKanji, isMeaning, readingType };
 };
 
 const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressData, onAnswer }) => {
   const [questionMode, setQuestionMode] = useState<QuestionMode>('mixed');
   const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
-  const [quizState, setQuizState] = useState<QuizState | null>(null);
+  const [quizState, setQuizState] = useState<QuizState | null>(() => createQuestion(kanjiList, 'mixed', progressData, [], []));
   const [input, setInput] = useState('');
   const [isWrong, setIsWrong] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -50,39 +92,10 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
     return selectedLessons.length === 0 ? kanjiList : kanjiList.filter(k => selectedLessons.includes(k.lesson));
   }, [kanjiList, selectedLessons]);
 
-  const loadNewQuestion = (list?: Kanji[], mode?: QuestionMode) => {
-    const useList = list || filteredKanji;
-    const useMode = mode || questionMode;
-    if (useList.length === 0) return;
-
-    let randomKanji: Kanji;
-    if (progressData && Object.keys(progressData).length > 0) {
-      const picked = pickAdaptiveKanji(useList, progressData, recentIds, 1);
-      randomKanji = picked[0] || useList[Math.floor(Math.random() * useList.length)];
-    } else {
-      randomKanji = useList[Math.floor(Math.random() * useList.length)];
-    }
-
-    let isMeaning: boolean;
-    if (useMode === 'meaning') isMeaning = true;
-    else if (useMode === 'reading') isMeaning = false;
-    else isMeaning = Math.random() > 0.5;
-
-    // For reading questions, pick kunyomi or onyomi specifically
-    let readingType: ReadingType | undefined;
-    if (!isMeaning) {
-      const hasKun = !!randomKanji.kunyomi;
-      const hasOn = !!randomKanji.onyomi;
-      if (hasKun && hasOn) {
-        readingType = Math.random() > 0.5 ? 'kunyomi' : 'onyomi';
-      } else if (hasKun) {
-        readingType = 'kunyomi';
-      } else {
-        readingType = 'onyomi';
-      }
-    }
-
-    setQuizState({ kanji: randomKanji, isMeaning, readingType });
+  const loadNewQuestion = (nextSelectedLessons = selectedLessons, nextMode = questionMode, recent = recentIds) => {
+    const nextQuestion = createQuestion(kanjiList, nextMode, progressData, recent, nextSelectedLessons);
+    if (!nextQuestion) return;
+    setQuizState(nextQuestion);
     setInput('');
     setIsWrong(false);
     setShowAnswer(false);
@@ -90,11 +103,6 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
     setShowHint(false);
     setTimeout(() => inputRef.current?.focus(), 100);
   };
-
-  useEffect(() => {
-    loadNewQuestion();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredKanji]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,15 +137,16 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
     }));
 
     onAnswer(quizState.kanji.id, isCorrect);
-    setRecentIds(prev => [...prev.slice(-14), quizState.kanji.id]);
+    const newRecent = [...recentIds.slice(-14), quizState.kanji.id];
+    setRecentIds(newRecent);
 
     if (isCorrect) {
       setIsCorrectAnim(true);
-      setTimeout(() => loadNewQuestion(), 800);
+      setTimeout(() => loadNewQuestion(undefined, undefined, newRecent), 800);
     } else {
       setIsWrong(true);
       setShowAnswer(true);
-      setTimeout(() => loadNewQuestion(), 2500);
+      setTimeout(() => loadNewQuestion(undefined, undefined, newRecent), 2500);
     }
   };
 
@@ -147,21 +156,23 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
     setShowAnswer(true);
     setScore(prev => ({ total: prev.total + 1, correct: prev.correct }));
     onAnswer(quizState.kanji.id, false);
-    setRecentIds(prev => [...prev.slice(-14), quizState.kanji.id]);
-    setTimeout(() => loadNewQuestion(), 2500);
+    const newRecent = [...recentIds.slice(-14), quizState.kanji.id];
+    setRecentIds(newRecent);
+    setTimeout(() => loadNewQuestion(undefined, undefined, newRecent), 2500);
   };
 
   const handleModeChange = (newMode: QuestionMode) => {
     setQuestionMode(newMode);
     setScore({ correct: 0, total: 0 });
     setRecentIds([]);
-    loadNewQuestion(undefined, newMode);
+    loadNewQuestion(selectedLessons, newMode, []);
   };
 
   const handleLessonChange = (lessons: number[]) => {
     setSelectedLessons(lessons);
     setScore({ correct: 0, total: 0 });
     setRecentIds([]);
+    loadNewQuestion(lessons, questionMode, []);
   };
 
   const getHintText = (): string => {

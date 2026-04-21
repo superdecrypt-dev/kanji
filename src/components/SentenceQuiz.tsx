@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, FileText } from 'lucide-react';
 import { sentenceList } from '../sentenceData';
 import type { SentenceQuizItem } from '../sentenceData';
 
+const createQuestion = (): { currentSentence: SentenceQuizItem | null; options: string[] } => {
+  if (sentenceList.length === 0) {
+    return { currentSentence: null, options: [] };
+  }
+
+  const randomSentence = sentenceList[Math.floor(Math.random() * sentenceList.length)];
+  const shuffledWrong = [...randomSentence.wrongOptions].sort(() => Math.random() - 0.5).slice(0, 3);
+  const allOptions = [randomSentence.target, ...shuffledWrong].sort(() => Math.random() - 0.5);
+
+  return { currentSentence: randomSentence, options: allOptions };
+};
+
 const SentenceQuiz: React.FC = () => {
-  const [currentSentence, setCurrentSentence] = useState<SentenceQuizItem | null>(null);
-  const [options, setOptions] = useState<string[]>([]);
+  const initialQuestion = createQuestion();
+  const [currentSentence, setCurrentSentence] = useState<SentenceQuizItem | null>(initialQuestion.currentSentence);
+  const [options, setOptions] = useState<string[]>(initialQuestion.options);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isWrong, setIsWrong] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
-
-  const loadNewQuestion = () => {
-    if (sentenceList.length === 0) return;
-    const randomSentence = sentenceList[Math.floor(Math.random() * sentenceList.length)];
-    const shuffledWrong = [...randomSentence.wrongOptions].sort(() => Math.random() - 0.5).slice(0, 3);
-    const allOptions = [randomSentence.target, ...shuffledWrong].sort(() => Math.random() - 0.5);
-    setCurrentSentence(randomSentence);
-    setOptions(allOptions);
-    setSelectedAnswer(null);
-    setIsWrong(false);
-  };
-
-  useEffect(() => { loadNewQuestion(); }, []);
 
   const handleAnswerClick = (option: string) => {
     if (selectedAnswer !== null || !currentSentence) return;
@@ -30,7 +30,13 @@ const SentenceQuiz: React.FC = () => {
     setSelectedAnswer(option);
     if (!isCorrect) setIsWrong(true);
     setScore(prev => ({ total: prev.total + 1, correct: prev.correct + (isCorrect ? 1 : 0) }));
-    setTimeout(() => loadNewQuestion(), 2000);
+    setTimeout(() => {
+      const nextQuestion = createQuestion();
+      setCurrentSentence(nextQuestion.currentSentence);
+      setOptions(nextQuestion.options);
+      setSelectedAnswer(null);
+      setIsWrong(false);
+    }, 2000);
   };
 
   if (!currentSentence) return <div className="text-center py-16 text-muted-foreground font-bold">Memuat...</div>;
