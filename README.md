@@ -1,6 +1,6 @@
 # Kanji
 
-Aplikasi web untuk mempelajari **248 Kanji JLPT N4** dengan antarmuka modern, responsif, dan dukungan Bahasa Indonesia sepenuhnya.
+Aplikasi web untuk mempelajari **345 kanji** dengan antarmuka modern, responsif, dan dukungan Bahasa Indonesia sepenuhnya. Dataset utama mencakup **248 kanji JLPT N4** dan lesson tambahan dari **Marugoto**.
 
 **Live:** [kanji.pages.dev](https://kanji.pages.dev)
 
@@ -9,9 +9,9 @@ Aplikasi web untuk mempelajari **248 Kanji JLPT N4** dengan antarmuka modern, re
 ## Fitur
 
 ### Daftar Kanji
-- Referensi lengkap 248 Kanji N4 dengan arti, Kunyomi, Onyomi, dan Romaji
+- Referensi lengkap 345 kanji dengan arti, Kunyomi, Onyomi, dan Romaji
 - Pencarian berdasarkan kanji, arti, atau cara baca
-- Filter per pelajaran (L1–L22)
+- Filter per pelajaran (L1–L31)
 - Contoh kalimat per Kanji (Jepang, cara baca, terjemahan Indonesia)
 - Indikator status penguasaan di setiap kartu
 
@@ -111,7 +111,7 @@ Buka `http://localhost:5173` di browser.
 ```
 src/
 ├── App.tsx                    # Komponen utama + navigasi + progress bar
-├── data.ts                    # Data 248 Kanji N4
+├── data.ts                    # Data 345 kanji (N4 + tambahan Marugoto)
 ├── jukugoData.ts              # Data 250+ kata majemuk (Jukugo)
 ├── sentenceData.ts            # Data soal kalimat rumpang
 ├── exampleSentences.ts        # Contoh kalimat per Kanji
@@ -132,7 +132,9 @@ src/
 
 ## Catatan Data
 
-- Data Kanji bersumber dari daftar standar JLPT N4, diterjemahkan ke Bahasa Indonesia
+- Data Kanji utama bersumber dari daftar standar JLPT N4, diterjemahkan ke Bahasa Indonesia
+- Lesson tambahan `L23–L31` diambil dari daftar kanji Marugoto
 - Contoh kalimat disertai cara baca (Hiragana) dan terjemahan Indonesia
 - Data Jukugo menggunakan Hiragana untuk cara baca
 - Progres belajar disimpan di **LocalStorage** browser
+- Aturan gloss, reading, dan sumber verifikasi data didokumentasikan di [memory/KANJI_DATA_GUIDELINES.md](memory/KANJI_DATA_GUIDELINES.md)

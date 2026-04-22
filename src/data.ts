@@ -9,6 +9,9 @@ export interface Kanji {
   onyomi_romaji?: string;
 }
 
+export const CORE_LESSON_MAX = 22;
+export const DEFAULT_CORE_LESSONS = Array.from({ length: CORE_LESSON_MAX }, (_, i) => i + 1);
+
 export const kanjiList: Kanji[] = [
   {
     "id": 1,
@@ -380,7 +383,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 38,
     "kanji": "本",
-    "meaning": "buku / akar / asal",
+    "meaning": "asal / dasar / buku",
     "kunyomi": "もと",
     "onyomi": "ホン",
     "lesson": 4,
@@ -400,7 +403,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 40,
     "kanji": "分",
-    "meaning": "menit / membagi / mengerti",
+    "meaning": "bagian / membagi / mengerti",
     "kunyomi": "わかれる / わかる / わける",
     "onyomi": "フン / -プン",
     "lesson": 4,
@@ -430,7 +433,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 43,
     "kanji": "明",
-    "meaning": "terang / besok",
+    "meaning": "terang / jelas",
     "kunyomi": "あかるい / あける",
     "onyomi": "メイ",
     "lesson": 5,
@@ -460,7 +463,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 46,
     "kanji": "好",
-    "meaning": "suka / bagus",
+    "meaning": "suka / baik",
     "kunyomi": "すきな / すく",
     "onyomi": "コウ",
     "lesson": 5,
@@ -876,7 +879,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 88,
     "kanji": "見",
-    "meaning": "melihat / menonton",
+    "meaning": "melihat / tampak",
     "kunyomi": "みる / みえる",
     "onyomi": "ケン",
     "lesson": 9,
@@ -906,7 +909,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 91,
     "kanji": "書",
-    "meaning": "menulis / buku",
+    "meaning": "menulis / tulisan",
     "kunyomi": "かく",
     "onyomi": "ショ",
     "lesson": 9,
@@ -916,7 +919,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 92,
     "kanji": "話",
-    "meaning": "berbicara / cerita",
+    "meaning": "berbicara / kisah",
     "kunyomi": "はなす / はなし",
     "onyomi": "ワ",
     "lesson": 9,
@@ -936,7 +939,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 94,
     "kanji": "教",
-    "meaning": "mengajar / pendidikan",
+    "meaning": "mengajar / ajaran",
     "kunyomi": "おしえる",
     "onyomi": "キョウ",
     "lesson": 9,
@@ -995,7 +998,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 100,
     "kanji": "方",
-    "meaning": "arah / cara / orang",
+    "meaning": "arah / cara / pihak",
     "kunyomi": "かた / -がた",
     "onyomi": "ホウ",
     "lesson": 10,
@@ -1150,7 +1153,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 116,
     "kanji": "計",
-    "meaning": "mengukur / merencanakan",
+    "meaning": "menghitung / merencanakan",
     "kunyomi": "(はかる)",
     "onyomi": "ケイ",
     "lesson": 11,
@@ -1160,7 +1163,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 117,
     "kanji": "語",
-    "meaning": "bahasa / kata",
+    "meaning": "bahasa / bertutur",
     "kunyomi": "(かたる)",
     "onyomi": "ゴ",
     "lesson": 11,
@@ -1207,7 +1210,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 122,
     "kanji": "家",
-    "meaning": "rumah / keluarga",
+    "meaning": "rumah / keluarga / ahli",
     "kunyomi": "いえ / や",
     "onyomi": "カ / ケ",
     "lesson": 12,
@@ -1217,7 +1220,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 123,
     "kanji": "英",
-    "meaning": "Inggris / cerdas",
+    "meaning": "Inggris / unggul",
     "kunyomi": "",
     "onyomi": "エイ",
     "lesson": 12,
@@ -1623,7 +1626,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 164,
     "kanji": "彼",
-    "meaning": "dia (laki-laki) / pacar",
+    "meaning": "dia / itu",
     "kunyomi": "かれ / かの-",
     "onyomi": "(ヒ)",
     "lesson": 15,
@@ -1633,7 +1636,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 165,
     "kanji": "主",
-    "meaning": "tuan / majikan / utama",
+    "meaning": "tuan / utama",
     "kunyomi": "おもな / ぬし",
     "onyomi": "シュ",
     "lesson": 15,
@@ -1643,7 +1646,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 166,
     "kanji": "奥",
-    "meaning": "dalam / istri orang lain",
+    "meaning": "bagian dalam / terdalam",
     "kunyomi": "おく",
     "onyomi": "(オウ)",
     "lesson": 15,
@@ -1653,7 +1656,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 167,
     "kanji": "元",
-    "meaning": "asal / sumber / sehat",
+    "meaning": "asal / dasar",
     "kunyomi": "もと",
     "onyomi": "ゲン / ガン",
     "lesson": 16,
@@ -1663,7 +1666,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 168,
     "kanji": "気",
-    "meaning": "semangat / cuaca / perasaan",
+    "meaning": "semangat / perasaan / suasana",
     "kunyomi": "",
     "onyomi": "キ",
     "lesson": 16,
@@ -1682,7 +1685,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 170,
     "kanji": "名",
-    "meaning": "nama / terkenal",
+    "meaning": "nama / kemasyhuran",
     "kunyomi": "な",
     "onyomi": "メイ / ミョウ",
     "lesson": 16,
@@ -1692,7 +1695,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 171,
     "kanji": "親",
-    "meaning": "orang tua / akrab",
+    "meaning": "orang tua / kerabat",
     "kunyomi": "おや / したしい",
     "onyomi": "シン",
     "lesson": 16,
@@ -1712,7 +1715,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 173,
     "kanji": "便",
-    "meaning": "praktis / surat / penerbangan",
+    "meaning": "surat / kemudahan",
     "kunyomi": "たより",
     "onyomi": "ベン / ビン",
     "lesson": 16,
@@ -1722,7 +1725,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 174,
     "kanji": "利",
-    "meaning": "keuntungan / berguna",
+    "meaning": "berguna / keuntungan",
     "kunyomi": "(きく)",
     "onyomi": "リ",
     "lesson": 16,
@@ -1791,7 +1794,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 181,
     "kanji": "乗",
-    "meaning": "naik (kendaraan)",
+    "meaning": "naik / menaiki",
     "kunyomi": "のる / のせる",
     "onyomi": "ジョウ",
     "lesson": 17,
@@ -1961,7 +1964,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 198,
     "kanji": "内",
-    "meaning": "dalam / internal",
+    "meaning": "dalam / bagian dalam",
     "kunyomi": "うち",
     "onyomi": "ナイ",
     "lesson": 18,
@@ -1971,7 +1974,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 199,
     "kanji": "部",
-    "meaning": "bagian / departemen / klub",
+    "meaning": "bagian / kelompok",
     "kunyomi": "",
     "onyomi": "ブ",
     "lesson": 18,
@@ -1989,7 +1992,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 201,
     "kanji": "社",
-    "meaning": "perusahaan / kuil Shinto",
+    "meaning": "kuil Shinto / organisasi",
     "kunyomi": "",
     "onyomi": "シャ / -ジャ",
     "lesson": 18,
@@ -1998,7 +2001,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 202,
     "kanji": "院",
-    "meaning": "institusi / rumah sakit",
+    "meaning": "institusi / bangunan",
     "kunyomi": "",
     "onyomi": "イン",
     "lesson": 18,
@@ -2016,7 +2019,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 204,
     "kanji": "鉄",
-    "meaning": "besi / rel kereta",
+    "meaning": "besi",
     "kunyomi": "",
     "onyomi": "テツ",
     "lesson": 19,
@@ -2025,7 +2028,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 205,
     "kanji": "工",
-    "meaning": "pabrik / konstruksi / teknik",
+    "meaning": "kerajinan / teknik",
     "kunyomi": "",
     "onyomi": "コウ",
     "lesson": 19,
@@ -2034,7 +2037,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 206,
     "kanji": "場",
-    "meaning": "tempat / lokasi",
+    "meaning": "tempat / situasi",
     "kunyomi": "ば",
     "onyomi": "ジョウ",
     "lesson": 19,
@@ -2044,7 +2047,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 207,
     "kanji": "図",
-    "meaning": "gambar / peta / rencana",
+    "meaning": "gambar / rencana",
     "kunyomi": "",
     "onyomi": "ズ / ト",
     "lesson": 19,
@@ -2053,7 +2056,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 208,
     "kanji": "館",
-    "meaning": "gedung / bangunan besar",
+    "meaning": "gedung / fasilitas umum",
     "kunyomi": "",
     "onyomi": "カン",
     "lesson": 19,
@@ -2062,7 +2065,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 209,
     "kanji": "公",
-    "meaning": "publik / umum / resmi",
+    "meaning": "publik / adil / umum",
     "kunyomi": "(おおやけ)",
     "onyomi": "コウ",
     "lesson": 19,
@@ -2092,7 +2095,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 212,
     "kanji": "所",
-    "meaning": "tempat / alamat",
+    "meaning": "tempat / fasilitas",
     "kunyomi": "ところ",
     "onyomi": "ショ / -ジョ",
     "lesson": 19,
@@ -2111,7 +2114,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 214,
     "kanji": "号",
-    "meaning": "nomor / edisi / simbol",
+    "meaning": "tanda / nama / nomor",
     "kunyomi": "",
     "onyomi": "ゴウ",
     "lesson": 19,
@@ -2120,7 +2123,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 215,
     "kanji": "市",
-    "meaning": "kota (city) / pasar",
+    "meaning": "pasar / kota",
     "kunyomi": "いち",
     "onyomi": "シ",
     "lesson": 20,
@@ -2159,7 +2162,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 219,
     "kanji": "都",
-    "meaning": "ibu kota / metropolis",
+    "meaning": "ibu kota / kota besar",
     "kunyomi": "みやこ",
     "onyomi": "ト",
     "lesson": 20,
@@ -2169,7 +2172,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 220,
     "kanji": "府",
-    "meaning": "prefektur (Osaka/Kyoto)",
+    "meaning": "kantor pemerintahan / prefektur",
     "kunyomi": "",
     "onyomi": "フ",
     "lesson": 20,
@@ -2206,7 +2209,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 224,
     "kanji": "様",
-    "meaning": "Tuan/Nyonya / kondisi",
+    "meaning": "keadaan / bentuk",
     "kunyomi": "さま",
     "onyomi": "ヨウ",
     "lesson": 20,
@@ -2236,7 +2239,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 227,
     "kanji": "勉",
-    "meaning": "berusaha / belajar",
+    "meaning": "berusaha keras",
     "kunyomi": "",
     "onyomi": "ベン",
     "lesson": 21,
@@ -2274,7 +2277,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 231,
     "kanji": "留",
-    "meaning": "tinggal / menahan / studi",
+    "meaning": "tinggal / menahan",
     "kunyomi": "とまる / とめる",
     "onyomi": "リュウ",
     "lesson": 21,
@@ -2284,7 +2287,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 232,
     "kanji": "質",
-    "meaning": "kualitas / pertanyaan",
+    "meaning": "mutu / sifat",
     "kunyomi": "",
     "onyomi": "シツ",
     "lesson": 21,
@@ -2303,7 +2306,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 234,
     "kanji": "題",
-    "meaning": "topik / judul / soal",
+    "meaning": "judul / topik / soal",
     "kunyomi": "",
     "onyomi": "ダイ",
     "lesson": 21,
@@ -2322,7 +2325,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 236,
     "kanji": "宿",
-    "meaning": "penginapan / PR",
+    "meaning": "penginapan / bermalam",
     "kunyomi": "やど",
     "onyomi": "シュク",
     "lesson": 21,
@@ -2351,7 +2354,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 239,
     "kanji": "経",
-    "meaning": "lalu / mengelola / ekonomi",
+    "meaning": "melewati / mengelola",
     "kunyomi": "へる",
     "onyomi": "ケイ",
     "lesson": 22,
@@ -2371,7 +2374,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 241,
     "kanji": "歴",
-    "meaning": "sejarah / riwayat",
+    "meaning": "riwayat / melalui",
     "kunyomi": "",
     "onyomi": "レキ",
     "lesson": 22,
@@ -2418,7 +2421,7 @@ export const kanjiList: Kanji[] = [
   {
     "id": 246,
     "kanji": "科",
-    "meaning": "jurusan / ilmu / departemen",
+    "meaning": "golongan / bidang",
     "kunyomi": "",
     "onyomi": "カ",
     "lesson": 22,
@@ -2437,10 +2440,968 @@ export const kanjiList: Kanji[] = [
   {
     "id": 248,
     "kanji": "医",
-    "meaning": "medis / dokter",
+    "meaning": "pengobatan / dokter",
     "kunyomi": "",
     "onyomi": "イ",
     "lesson": 22,
     "onyomi_romaji": "i"
+  },
+  {
+    "id": 249,
+    "kanji": "枚",
+    "meaning": "lembar (penghitung)",
+    "kunyomi": "",
+    "onyomi": "マイ",
+    "lesson": 23,
+    "onyomi_romaji": "mai"
+  },
+  {
+    "id": 250,
+    "kanji": "横",
+    "meaning": "samping",
+    "kunyomi": "よこ",
+    "onyomi": "オウ",
+    "lesson": 23,
+    "kunyomi_romaji": "yoko",
+    "onyomi_romaji": "ou"
+  },
+  {
+    "id": 251,
+    "kanji": "階",
+    "meaning": "lantai",
+    "kunyomi": "",
+    "onyomi": "カイ",
+    "lesson": 23,
+    "onyomi_romaji": "kai"
+  },
+  {
+    "id": 252,
+    "kanji": "押",
+    "meaning": "mendorong / tekan",
+    "kunyomi": "お(す) / お(さえる)",
+    "onyomi": "オウ",
+    "lesson": 23,
+    "kunyomi_romaji": "osu / osaeru",
+    "onyomi_romaji": "ou"
+  },
+  {
+    "id": 253,
+    "kanji": "引",
+    "meaning": "menarik",
+    "kunyomi": "ひ(く) / ひ(ける)",
+    "onyomi": "イン",
+    "lesson": 23,
+    "kunyomi_romaji": "hiku / hikeru",
+    "onyomi_romaji": "in"
+  },
+  {
+    "id": 254,
+    "kanji": "映",
+    "meaning": "mencerminkan / memantul",
+    "kunyomi": "うつ(す) / うつ(る) / は(える)",
+    "onyomi": "エイ",
+    "lesson": 23,
+    "kunyomi_romaji": "utsusu / utsuru / haeru",
+    "onyomi_romaji": "ei"
+  },
+  {
+    "id": 255,
+    "kanji": "画",
+    "meaning": "gambar / menggambar",
+    "kunyomi": "え / えが(く)",
+    "onyomi": "ガ / カク",
+    "lesson": 23,
+    "kunyomi_romaji": "e / egaku",
+    "onyomi_romaji": "ga / kaku"
+  },
+  {
+    "id": 256,
+    "kanji": "温",
+    "meaning": "hangat / menghangatkan",
+    "kunyomi": "あたた(かい) / あたた(める) / あたた(まる)",
+    "onyomi": "オン",
+    "lesson": 23,
+    "kunyomi_romaji": "atatakai / atatameru / atatamaru",
+    "onyomi_romaji": "on"
+  },
+  {
+    "id": 257,
+    "kanji": "泉",
+    "meaning": "mata air",
+    "kunyomi": "いずみ",
+    "onyomi": "セン",
+    "lesson": 23,
+    "kunyomi_romaji": "izumi",
+    "onyomi_romaji": "sen"
+  },
+  {
+    "id": 258,
+    "kanji": "予",
+    "meaning": "sebelumnya / di muka",
+    "kunyomi": "あらかじ(め)",
+    "onyomi": "ヨ",
+    "lesson": 23,
+    "kunyomi_romaji": "arakajime",
+    "onyomi_romaji": "yo"
+  },
+  {
+    "id": 259,
+    "kanji": "定",
+    "meaning": "menetapkan / tetap",
+    "kunyomi": "さだ(める) / さだ(まる)",
+    "onyomi": "テイ / ジョウ",
+    "lesson": 23,
+    "kunyomi_romaji": "sadameru / sadamaru",
+    "onyomi_romaji": "tei / jou"
+  },
+  {
+    "id": 260,
+    "kanji": "旅",
+    "meaning": "perjalanan",
+    "kunyomi": "たび",
+    "onyomi": "リョ",
+    "lesson": 24,
+    "kunyomi_romaji": "tabi",
+    "onyomi_romaji": "ryo"
+  },
+  {
+    "id": 261,
+    "kanji": "仕",
+    "meaning": "melayani / mengabdi",
+    "kunyomi": "つか(える)",
+    "onyomi": "シ",
+    "lesson": 24,
+    "kunyomi_romaji": "tsukaeru",
+    "onyomi_romaji": "shi"
+  },
+  {
+    "id": 262,
+    "kanji": "事",
+    "meaning": "urusan / hal",
+    "kunyomi": "こと",
+    "onyomi": "ジ / ズ",
+    "lesson": 24,
+    "kunyomi_romaji": "koto",
+    "onyomi_romaji": "ji / zu"
+  },
+  {
+    "id": 263,
+    "kanji": "活",
+    "meaning": "hidup / aktif",
+    "kunyomi": "い(きる) / い(かす) / い(ける)",
+    "onyomi": "カツ",
+    "lesson": 24,
+    "kunyomi_romaji": "ikiru / ikasu / ikeru",
+    "onyomi_romaji": "katsu"
+  },
+  {
+    "id": 264,
+    "kanji": "去",
+    "meaning": "pergi / lalu",
+    "kunyomi": "さ(る)",
+    "onyomi": "キョ / コ",
+    "lesson": 24,
+    "kunyomi_romaji": "saru",
+    "onyomi_romaji": "kyo / ko"
+  },
+  {
+    "id": 265,
+    "kanji": "先",
+    "meaning": "depan / lebih dulu",
+    "kunyomi": "さき / まず / さきん(じる)",
+    "onyomi": "セン",
+    "lesson": 24,
+    "kunyomi_romaji": "saki / mazu / sakin(jiru)",
+    "onyomi_romaji": "sen"
+  },
+  {
+    "id": 266,
+    "kanji": "音",
+    "meaning": "suara",
+    "kunyomi": "おと",
+    "onyomi": "オン / イン",
+    "lesson": 24,
+    "kunyomi_romaji": "oto",
+    "onyomi_romaji": "on / in"
+  },
+  {
+    "id": 267,
+    "kanji": "楽",
+    "meaning": "menyenangkan / musik",
+    "kunyomi": "たの(しい) / たの(しむ)",
+    "onyomi": "ガク / ラク",
+    "lesson": 24,
+    "kunyomi_romaji": "tanoshii / tanoshimu",
+    "onyomi_romaji": "gaku / raku"
+  },
+  {
+    "id": 268,
+    "kanji": "犬",
+    "meaning": "anjing",
+    "kunyomi": "いぬ",
+    "onyomi": "ケン",
+    "lesson": 24,
+    "kunyomi_romaji": "inu",
+    "onyomi_romaji": "ken"
+  },
+  {
+    "id": 269,
+    "kanji": "族",
+    "meaning": "keluarga / kelompok",
+    "kunyomi": "",
+    "onyomi": "ゾク",
+    "lesson": 24,
+    "onyomi_romaji": "zoku"
+  },
+  {
+    "id": 270,
+    "kanji": "季",
+    "meaning": "musim",
+    "kunyomi": "",
+    "onyomi": "キ",
+    "lesson": 24,
+    "onyomi_romaji": "ki"
+  },
+  {
+    "id": 271,
+    "kanji": "節",
+    "meaning": "musim / ruas",
+    "kunyomi": "ふし",
+    "onyomi": "セツ / セチ",
+    "lesson": 25,
+    "kunyomi_romaji": "fushi",
+    "onyomi_romaji": "setsu / sechi"
+  },
+  {
+    "id": 272,
+    "kanji": "春",
+    "meaning": "musim semi",
+    "kunyomi": "はる",
+    "onyomi": "シュン",
+    "lesson": 25,
+    "kunyomi_romaji": "haru",
+    "onyomi_romaji": "shun"
+  },
+  {
+    "id": 273,
+    "kanji": "夏",
+    "meaning": "musim panas",
+    "kunyomi": "なつ",
+    "onyomi": "カ / ゲ",
+    "lesson": 25,
+    "kunyomi_romaji": "natsu",
+    "onyomi_romaji": "ka / ge"
+  },
+  {
+    "id": 274,
+    "kanji": "秋",
+    "meaning": "musim gugur",
+    "kunyomi": "あき",
+    "onyomi": "シュウ",
+    "lesson": 25,
+    "kunyomi_romaji": "aki",
+    "onyomi_romaji": "shuu"
+  },
+  {
+    "id": 275,
+    "kanji": "冬",
+    "meaning": "musim dingin",
+    "kunyomi": "ふゆ",
+    "onyomi": "トウ",
+    "lesson": 25,
+    "kunyomi_romaji": "fuyu",
+    "onyomi_romaji": "tou"
+  },
+  {
+    "id": 276,
+    "kanji": "同",
+    "meaning": "sama",
+    "kunyomi": "おな(じ)",
+    "onyomi": "ドウ",
+    "lesson": 25,
+    "kunyomi_romaji": "onaji",
+    "onyomi_romaji": "dou"
+  },
+  {
+    "id": 277,
+    "kanji": "暑",
+    "meaning": "panas (cuaca)",
+    "kunyomi": "あつ(い)",
+    "onyomi": "ショ",
+    "lesson": 25,
+    "kunyomi_romaji": "atsui",
+    "onyomi_romaji": "sho"
+  },
+  {
+    "id": 278,
+    "kanji": "寒",
+    "meaning": "dingin (cuaca)",
+    "kunyomi": "さむ(い)",
+    "onyomi": "カン",
+    "lesson": 25,
+    "kunyomi_romaji": "samui",
+    "onyomi_romaji": "kan"
+  },
+  {
+    "id": 279,
+    "kanji": "天",
+    "meaning": "langit / surga",
+    "kunyomi": "あめ / あま",
+    "onyomi": "テン",
+    "lesson": 25,
+    "kunyomi_romaji": "ame / ama",
+    "onyomi_romaji": "ten"
+  },
+  {
+    "id": 280,
+    "kanji": "風",
+    "meaning": "angin",
+    "kunyomi": "かぜ",
+    "onyomi": "フウ / フ",
+    "lesson": 25,
+    "kunyomi_romaji": "kaze",
+    "onyomi_romaji": "fuu / fu"
+  },
+  {
+    "id": 281,
+    "kanji": "昨",
+    "meaning": "kemarin / lalu",
+    "kunyomi": "きのう",
+    "onyomi": "サク",
+    "lesson": 25,
+    "kunyomi_romaji": "kinou",
+    "onyomi_romaji": "saku"
+  },
+  {
+    "id": 282,
+    "kanji": "堂",
+    "meaning": "aula / gedung",
+    "kunyomi": "",
+    "onyomi": "ドウ",
+    "lesson": 26,
+    "onyomi_romaji": "dou"
+  },
+  {
+    "id": 283,
+    "kanji": "銀",
+    "meaning": "perak / uang",
+    "kunyomi": "しろがね / かね",
+    "onyomi": "ギン",
+    "lesson": 26,
+    "kunyomi_romaji": "shirogane / kane",
+    "onyomi_romaji": "gin"
+  },
+  {
+    "id": 284,
+    "kanji": "車",
+    "meaning": "kendaraan / roda",
+    "kunyomi": "くるま",
+    "onyomi": "シャ",
+    "lesson": 26,
+    "kunyomi_romaji": "kuruma",
+    "onyomi_romaji": "sha"
+  },
+  {
+    "id": 285,
+    "kanji": "神",
+    "meaning": "dewa / roh",
+    "kunyomi": "かみ",
+    "onyomi": "シン / ジン",
+    "lesson": 26,
+    "kunyomi_romaji": "kami",
+    "onyomi_romaji": "shin / jin"
+  },
+  {
+    "id": 286,
+    "kanji": "送",
+    "meaning": "mengirim",
+    "kunyomi": "おく(る) / おく(り)",
+    "onyomi": "ソウ",
+    "lesson": 26,
+    "kunyomi_romaji": "okuru / okuri",
+    "onyomi_romaji": "sou"
+  },
+  {
+    "id": 287,
+    "kanji": "受",
+    "meaning": "menerima",
+    "kunyomi": "う(ける) / う(かる)",
+    "onyomi": "ジュ",
+    "lesson": 26,
+    "kunyomi_romaji": "ukeru / ukaru",
+    "onyomi_romaji": "ju"
+  },
+  {
+    "id": 288,
+    "kanji": "付",
+    "meaning": "menempel / lampir",
+    "kunyomi": "つ(く) / つ(ける)",
+    "onyomi": "フ",
+    "lesson": 26,
+    "kunyomi_romaji": "tsuku / tsukeru",
+    "onyomi_romaji": "fu"
+  },
+  {
+    "id": 289,
+    "kanji": "門",
+    "meaning": "gerbang",
+    "kunyomi": "かど",
+    "onyomi": "モン",
+    "lesson": 26,
+    "kunyomi_romaji": "kado",
+    "onyomi_romaji": "mon"
+  },
+  {
+    "id": 290,
+    "kanji": "急",
+    "meaning": "cepat / mendesak",
+    "kunyomi": "いそ(ぐ)",
+    "onyomi": "キュウ",
+    "lesson": 26,
+    "kunyomi_romaji": "isogu",
+    "onyomi_romaji": "kyuu"
+  },
+  {
+    "id": 291,
+    "kanji": "試",
+    "meaning": "mencoba / ujian",
+    "kunyomi": "こころ(みる) / ため(す)",
+    "onyomi": "シ",
+    "lesson": 26,
+    "kunyomi_romaji": "kokoromiru / tamesu",
+    "onyomi_romaji": "shi"
+  },
+  {
+    "id": 292,
+    "kanji": "合",
+    "meaning": "sesuai / cocok",
+    "kunyomi": "あ(う) / あ(わす) / あ(わせる)",
+    "onyomi": "ゴウ / ガッ",
+    "lesson": 26,
+    "kunyomi_romaji": "au / awasu / awaseru",
+    "onyomi_romaji": "gou / ga"
+  },
+  {
+    "id": 293,
+    "kanji": "博",
+    "meaning": "luas / tersebar luas",
+    "kunyomi": "",
+    "onyomi": "ハク / バク",
+    "lesson": 27,
+    "onyomi_romaji": "haku / baku"
+  },
+  {
+    "id": 294,
+    "kanji": "登",
+    "meaning": "naik / mendaki",
+    "kunyomi": "のぼ(る) / のぼ(り)",
+    "onyomi": "トウ / ト",
+    "lesson": 27,
+    "kunyomi_romaji": "noboru / nobori",
+    "onyomi_romaji": "tou / to"
+  },
+  {
+    "id": 295,
+    "kanji": "難",
+    "meaning": "sulit",
+    "kunyomi": "むずか(しい)",
+    "onyomi": "ナン",
+    "lesson": 27,
+    "kunyomi_romaji": "muzukashii",
+    "onyomi_romaji": "nan"
+  },
+  {
+    "id": 296,
+    "kanji": "漢",
+    "meaning": "Tiongkok / Han",
+    "kunyomi": "",
+    "onyomi": "カン",
+    "lesson": 27,
+    "onyomi_romaji": "kan"
+  },
+  {
+    "id": 297,
+    "kanji": "無",
+    "meaning": "tidak ada",
+    "kunyomi": "な(い) / な(くす) / な(くなる)",
+    "onyomi": "ム / ブ",
+    "lesson": 27,
+    "kunyomi_romaji": "nai / nakusu / nakunaru",
+    "onyomi_romaji": "mu / bu"
+  },
+  {
+    "id": 298,
+    "kanji": "料",
+    "meaning": "bahan / biaya",
+    "kunyomi": "",
+    "onyomi": "リョウ",
+    "lesson": 27,
+    "onyomi_romaji": "ryou"
+  },
+  {
+    "id": 299,
+    "kanji": "貸",
+    "meaning": "meminjamkan",
+    "kunyomi": "か(す) / か(し)",
+    "onyomi": "タイ",
+    "lesson": 27,
+    "kunyomi_romaji": "kasu / kashi",
+    "onyomi_romaji": "tai"
+  },
+  {
+    "id": 300,
+    "kanji": "説",
+    "meaning": "teori / menjelaskan",
+    "kunyomi": "と(く)",
+    "onyomi": "セツ / ゼイ",
+    "lesson": 27,
+    "kunyomi_romaji": "toku",
+    "onyomi_romaji": "setsu / zei"
+  },
+  {
+    "id": 301,
+    "kanji": "全",
+    "meaning": "semua / lengkap",
+    "kunyomi": "すべ(て) / まった(く)",
+    "onyomi": "ゼン",
+    "lesson": 27,
+    "kunyomi_romaji": "subete / mattaku",
+    "onyomi_romaji": "zen"
+  },
+  {
+    "id": 302,
+    "kanji": "参",
+    "meaning": "datang / ikut",
+    "kunyomi": "まい(る)",
+    "onyomi": "サン",
+    "lesson": 27,
+    "kunyomi_romaji": "mairu",
+    "onyomi_romaji": "san"
+  },
+  {
+    "id": 303,
+    "kanji": "加",
+    "meaning": "menambah",
+    "kunyomi": "くわ(える) / くわ(わる)",
+    "onyomi": "カ",
+    "lesson": 27,
+    "kunyomi_romaji": "kuwaeru / kuwawaru",
+    "onyomi_romaji": "ka"
+  },
+  {
+    "id": 304,
+    "kanji": "用",
+    "meaning": "guna / menggunakan",
+    "kunyomi": "もち(いる)",
+    "onyomi": "ヨウ",
+    "lesson": 28,
+    "kunyomi_romaji": "mochiiru",
+    "onyomi_romaji": "you"
+  },
+  {
+    "id": 305,
+    "kanji": "意",
+    "meaning": "maksud / pikiran",
+    "kunyomi": "",
+    "onyomi": "イ",
+    "lesson": 28,
+    "onyomi_romaji": "i"
+  },
+  {
+    "id": 306,
+    "kanji": "材",
+    "meaning": "bahan",
+    "kunyomi": "",
+    "onyomi": "ザイ",
+    "lesson": 28,
+    "onyomi_romaji": "zai"
+  },
+  {
+    "id": 307,
+    "kanji": "野",
+    "meaning": "ladang / liar",
+    "kunyomi": "の",
+    "onyomi": "ヤ",
+    "lesson": 28,
+    "kunyomi_romaji": "no",
+    "onyomi_romaji": "ya"
+  },
+  {
+    "id": 308,
+    "kanji": "菜",
+    "meaning": "sayuran",
+    "kunyomi": "な",
+    "onyomi": "サイ",
+    "lesson": 28,
+    "kunyomi_romaji": "na",
+    "onyomi_romaji": "sai"
+  },
+  {
+    "id": 309,
+    "kanji": "豚",
+    "meaning": "babi",
+    "kunyomi": "ぶた",
+    "onyomi": "トン",
+    "lesson": 28,
+    "kunyomi_romaji": "buta",
+    "onyomi_romaji": "ton"
+  },
+  {
+    "id": 310,
+    "kanji": "皿",
+    "meaning": "piring",
+    "kunyomi": "さら",
+    "onyomi": "",
+    "lesson": 28,
+    "kunyomi_romaji": "sara",
+    "onyomi_romaji": ""
+  },
+  {
+    "id": 311,
+    "kanji": "卵",
+    "meaning": "telur",
+    "kunyomi": "たまご",
+    "onyomi": "ラン",
+    "lesson": 28,
+    "kunyomi_romaji": "tamago",
+    "onyomi_romaji": "ran"
+  },
+  {
+    "id": 312,
+    "kanji": "湯",
+    "meaning": "air panas",
+    "kunyomi": "ゆ",
+    "onyomi": "トウ",
+    "lesson": 28,
+    "kunyomi_romaji": "yu",
+    "onyomi_romaji": "tou"
+  },
+  {
+    "id": 313,
+    "kanji": "調",
+    "meaning": "menyesuaikan / menyelidiki",
+    "kunyomi": "しら(べる) / ととの(う) / ととの(える)",
+    "onyomi": "チョウ",
+    "lesson": 28,
+    "kunyomi_romaji": "shiraberu / totonou / totoeru",
+    "onyomi_romaji": "chou"
+  },
+  {
+    "id": 314,
+    "kanji": "味",
+    "meaning": "rasa",
+    "kunyomi": "あじ",
+    "onyomi": "ミ",
+    "lesson": 28,
+    "kunyomi_romaji": "aji",
+    "onyomi_romaji": "mi"
+  },
+  {
+    "id": 315,
+    "kanji": "甘",
+    "meaning": "manis",
+    "kunyomi": "あま(い)",
+    "onyomi": "カン",
+    "lesson": 29,
+    "kunyomi_romaji": "amai",
+    "onyomi_romaji": "kan"
+  },
+  {
+    "id": 316,
+    "kanji": "辛",
+    "meaning": "pedas",
+    "kunyomi": "から(い)",
+    "onyomi": "シン",
+    "lesson": 29,
+    "kunyomi_romaji": "karai",
+    "onyomi_romaji": "shin"
+  },
+  {
+    "id": 317,
+    "kanji": "苦",
+    "meaning": "susah / pahit",
+    "kunyomi": "にが(い)",
+    "onyomi": "ク",
+    "lesson": 29,
+    "kunyomi_romaji": "nigai",
+    "onyomi_romaji": "ku"
+  },
+  {
+    "id": 318,
+    "kanji": "悪",
+    "meaning": "buruk / jahat",
+    "kunyomi": "わる(い)",
+    "onyomi": "アク / オ",
+    "lesson": 29,
+    "kunyomi_romaji": "warui",
+    "onyomi_romaji": "aku / o"
+  },
+  {
+    "id": 319,
+    "kanji": "机",
+    "meaning": "meja",
+    "kunyomi": "つくえ",
+    "onyomi": "キ",
+    "lesson": 29,
+    "kunyomi_romaji": "tsukue",
+    "onyomi_romaji": "ki"
+  },
+  {
+    "id": 320,
+    "kanji": "使",
+    "meaning": "menggunakan",
+    "kunyomi": "つか(う) / つか(い)",
+    "onyomi": "シ",
+    "lesson": 29,
+    "kunyomi_romaji": "tsukau / tsukai",
+    "onyomi_romaji": "shi"
+  },
+  {
+    "id": 321,
+    "kanji": "終",
+    "meaning": "selesai / berakhir",
+    "kunyomi": "お(わる) / お(える) / お(わり)",
+    "onyomi": "シュウ",
+    "lesson": 29,
+    "kunyomi_romaji": "owaru / oeru / owari",
+    "onyomi_romaji": "shuu"
+  },
+  {
+    "id": 322,
+    "kanji": "氏",
+    "meaning": "marga / tuan",
+    "kunyomi": "うじ",
+    "onyomi": "シ",
+    "lesson": 29,
+    "kunyomi_romaji": "uji",
+    "onyomi_romaji": "shi"
+  },
+  {
+    "id": 323,
+    "kanji": "由",
+    "meaning": "alasan / asal",
+    "kunyomi": "よし",
+    "onyomi": "ユ / ユウ",
+    "lesson": 29,
+    "kunyomi_romaji": "yoshi",
+    "onyomi_romaji": "yu / yuu"
+  },
+  {
+    "id": 324,
+    "kanji": "取",
+    "meaning": "mengambil",
+    "kunyomi": "と(る) / と(り)",
+    "onyomi": "シュ",
+    "lesson": 29,
+    "kunyomi_romaji": "toru / tori",
+    "onyomi_romaji": "shu"
+  },
+  {
+    "id": 325,
+    "kanji": "別",
+    "meaning": "lain / berpisah",
+    "kunyomi": "わか(れる) / わ(ける)",
+    "onyomi": "ベツ",
+    "lesson": 29,
+    "kunyomi_romaji": "wakareru / wakeru",
+    "onyomi_romaji": "betsu"
+  },
+  {
+    "id": 326,
+    "kanji": "伝",
+    "meaning": "menyampaikan / meneruskan",
+    "kunyomi": "つた(える) / つた(わる) / つた(う)",
+    "onyomi": "デン",
+    "lesson": 30,
+    "kunyomi_romaji": "tsutaeru / tsutawaru / tsutau",
+    "onyomi_romaji": "den"
+  },
+  {
+    "id": 327,
+    "kanji": "連",
+    "meaning": "berlanjut / tersambung",
+    "kunyomi": "つら(なる) / つら(ねる) / つ(れる)",
+    "onyomi": "レン",
+    "lesson": 30,
+    "kunyomi_romaji": "tsuranaru / tsuraneru / tsureru",
+    "onyomi_romaji": "ren"
+  },
+  {
+    "id": 328,
+    "kanji": "絡",
+    "meaning": "melilit / terkait",
+    "kunyomi": "から(む) / から(まる) / から(める)",
+    "onyomi": "ラク",
+    "lesson": 30,
+    "kunyomi_romaji": "karamu / karamaru / karameru",
+    "onyomi_romaji": "raku"
+  },
+  {
+    "id": 329,
+    "kanji": "吸",
+    "meaning": "menghirup / menyedot",
+    "kunyomi": "す(う)",
+    "onyomi": "キュウ",
+    "lesson": 30,
+    "kunyomi_romaji": "suu",
+    "onyomi_romaji": "kyuu"
+  },
+  {
+    "id": 330,
+    "kanji": "熱",
+    "meaning": "panas / demam",
+    "kunyomi": "あつ(い) / ほて(る)",
+    "onyomi": "ネツ",
+    "lesson": 30,
+    "kunyomi_romaji": "atsui / hoteru",
+    "onyomi_romaji": "netsu"
+  },
+  {
+    "id": 331,
+    "kanji": "者",
+    "meaning": "orang / pihak",
+    "kunyomi": "もの",
+    "onyomi": "シャ",
+    "lesson": 30,
+    "kunyomi_romaji": "mono",
+    "onyomi_romaji": "sha"
+  },
+  {
+    "id": 332,
+    "kanji": "眠",
+    "meaning": "mengantuk / tidur",
+    "kunyomi": "ねむ(い) / ねむ(る)",
+    "onyomi": "ミン",
+    "lesson": 30,
+    "kunyomi_romaji": "nemui / nemuru",
+    "onyomi_romaji": "min"
+  },
+  {
+    "id": 333,
+    "kanji": "寝",
+    "meaning": "tidur / berbaring",
+    "kunyomi": "ね(る) / ね(かす)",
+    "onyomi": "シン",
+    "lesson": 30,
+    "kunyomi_romaji": "neru / nekasu",
+    "onyomi_romaji": "shin"
+  },
+  {
+    "id": 334,
+    "kanji": "顔",
+    "meaning": "wajah",
+    "kunyomi": "かお",
+    "onyomi": "ガン",
+    "lesson": 30,
+    "kunyomi_romaji": "kao",
+    "onyomi_romaji": "gan"
+  },
+  {
+    "id": 335,
+    "kanji": "頭",
+    "meaning": "kepala",
+    "kunyomi": "あたま / かしら",
+    "onyomi": "トウ / ズ / ト",
+    "lesson": 30,
+    "kunyomi_romaji": "atama / kashira",
+    "onyomi_romaji": "tou / zu / to"
+  },
+  {
+    "id": 336,
+    "kanji": "起",
+    "meaning": "bangun / terjadi",
+    "kunyomi": "お(きる) / お(こす) / お(こる)",
+    "onyomi": "キ",
+    "lesson": 30,
+    "kunyomi_romaji": "okiru / okosu / okoru",
+    "onyomi_romaji": "ki"
+  },
+  {
+    "id": 337,
+    "kanji": "運",
+    "meaning": "keberuntungan / mengangkut",
+    "kunyomi": "はこ(ぶ) / はこ(び)",
+    "onyomi": "ウン",
+    "lesson": 31,
+    "kunyomi_romaji": "hakobu / hakobi",
+    "onyomi_romaji": "un"
+  },
+  {
+    "id": 338,
+    "kanji": "両",
+    "meaning": "keduanya / dua",
+    "kunyomi": "",
+    "onyomi": "リョウ",
+    "lesson": 31,
+    "kunyomi_romaji": "",
+    "onyomi_romaji": "ryou"
+  },
+  {
+    "id": 339,
+    "kanji": "幸",
+    "meaning": "kebahagiaan / keberuntungan",
+    "kunyomi": "しあわ(せ) / さいわ(い) / さち",
+    "onyomi": "コウ",
+    "lesson": 31,
+    "kunyomi_romaji": "shiawase / saiwai / sachi",
+    "onyomi_romaji": "kou"
+  },
+  {
+    "id": 340,
+    "kanji": "誕",
+    "meaning": "lahir",
+    "kunyomi": "う(まれる)",
+    "onyomi": "タン",
+    "lesson": 31,
+    "kunyomi_romaji": "umareru",
+    "onyomi_romaji": "tan"
+  },
+  {
+    "id": 341,
+    "kanji": "結",
+    "meaning": "mengikat / menyatukan",
+    "kunyomi": "むす(ぶ) / ゆ(う)",
+    "onyomi": "ケツ",
+    "lesson": 31,
+    "kunyomi_romaji": "musubu / yuu",
+    "onyomi_romaji": "ketsu"
+  },
+  {
+    "id": 342,
+    "kanji": "婚",
+    "meaning": "perkawinan / menikah",
+    "kunyomi": "",
+    "onyomi": "コン",
+    "lesson": 31,
+    "onyomi_romaji": "kon"
+  },
+  {
+    "id": 343,
+    "kanji": "選",
+    "meaning": "memilih",
+    "kunyomi": "えら(ぶ)",
+    "onyomi": "セン",
+    "lesson": 31,
+    "kunyomi_romaji": "erabu",
+    "onyomi_romaji": "sen"
+  },
+  {
+    "id": 344,
+    "kanji": "思",
+    "meaning": "berpikir",
+    "kunyomi": "おも(う)",
+    "onyomi": "シ",
+    "lesson": 31,
+    "kunyomi_romaji": "omou",
+    "onyomi_romaji": "shi"
+  },
+  {
+    "id": 345,
+    "kanji": "格",
+    "meaning": "standar / status",
+    "kunyomi": "",
+    "onyomi": "カク",
+    "lesson": 31,
+    "onyomi_romaji": "kaku"
   }
 ];

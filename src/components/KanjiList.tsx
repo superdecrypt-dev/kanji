@@ -147,7 +147,7 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress }) => {
                       )}
                     </div>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-[10px] font-medium text-muted-foreground/50">N4-L{kanji.lesson}</span>
+                      <span className="text-[10px] font-medium text-muted-foreground/50">L{kanji.lesson}</span>
                       {level !== 'new' && p && (
                         <span className="text-[10px] font-bold text-muted-foreground/40">{p.correct}/{p.correct + p.wrong} benar</span>
                       )}

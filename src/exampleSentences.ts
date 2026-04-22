@@ -788,4 +788,295 @@ export const exampleSentences: Record<string, ExampleSentence[]> = {
   "医": [
     { japanese: "医者になりたいです。", reading: "いしゃになりたいです。", meaning: "Ingin menjadi dokter." }
   ],
+  "枚": [
+    { japanese: "切手を三枚買いました。", reading: "きってをさんまいかいました。", meaning: "Saya membeli tiga lembar perangko." }
+  ],
+  "横": [
+    { japanese: "いすは机の横にあります。", reading: "いすはつくえのよこにあります。", meaning: "Kursinya ada di samping meja." }
+  ],
+  "階": [
+    { japanese: "受付は二階です。", reading: "うけつけはにかいです。", meaning: "Resepsionis ada di lantai dua." }
+  ],
+  "押": [
+    { japanese: "このボタンを押してください。", reading: "このボタンをおしてください。", meaning: "Tolong tekan tombol ini." }
+  ],
+  "引": [
+    { japanese: "ドアを引いて開けます。", reading: "ドアをひいてあけます。", meaning: "Buka pintu dengan menariknya." }
+  ],
+  "映": [
+    { japanese: "この写真はよく映っています。", reading: "このしゃしんはよくうつっています。", meaning: "Foto ini terlihat dengan jelas." }
+  ],
+  "画": [
+    { japanese: "昨日、友達と映画を見ました。", reading: "きのう、ともだちとえいがをみました。", meaning: "Kemarin saya menonton film dengan teman." }
+  ],
+  "温": [
+    { japanese: "スープがまだ温かいです。", reading: "スープがまだあたたかいです。", meaning: "Supnya masih hangat." }
+  ],
+  "泉": [
+    { japanese: "公園にきれいな泉があります。", reading: "こうえんにきれいないずみがあります。", meaning: "Di taman ada mata air yang indah." }
+  ],
+  "予": [
+    { japanese: "旅行の予定を立てています。", reading: "りょこうのよていをたてています。", meaning: "Saya sedang menyusun rencana perjalanan." }
+  ],
+  "定": [
+    { japanese: "会議は三時に始まる予定です。", reading: "かいぎはさんじにはじまるよていです。", meaning: "Rapat dijadwalkan mulai jam tiga." }
+  ],
+  "旅": [
+    { japanese: "来月、家族と旅に出ます。", reading: "らいげつ、かぞくとたびにでます。", meaning: "Bulan depan saya akan bepergian dengan keluarga." }
+  ],
+  "仕": [
+    { japanese: "母は銀行で仕事をしています。", reading: "はははぎんこうでしごとをしています。", meaning: "Ibu bekerja di bank." }
+  ],
+  "事": [
+    { japanese: "大事な事を忘れないでください。", reading: "だいじなことをわすれないでください。", meaning: "Tolong jangan lupakan hal yang penting." }
+  ],
+  "活": [
+    { japanese: "毎朝運動して生活を整えます。", reading: "まいあさうんどうしてせいかつをととのえます。", meaning: "Saya berolahraga tiap pagi untuk menata pola hidup." }
+  ],
+  "去": [
+    { japanese: "去年、日本へ行きました。", reading: "きょねん、にほんへいきました。", meaning: "Tahun lalu saya pergi ke Jepang." }
+  ],
+  "先": [
+    { japanese: "先に昼ご飯を食べます。", reading: "さきにひるごはんをたべます。", meaning: "Saya makan siang lebih dulu." }
+  ],
+  "音": [
+    { japanese: "この音が聞こえますか。", reading: "このおとがきこえますか。", meaning: "Apakah suara ini terdengar?" }
+  ],
+  "楽": [
+    { japanese: "音楽を聞くと楽しいです。", reading: "おんがくをきくとたのしいです。", meaning: "Mendengarkan musik itu menyenangkan." }
+  ],
+  "犬": [
+    { japanese: "犬が庭で遊んでいます。", reading: "いぬがにわであそんでいます。", meaning: "Anjing itu sedang bermain di halaman." }
+  ],
+  "族": [
+    { japanese: "家族と夕飯を食べます。", reading: "かぞくとゆうはんをたべます。", meaning: "Saya makan malam bersama keluarga." }
+  ],
+  "季": [
+    { japanese: "日本には四季があります。", reading: "にほんにはしきがあります。", meaning: "Di Jepang ada empat musim." }
+  ],
+  "節": [
+    { japanese: "季節が変わりました。", reading: "きせつがかわりました。", meaning: "Musimnya sudah berubah." }
+  ],
+  "春": [
+    { japanese: "春は花がたくさん咲きます。", reading: "はるははながたくさんさきます。", meaning: "Di musim semi banyak bunga bermekaran." }
+  ],
+  "夏": [
+    { japanese: "夏は海へ行きたいです。", reading: "なつはうみへいきたいです。", meaning: "Saat musim panas saya ingin pergi ke laut." }
+  ],
+  "秋": [
+    { japanese: "秋は涼しくて好きです。", reading: "あきはすずしくてすきです。", meaning: "Saya suka musim gugur karena sejuk." }
+  ],
+  "冬": [
+    { japanese: "冬は雪が降ります。", reading: "ふゆはゆきがふります。", meaning: "Pada musim dingin turun salju." }
+  ],
+  "同": [
+    { japanese: "同じ本を持っています。", reading: "おなじほんをもっています。", meaning: "Saya punya buku yang sama." }
+  ],
+  "暑": [
+    { japanese: "今日はとても暑いです。", reading: "きょうはとてもあついです。", meaning: "Hari ini sangat panas." }
+  ],
+  "寒": [
+    { japanese: "朝は寒かったです。", reading: "あさはさむかったです。", meaning: "Tadi pagi dingin." }
+  ],
+  "天": [
+    { japanese: "天気がいいので散歩します。", reading: "てんきがいいのでさんぽします。", meaning: "Karena cuacanya bagus, saya berjalan-jalan." }
+  ],
+  "風": [
+    { japanese: "風が強いですね。", reading: "かぜがつよいですね。", meaning: "Anginnya kencang ya." }
+  ],
+  "昨": [
+    { japanese: "昨日、友達に会いました。", reading: "きのう、ともだちにあいました。", meaning: "Kemarin saya bertemu teman." }
+  ],
+  "堂": [
+    { japanese: "食堂で昼ご飯を食べます。", reading: "しょくどうでひるごはんをたべます。", meaning: "Saya makan siang di kantin." }
+  ],
+  "銀": [
+    { japanese: "銀行でお金を下ろします。", reading: "ぎんこうでおかねをおろします。", meaning: "Saya menarik uang di bank." }
+  ],
+  "車": [
+    { japanese: "車で駅まで行きます。", reading: "くるまでえきまでいきます。", meaning: "Saya pergi ke stasiun dengan mobil." }
+  ],
+  "神": [
+    { japanese: "神社でお祈りしました。", reading: "じんじゃでおいのりしました。", meaning: "Saya berdoa di kuil Shinto." }
+  ],
+  "送": [
+    { japanese: "友達にメールを送ります。", reading: "ともだちにメールをおくります。", meaning: "Saya mengirim email ke teman." }
+  ],
+  "受": [
+    { japanese: "明日、試験を受けます。", reading: "あした、しけんをうけます。", meaning: "Besok saya akan mengikuti ujian." }
+  ],
+  "付": [
+    { japanese: "シャツにボタンを付けます。", reading: "シャツにボタンをつけます。", meaning: "Saya memasang kancing pada baju." }
+  ],
+  "門": [
+    { japanese: "門の前で写真を撮りました。", reading: "もんのまえでしゃしんをとりました。", meaning: "Saya mengambil foto di depan gerbang." }
+  ],
+  "急": [
+    { japanese: "急いで駅へ向かいます。", reading: "いそいでえきへむかいます。", meaning: "Saya bergegas menuju stasiun." }
+  ],
+  "試": [
+    { japanese: "新しい方法を試してみます。", reading: "あたらしいほうほうをためしてみます。", meaning: "Saya mencoba cara baru." }
+  ],
+  "合": [
+    { japanese: "この靴は足に合いません。", reading: "このくつはあしにあいません。", meaning: "Sepatu ini tidak pas di kaki." }
+  ],
+  "博": [
+    { japanese: "博物館で歴史を勉強しました。", reading: "はくぶつかんでれきしをべんきょうしました。", meaning: "Saya belajar sejarah di museum." }
+  ],
+  "登": [
+    { japanese: "山に登るのが好きです。", reading: "やまにのぼるのがすきです。", meaning: "Saya suka mendaki gunung." }
+  ],
+  "難": [
+    { japanese: "この問題は難しいです。", reading: "このもんだいはむずかしいです。", meaning: "Soal ini sulit." }
+  ],
+  "漢": [
+    { japanese: "漢字を毎日十個練習します。", reading: "かんじをまいにちじゅっこれんしゅうします。", meaning: "Saya berlatih sepuluh kanji setiap hari." }
+  ],
+  "無": [
+    { japanese: "今日は宿題が無いです。", reading: "きょうはしゅくだいがないです。", meaning: "Hari ini tidak ada PR." }
+  ],
+  "料": [
+    { japanese: "日本料理が大好きです。", reading: "にほんりょうりがだいすきです。", meaning: "Saya sangat suka masakan Jepang." }
+  ],
+  "貸": [
+    { japanese: "友達に本を貸しました。", reading: "ともだちにほんをかしました。", meaning: "Saya meminjamkan buku kepada teman." }
+  ],
+  "説": [
+    { japanese: "先生が文法を説明します。", reading: "せんせいがぶんぽうをせつめいします。", meaning: "Guru menjelaskan tata bahasa." }
+  ],
+  "全": [
+    { japanese: "全部食べてください。", reading: "ぜんぶたべてください。", meaning: "Tolong makan semuanya." }
+  ],
+  "参": [
+    { japanese: "会議に参加します。", reading: "かいぎにさんかします。", meaning: "Saya ikut serta dalam rapat." }
+  ],
+  "加": [
+    { japanese: "スープに塩を加えます。", reading: "スープにしおをくわえます。", meaning: "Saya menambahkan garam ke sup." }
+  ],
+  "用": [
+    { japanese: "この道具は料理用です。", reading: "このどうぐはりょうりようです。", meaning: "Alat ini untuk memasak." }
+  ],
+  "意": [
+    { japanese: "この言葉の意味に注意してください。", reading: "このことばのいみにちゅういしてください。", meaning: "Perhatikan arti kata ini." }
+  ],
+  "材": [
+    { japanese: "木の材料で棚を作ります。", reading: "きのざいりょうでたなをつくります。", meaning: "Saya membuat rak dari bahan kayu." }
+  ],
+  "野": [
+    { japanese: "野菜をたくさん食べます。", reading: "やさいをたくさんたべます。", meaning: "Saya makan banyak sayur." }
+  ],
+  "菜": [
+    { japanese: "野菜を細かく切ってください。", reading: "やさいをこまかくきってください。", meaning: "Tolong potong sayurnya kecil-kecil." }
+  ],
+  "豚": [
+    { japanese: "豚肉を少し買いました。", reading: "ぶたにくをすこしかいました。", meaning: "Saya membeli sedikit daging babi." }
+  ],
+  "皿": [
+    { japanese: "皿をテーブルに並べます。", reading: "さらをテーブルにならべます。", meaning: "Saya menata piring di meja." }
+  ],
+  "卵": [
+    { japanese: "朝ご飯に卵を食べます。", reading: "あさごはんにたまごをたべます。", meaning: "Saya makan telur saat sarapan." }
+  ],
+  "湯": [
+    { japanese: "熱い湯を入れてください。", reading: "あついゆをいれてください。", meaning: "Tolong tuangkan air panas." }
+  ],
+  "調": [
+    { japanese: "音量を調整してください。", reading: "おんりょうをちょうせいしてください。", meaning: "Tolong atur volumenya." }
+  ],
+  "味": [
+    { japanese: "このスープは味が薄いです。", reading: "このスープはあじがうすいです。", meaning: "Sup ini rasanya hambar." }
+  ],
+  "甘": [
+    { japanese: "このケーキは甘いです。", reading: "このケーキはあまいです。", meaning: "Kue ini manis." }
+  ],
+  "辛": [
+    { japanese: "このカレーは少し辛いです。", reading: "このカレーはすこしからいです。", meaning: "Kari ini agak pedas." }
+  ],
+  "苦": [
+    { japanese: "この薬は苦いです。", reading: "このくすりはにがいです。", meaning: "Obat ini pahit." }
+  ],
+  "悪": [
+    { japanese: "天気が悪いので出かけません。", reading: "てんきがわるいのででかけません。", meaning: "Saya tidak keluar karena cuacanya buruk." }
+  ],
+  "机": [
+    { japanese: "机の上にノートがあります。", reading: "つくえのうえにノートがあります。", meaning: "Ada buku catatan di atas meja." }
+  ],
+  "使": [
+    { japanese: "毎日パソコンを使います。", reading: "まいにちパソコンをつかいます。", meaning: "Saya memakai komputer setiap hari." }
+  ],
+  "終": [
+    { japanese: "授業は五時に終わります。", reading: "じゅぎょうはごじにおわります。", meaning: "Pelajaran selesai jam lima." }
+  ],
+  "氏": [
+    { japanese: "鈴木氏は会議に出席しています。", reading: "すずきしはかいぎにしゅっせきしています。", meaning: "Tuan Suzuki hadir dalam rapat." }
+  ],
+  "由": [
+    { japanese: "欠席した理由を教えてください。", reading: "けっせきしたりゆうをおしえてください。", meaning: "Tolong beri tahu alasan ketidakhadiranmu." }
+  ],
+  "取": [
+    { japanese: "本を棚から取ってください。", reading: "ほんをたなからとってください。", meaning: "Tolong ambil buku dari rak." }
+  ],
+  "別": [
+    { japanese: "別の日に会いましょう。", reading: "べつのひにあいましょう。", meaning: "Mari bertemu di hari lain." }
+  ],
+  "伝": [
+    { japanese: "このことをみんなに伝えてください。", reading: "このことをみんなにつたえてください。", meaning: "Tolong sampaikan hal ini kepada semua orang." }
+  ],
+  "連": [
+    { japanese: "後で連絡します。", reading: "あとでれんらくします。", meaning: "Nanti saya akan menghubungi." }
+  ],
+  "絡": [
+    { japanese: "先生に連絡を取りました。", reading: "せんせいにれんらくをとりました。", meaning: "Saya sudah menghubungi guru." }
+  ],
+  "吸": [
+    { japanese: "深く息を吸ってください。", reading: "ふかくいきをすってください。", meaning: "Tolong tarik napas dalam-dalam." }
+  ],
+  "熱": [
+    { japanese: "熱があるので休みます。", reading: "ねつがあるのでやすみます。", meaning: "Saya istirahat karena demam." }
+  ],
+  "者": [
+    { japanese: "初めて来た者です。", reading: "はじめてきたものです。", meaning: "Saya orang yang datang pertama kali ke sini." }
+  ],
+  "眠": [
+    { japanese: "昼ご飯の後は眠いです。", reading: "ひるごはんのあとはねむいです。", meaning: "Setelah makan siang saya mengantuk." }
+  ],
+  "寝": [
+    { japanese: "毎晩十一時に寝ます。", reading: "まいばんじゅういちじにねます。", meaning: "Saya tidur tiap malam jam sebelas." }
+  ],
+  "顔": [
+    { japanese: "彼女はいつも明るい顔をしています。", reading: "かのじょはいつもあかるいかおをしています。", meaning: "Dia selalu berwajah cerah." }
+  ],
+  "頭": [
+    { japanese: "頭が少し痛いです。", reading: "あたまがすこしいたいです。", meaning: "Kepala saya agak sakit." }
+  ],
+  "起": [
+    { japanese: "毎朝六時に起きます。", reading: "まいあさろくじにおきます。", meaning: "Saya bangun tiap pagi jam enam." }
+  ],
+  "運": [
+    { japanese: "荷物を運ぶのを手伝います。", reading: "にもつをはこぶのをてつだいます。", meaning: "Saya membantu mengangkut barang." }
+  ],
+  "両": [
+    { japanese: "両親は大阪に住んでいます。", reading: "りょうしんはおおさかにすんでいます。", meaning: "Kedua orang tua saya tinggal di Osaka." }
+  ],
+  "幸": [
+    { japanese: "あなたの幸せを願っています。", reading: "あなたのしあわせをねがっています。", meaning: "Saya mendoakan kebahagiaanmu." }
+  ],
+  "誕": [
+    { japanese: "来週、妹の誕生日です。", reading: "らいしゅう、いもうとのたんじょうびです。", meaning: "Minggu depan adalah ulang tahun adik perempuan saya." }
+  ],
+  "結": [
+    { japanese: "ひもをしっかり結んでください。", reading: "ひもをしっかりむすんでください。", meaning: "Tolong ikat talinya dengan kuat." }
+  ],
+  "婚": [
+    { japanese: "友達が来月結婚します。", reading: "ともだちがらいげつけっこんします。", meaning: "Teman saya akan menikah bulan depan." }
+  ],
+  "選": [
+    { japanese: "好きな色を一つ選んでください。", reading: "すきないろをひとつえらんでください。", meaning: "Tolong pilih satu warna yang kamu suka." }
+  ],
+  "思": [
+    { japanese: "私もそう思います。", reading: "わたしもそうおもいます。", meaning: "Saya juga berpikir begitu." }
+  ],
+  "格": [
+    { japanese: "彼は試験に合格しました。", reading: "かれはしけんにごうかくしました。", meaning: "Dia lulus ujian." }
+  ],
 };

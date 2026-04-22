@@ -5,6 +5,7 @@ import { Lightbulb, SkipForward } from 'lucide-react';
 import { pickAdaptiveKanji, getMasteryLevel, getMasteryColor, getMasteryLabel } from '../hooks/useProgress';
 import type { KanjiProgress } from '../hooks/useProgress';
 import LessonSelector from './LessonSelector';
+import { getAcceptedReadingAnswers, getReadingHintBase, formatReadingDisplay } from '../kanjiReadings';
 
 interface TypingQuizProps {
   kanjiList: Kanji[];
@@ -21,14 +22,26 @@ interface QuizState {
   readingType?: ReadingType; // only set when isMeaning is false
 }
 
-const splitJapaneseStr = (str: string | undefined | null): string[] => {
+const normalizeAnswer = (str: string | undefined | null): string => {
+  if (!str) return '';
+  return str.toLowerCase().trim().replace(/\s+/g, ' ');
+};
+
+const splitAnswerOptions = (str: string | undefined | null): string[] => {
   if (!str) return [];
-  const normalized = str.toLowerCase();
-  // Pisahkan berdasarkan , / ( ) [ ] dan hapus yang kosong
-  const parts = normalized.split(/[,/()[\]]/).map(s => s.trim()).filter(Boolean);
-  // Tambahkan versi tanpa tanda kurung sama sekali
-  const cleanVersion = normalized.replace(/[()[\]]/g, '').trim();
-  return Array.from(new Set([...parts, cleanVersion])).filter(Boolean);
+  return str
+    .split(/[\/,、]/)
+    .map(option => normalizeAnswer(option))
+    .filter(Boolean);
+};
+
+const getMeaningAnswers = (str: string | undefined | null): string[] => {
+  const answers = splitAnswerOptions(str).flatMap(option => {
+    const withoutNotes = normalizeAnswer(option.replace(/\s*\([^)]*\)/g, ''));
+    return withoutNotes && withoutNotes !== option ? [option, withoutNotes] : [option];
+  });
+
+  return Array.from(new Set(answers));
 };
 
 const createQuestion = (
@@ -108,26 +121,14 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
     e.preventDefault();
     if (!quizState || !input.trim() || showAnswer || isCorrectAnim) return;
 
-    const userAns = input.trim().toLowerCase();
+    const userAns = normalizeAnswer(input);
     let isCorrect = false;
 
     if (quizState.isMeaning) {
-      const validMeanings = splitJapaneseStr(quizState.kanji.meaning);
-      isCorrect = validMeanings.some(m => m === userAns || m.includes(userAns) || userAns.includes(m));
+      const validMeanings = getMeaningAnswers(quizState.kanji.meaning);
+      isCorrect = validMeanings.some(m => m === userAns);
     } else {
-      // Validate against specific reading type
-      let validReadings: string[];
-      if (quizState.readingType === 'kunyomi') {
-        validReadings = [
-          ...splitJapaneseStr(quizState.kanji.kunyomi_romaji),
-          ...splitJapaneseStr(quizState.kanji.kunyomi),
-        ];
-      } else {
-        validReadings = [
-          ...splitJapaneseStr(quizState.kanji.onyomi_romaji),
-          ...splitJapaneseStr(quizState.kanji.onyomi),
-        ];
-      }
+      const validReadings = getAcceptedReadingAnswers(quizState.kanji, quizState.readingType === 'kunyomi' ? 'kunyomi' : 'onyomi');
       isCorrect = validReadings.some(r => r === userAns);
     }
 
@@ -183,10 +184,10 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
       return meaning.substring(0, Math.ceil(meaning.length / 3)) + '...';
     } else {
       const reading = quizState.readingType === 'kunyomi' 
-        ? (quizState.kanji.kunyomi_romaji || quizState.kanji.kunyomi || '')
-        : (quizState.kanji.onyomi_romaji || quizState.kanji.onyomi || '');
+        ? getReadingHintBase(quizState.kanji, 'kunyomi')
+        : getReadingHintBase(quizState.kanji, 'onyomi');
       if (!reading) return '...';
-      const first = reading.split(/[,/]/)[0].trim();
+      const first = reading.trim();
       return first.substring(0, Math.ceil(first.length / 3)) + '...';
     }
   };
@@ -201,8 +202,8 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
   const correctAnswersDisplay = isMeaning 
     ? kanji.meaning 
     : readingType === 'kunyomi'
-      ? [kanji.kunyomi, kanji.kunyomi_romaji ? `(${kanji.kunyomi_romaji})` : ''].filter(Boolean).join(' ')
-      : [kanji.onyomi, kanji.onyomi_romaji ? `(${kanji.onyomi_romaji})` : ''].filter(Boolean).join(' ');
+      ? formatReadingDisplay(kanji, 'kunyomi')
+      : formatReadingDisplay(kanji, 'onyomi');
 
   const p = progressData[kanji.id];
   const level = getMasteryLevel(p);
@@ -266,7 +267,7 @@ const TypingQuiz: React.FC<TypingQuizProps> = ({ kanjiList, progress: progressDa
               <div className="flex items-center justify-center gap-2 mb-5">
                 <span className={`w-2 h-2 rounded-full ${masteryColorClass}`} />
                 <span className="text-[10px] font-bold text-muted-foreground">{masteryLabelText}</span>
-                <span className="text-[10px] text-muted-foreground">N4-L{kanji.lesson}</span>
+                <span className="text-[10px] text-muted-foreground">L{kanji.lesson}</span>
                 {p && <span className="text-[10px] text-muted-foreground">{p.correct}/{p.correct + p.wrong} benar</span>}
               </div>
 

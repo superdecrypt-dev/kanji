@@ -5,6 +5,7 @@ import { CheckCircle2, XCircle, BookOpen } from 'lucide-react';
 import { jukugoList } from '../jukugoData';
 import { pickAdaptiveKanji } from '../hooks/useProgress';
 import type { KanjiProgress } from '../hooks/useProgress';
+import { getAcceptedReadingAnswers, getPrimaryReadingChoices, formatReadingDisplay } from '../kanjiReadings';
 
 interface AdvancedQuizProps {
   kanjiList: Kanji[];
@@ -52,15 +53,18 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     else if (questionMode === 'reading') currentMode = 'kanjiToReading';
     else currentMode = Math.random() > 0.5 ? 'kanjiToMeaning' : 'kanjiToReading';
     
-    const allValidReadings = [...splitJapaneseStr(targetKanji.onyomi), ...splitJapaneseStr(targetKanji.kunyomi)];
+    const allValidReadings = [
+      ...getAcceptedReadingAnswers(targetKanji, 'onyomi'),
+      ...getAcceptedReadingAnswers(targetKanji, 'kunyomi')
+    ];
     const allValidMeanings = splitJapaneseStr(targetKanji.meaning).map(m => m.toLowerCase());
 
     const correctAnswer = currentMode === 'kanjiToMeaning'
       ? targetKanji.meaning
       : (() => {
       const availableReadings = [];
-      if (targetKanji.onyomi) availableReadings.push(targetKanji.onyomi);
-      if (targetKanji.kunyomi) availableReadings.push(targetKanji.kunyomi);
+      availableReadings.push(...getPrimaryReadingChoices(targetKanji, 'onyomi'));
+      availableReadings.push(...getPrimaryReadingChoices(targetKanji, 'kunyomi'));
       return availableReadings.length > 0
         ? availableReadings[Math.floor(Math.random() * availableReadings.length)]
         : (targetKanji.onyomi || targetKanji.kunyomi || targetKanji.meaning);
@@ -76,7 +80,10 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
         const isActuallyCorrect = allValidMeanings.some(m => wrongText.toLowerCase().includes(m) || m.includes(wrongText.toLowerCase()));
         if (isActuallyCorrect) continue;
       } else {
-        const rReadings = [...splitJapaneseStr(randomWrong.onyomi), ...splitJapaneseStr(randomWrong.kunyomi)];
+        const rReadings = [
+          ...getPrimaryReadingChoices(randomWrong, 'onyomi'),
+          ...getPrimaryReadingChoices(randomWrong, 'kunyomi')
+        ];
         wrongText = rReadings.length > 0 ? rReadings[Math.floor(Math.random() * rReadings.length)] : randomWrong.meaning;
         const wrongParts = splitJapaneseStr(wrongText);
         const isActuallyCorrect = wrongParts.some(wp => allValidReadings.includes(wp));
@@ -140,7 +147,10 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
         const optParts = splitJapaneseStr(option).map(o => o.toLowerCase());
         return optParts.some(op => allMeanings.includes(op)) || allMeanings.includes(option.toLowerCase());
       } else {
-        const allReadings = [...splitJapaneseStr(kanjiData.onyomi), ...splitJapaneseStr(kanjiData.kunyomi)];
+        const allReadings = [
+          ...getAcceptedReadingAnswers(kanjiData, 'onyomi'),
+          ...getAcceptedReadingAnswers(kanjiData, 'kunyomi')
+        ];
         const optParts = splitJapaneseStr(option);
         return optParts.some(op => allReadings.includes(op)) || allReadings.includes(option);
       }
@@ -201,7 +211,11 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
   let infoCorrectAnswer = '';
   if (quizType === 'kanji') {
     const kanjiData = kanjiList.find(k => k.kanji === currentWord.word);
-    infoCorrectAnswer = mode === 'kanjiToMeaning' ? kanjiData?.meaning || '' : (kanjiData?.onyomi && kanjiData?.kunyomi ? `${kanjiData.onyomi} / ${kanjiData.kunyomi}` : (kanjiData?.onyomi || kanjiData?.kunyomi || ''));
+    infoCorrectAnswer = mode === 'kanjiToMeaning'
+      ? kanjiData?.meaning || ''
+      : kanjiData
+        ? [formatReadingDisplay(kanjiData, 'onyomi'), formatReadingDisplay(kanjiData, 'kunyomi')].filter(Boolean).join(' / ')
+        : '';
   } else {
     infoCorrectAnswer = mode === 'kanjiToMeaning' ? currentWord.meaning : currentWord.reading;
   }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Kanji } from '../data';
 import './Quiz.css';
+import { getAcceptedReadingAnswers, getPrimaryReadingChoices } from '../kanjiReadings';
 
 interface QuizProps {
   kanjiList: Kanji[];
@@ -25,7 +26,12 @@ function createNewQuestion(kanjiList: Kanji[]): QuizState {
   
   const type: QuestionType = Math.random() > 0.5 ? 'meaning' : 'reading';
 
-  let correctAnswer = type === 'meaning' ? targetKanji.meaning : (targetKanji.onyomi || targetKanji.kunyomi);
+  let correctAnswer = type === 'meaning'
+    ? targetKanji.meaning
+    : (() => {
+      const readings = [...getPrimaryReadingChoices(targetKanji, 'onyomi'), ...getPrimaryReadingChoices(targetKanji, 'kunyomi')];
+      return readings[0] || targetKanji.onyomi || targetKanji.kunyomi;
+    })();
   if (!correctAnswer) {
     correctAnswer = targetKanji.kunyomi || targetKanji.onyomi || targetKanji.meaning;
   }
@@ -37,7 +43,8 @@ function createNewQuestion(kanjiList: Kanji[]): QuizState {
     const randomWrong = kanjiList[Math.floor(Math.random() * kanjiList.length)];
     if (randomWrong.id === targetKanji.id) continue;
     
-    const wrongText = type === 'meaning' ? randomWrong.meaning : (randomWrong.onyomi || randomWrong.kunyomi || randomWrong.meaning);
+    const wrongReadings = [...getPrimaryReadingChoices(randomWrong, 'onyomi'), ...getPrimaryReadingChoices(randomWrong, 'kunyomi')];
+    const wrongText = type === 'meaning' ? randomWrong.meaning : (wrongReadings[0] || randomWrong.onyomi || randomWrong.kunyomi || randomWrong.meaning);
     if (wrongText && wrongText !== correctAnswer) {
       wrongAnswers.add(wrongText);
     }
@@ -67,7 +74,12 @@ const Quiz: React.FC<QuizProps> = ({ kanjiList }) => {
   const handleAnswerClick = (option: string) => {
     if (selectedAnswer !== null || !currentKanji) return;
 
-    let correctAnswer = questionType === 'meaning' ? currentKanji.meaning : (currentKanji.onyomi || currentKanji.kunyomi);
+    let correctAnswer = questionType === 'meaning'
+      ? currentKanji.meaning
+      : (() => {
+        const readings = [...getPrimaryReadingChoices(currentKanji, 'onyomi'), ...getPrimaryReadingChoices(currentKanji, 'kunyomi')];
+        return readings[0] || currentKanji.onyomi || currentKanji.kunyomi;
+      })();
     if (!correctAnswer) {
       correctAnswer = currentKanji.kunyomi || currentKanji.onyomi || currentKanji.meaning;
     }
@@ -75,7 +87,11 @@ const Quiz: React.FC<QuizProps> = ({ kanjiList }) => {
     setQuizState(prev => ({ ...prev, selectedAnswer: option }));
     setTotalQuestions(prev => prev + 1);
     
-    if (option === correctAnswer) {
+    const isCorrect = questionType === 'meaning'
+      ? option === correctAnswer
+      : [...getAcceptedReadingAnswers(currentKanji, 'onyomi'), ...getAcceptedReadingAnswers(currentKanji, 'kunyomi')].includes(option);
+
+    if (isCorrect) {
       setScore(prev => prev + 1);
     }
 
@@ -86,7 +102,12 @@ const Quiz: React.FC<QuizProps> = ({ kanjiList }) => {
 
   if (!currentKanji) return <div>Loading...</div>;
 
-  const correctAnswer = questionType === 'meaning' ? currentKanji.meaning : (currentKanji.onyomi || currentKanji.kunyomi || currentKanji.meaning);
+  const correctAnswer = questionType === 'meaning'
+    ? currentKanji.meaning
+    : [...getPrimaryReadingChoices(currentKanji, 'onyomi'), ...getPrimaryReadingChoices(currentKanji, 'kunyomi')][0]
+      || currentKanji.onyomi
+      || currentKanji.kunyomi
+      || currentKanji.meaning;
 
   return (
     <div className="quiz-container">

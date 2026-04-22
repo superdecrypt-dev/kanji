@@ -36,7 +36,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ kanji }) => {
           {/* Front Side */}
           <div className="absolute inset-0 backface-hidden bg-card border border-border rounded-2xl md:rounded-3xl flex flex-col items-center justify-center p-6 overflow-hidden shadow-sm">
             <div className="absolute top-4 right-4 md:top-6 md:right-6">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">N4-L{kanji.lesson}</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">L{kanji.lesson}</span>
             </div>
             
             <span className="text-[6rem] sm:text-[8rem] md:text-[10rem] font-bold text-foreground leading-none font-jp" data-testid="flashcard-kanji">
