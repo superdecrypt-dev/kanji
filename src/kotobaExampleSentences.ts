@@ -285,7 +285,7 @@ export const kotobaExampleSentences: Record<string, ExampleSentence[]> = {
     {
       japanese: "ここは安全な場所です。",
       reading: "ここはあんぜんなばしょです。",
-      meaning: "Ini tempat yang aman.",
+      meaning: "Tempat ini aman.",
     },
   ],
   "高校": [
