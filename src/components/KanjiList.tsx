@@ -255,16 +255,18 @@ const KanjiList: React.FC<KanjiListProps> = ({ kanjiList, progress, kotobaProgre
                 const sentences = kotobaExampleSentences[item.word] || [];
                 const isExpanded = expandedId === cardKey;
                 const isWideWord = item.word.length >= 3;
+                const isVeryWideWord = item.word.length >= 4;
+                const kotobaBadgeClass = isWideWord
+                  ? isVeryWideWord
+                    ? 'min-w-[7rem] md:min-w-[7.75rem] h-16 md:h-[4.5rem] px-3.5 md:px-4 text-[1.35rem] md:text-[1.55rem] whitespace-nowrap leading-none tracking-tight'
+                    : 'min-w-[6.25rem] md:min-w-[6.75rem] h-16 md:h-[4.5rem] px-3.5 md:px-4 text-[1.55rem] md:text-[1.8rem] whitespace-nowrap leading-none tracking-tight'
+                  : 'w-14 h-14 md:w-16 md:h-16 text-xl md:text-2xl';
                 return (
               <div className={`group bg-card border border-border rounded-xl md:rounded-2xl hover:border-foreground/20 transition-all duration-200 h-full ${isExpanded ? 'ring-1 ring-primary/20' : ''}`}>
                 <div className="p-4 md:p-5 flex items-start gap-4 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : cardKey)}>
                   <div className="flex-shrink-0">
                       <div
-                        className={`relative flex items-center justify-center rounded-xl bg-secondary font-bold font-jp text-foreground group-hover:bg-primary group-hover:text-white transition-colors duration-200 ${
-                          isWideWord
-                            ? 'min-w-[4.5rem] h-14 px-2.5 md:min-w-[5.25rem] md:h-16 md:px-3 text-lg md:text-xl'
-                            : 'w-14 h-14 md:w-16 md:h-16 text-xl md:text-2xl'
-                        }`}
+                        className={`relative flex items-center justify-center rounded-xl bg-secondary font-bold font-jp text-foreground group-hover:bg-primary group-hover:text-white transition-colors duration-200 ${kotobaBadgeClass}`}
                       >
                         {item.word}
                       <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-card ${colorClass}`} title={label} data-testid={`kotoba-mastery-${index}`} />
