@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, FileText } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { sentenceList } from '../sentenceData';
 import type { SentenceQuizItem } from '../sentenceData';
 
@@ -45,12 +45,11 @@ const SentenceQuiz: React.FC = () => {
     <div className="max-w-2xl mx-auto space-y-5 md:space-y-6" data-testid="sentence-quiz">
       {/* Score Bar */}
       <div className="flex justify-between items-center px-4 py-3 bg-card border border-border rounded-xl" data-testid="sentence-quiz-score">
-        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-          <FileText size={16} className="text-primary" />
-          <span>Kalimat Rumpang</span>
-        </div>
         <div className="text-sm font-bold text-foreground">
-          <span className="text-primary">{score.correct}</span><span className="text-muted-foreground">/{score.total}</span>
+          Skor: <span className="text-lg ml-1 text-primary">{score.correct}</span><span className="text-muted-foreground">/{score.total}</span>
+        </div>
+        <div className="text-xs font-bold text-muted-foreground">
+          {Math.round((score.correct / (score.total || 1)) * 100)}% benar
         </div>
       </div>
 

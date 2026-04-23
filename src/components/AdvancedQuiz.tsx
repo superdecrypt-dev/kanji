@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import type { Kanji } from '../data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, BookOpen } from 'lucide-react';
-import { jukugoList } from '../jukugoData';
-import { pickAdaptiveKanji } from '../hooks/useProgress';
-import type { KanjiProgress } from '../hooks/useProgress';
+import { kotobaList, getKotobaCategoryLabel } from '../kotobaData';
+import { pickAdaptiveKanji, pickAdaptiveByKey } from '../hooks/useProgress';
+import type { KanjiProgress, KotobaProgress } from '../hooks/useProgress';
 import { getAcceptedReadingAnswers, getPrimaryReadingChoices, formatReadingDisplay } from '../kanjiReadings';
 
 interface AdvancedQuizProps {
   kanjiList: Kanji[];
   progress: Record<number, KanjiProgress>;
+  kotobaProgress: Record<string, KotobaProgress>;
   onAnswer: (kanjiId: number, isCorrect: boolean) => void;
+  onKotobaAnswer: (kotobaWord: string, isCorrect: boolean) => void;
 }
 
-type QuizType = 'kanji' | 'jukugo';
+type QuizType = 'kanji' | 'kotoba';
 type QuestionMode = 'meaning' | 'reading' | 'mixed';
 type QuizMode = 'kanjiToMeaning' | 'kanjiToReading';
 
@@ -29,7 +31,14 @@ const splitJapaneseStr = (str: string | undefined | null): string[] => {
   return str.split(/[,/]/).map(s => s.trim()).filter(Boolean);
 };
 
-function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: string[], questionMode: QuestionMode = 'mixed', progressData?: Record<number, KanjiProgress>): QuizState {
+function createNewQuestion(
+  kanjiList: Kanji[],
+  type: QuizType,
+  recentWords: string[],
+  questionMode: QuestionMode = 'mixed',
+  progressData?: Record<number, KanjiProgress>,
+  kotobaProgressData?: Record<string, KotobaProgress>
+): QuizState {
   if (type === 'kanji') {
     if (kanjiList.length === 0) return { currentWord: null, options: [], mode: 'kanjiToMeaning', selectedAnswer: null };
     
@@ -99,11 +108,17 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
       selectedAnswer: null
     };
   } else {
-    let targetWord = jukugoList[Math.floor(Math.random() * jukugoList.length)];
-    let tries = 0;
-    while (recentWords.includes(targetWord.word) && tries < 10) {
-      targetWord = jukugoList[Math.floor(Math.random() * jukugoList.length)];
-      tries++;
+    let targetWord;
+    if (kotobaProgressData && Object.keys(kotobaProgressData).length > 0) {
+      const picked = pickAdaptiveByKey(kotobaList, kotobaProgressData, recentWords, (item) => item.word, 1);
+      targetWord = picked[0] || kotobaList[Math.floor(Math.random() * kotobaList.length)];
+    } else {
+      targetWord = kotobaList[Math.floor(Math.random() * kotobaList.length)];
+      let tries = 0;
+      while (recentWords.includes(targetWord.word) && tries < 10) {
+        targetWord = kotobaList[Math.floor(Math.random() * kotobaList.length)];
+        tries++;
+      }
     }
 
     let currentMode: QuizMode;
@@ -114,7 +129,7 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
     const correctAnswer = currentMode === 'kanjiToMeaning' ? targetWord.meaning : targetWord.reading;
     const wrongAnswers = new Set<string>();
     while (wrongAnswers.size < 3) {
-      const randomWrong = jukugoList[Math.floor(Math.random() * jukugoList.length)];
+      const randomWrong = kotobaList[Math.floor(Math.random() * kotobaList.length)];
       if (randomWrong.word === targetWord.word) continue;
       const wrongText = currentMode === 'kanjiToMeaning' ? randomWrong.meaning : randomWrong.reading;
       if (wrongText && wrongText !== correctAnswer) wrongAnswers.add(wrongText);
@@ -129,11 +144,11 @@ function createNewQuestion(kanjiList: Kanji[], type: QuizType, recentWords: stri
   }
 }
 
-const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progressData, onAnswer }) => {
+const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progressData, kotobaProgress: kotobaProgressData, onAnswer, onKotobaAnswer }) => {
   const [quizType, setQuizType] = useState<QuizType>('kanji');
   const [questionMode, setQuestionMode] = useState<QuestionMode>('mixed');
   const [recentWords, setRecentWords] = useState<string[]>([]);
-  const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', [], 'mixed', progressData));
+  const [quizState, setQuizState] = useState<QuizState | null>(() => createNewQuestion(kanjiList, 'kanji', [], 'mixed', progressData, kotobaProgressData));
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [isWrong, setIsWrong] = useState(false);
 
@@ -161,7 +176,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
   };
 
   const loadNextQuestion = (type: QuizType, currentRecent: string[], qMode: QuestionMode) => {
-    setQuizState(createNewQuestion(kanjiList, type, currentRecent, qMode, progressData));
+    setQuizState(createNewQuestion(kanjiList, type, currentRecent, qMode, progressData, kotobaProgressData));
   };
 
   const handleAnswerClick = (option: string) => {
@@ -175,6 +190,8 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
     if (quizType === 'kanji') {
       const kanjiData = kanjiList.find(k => k.kanji === quizState.currentWord?.word);
       if (kanjiData) onAnswer(kanjiData.id, isCorrect);
+    } else {
+      onKotobaAnswer(quizState.currentWord.word, isCorrect);
     }
 
     setTimeout(() => {
@@ -207,6 +224,7 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
 
   const { currentWord, options, mode, selectedAnswer } = quizState;
   const questionText = mode === 'kanjiToMeaning' ? `Apa arti dari ${quizType === 'kanji' ? 'Kanji' : 'kata'} ini?` : `Cara baca ${quizType === 'kanji' ? 'Kanji' : 'kata'} ini?`;
+  const kotobaCategoryLabel = quizType === 'kotoba' ? getKotobaCategoryLabel(currentWord.word) : '';
 
   let infoCorrectAnswer = '';
   if (quizType === 'kanji') {
@@ -233,11 +251,11 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
             Kanji
           </button>
           <button 
-            data-testid="quiz-type-jukugo"
-            onClick={() => switchQuizType('jukugo')} 
-            className={`px-4 md:px-6 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${quizType === 'jukugo' ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            data-testid="quiz-type-kotoba"
+            onClick={() => switchQuizType('kotoba')} 
+            className={`px-4 md:px-6 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${quizType === 'kotoba' ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
-            <BookOpen size={13} /> Jukugo
+            <BookOpen size={13} /> Kotoba
           </button>
         </div>
 
@@ -279,6 +297,13 @@ const AdvancedQuiz: React.FC<AdvancedQuizProps> = ({ kanjiList, progress: progre
           >
             {currentWord.word}
           </motion.div>
+          {quizType === 'kotoba' && (
+            <div className="mt-3">
+              <span className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                {kotobaCategoryLabel}
+              </span>
+            </div>
+          )}
 
           <AnimatePresence>
             {isWrong && selectedAnswer && (

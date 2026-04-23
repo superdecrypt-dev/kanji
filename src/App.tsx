@@ -1,16 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
 import { kanjiList } from './data';
+import { kotobaList } from './kotobaData';
 import Flashcard from './components/Flashcard';
 import AdvancedQuiz from './components/AdvancedQuiz';
 import LessonSelector from './components/LessonSelector';
 import KanjiList from './components/KanjiList';
 import TypingQuiz from './components/TypingQuiz';
 import SentenceQuiz from './components/SentenceQuiz';
-import { Moon, Sun, List, Layers, PlayCircle, Keyboard, FileText, ChevronRight, Shuffle, RefreshCcw, RotateCcw } from 'lucide-react';
+import { Moon, Sun, List, Layers, PlayCircle, Keyboard, FileText, ChevronRight, Shuffle, RefreshCcw, RotateCcw, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProgress } from './hooks/useProgress';
 
 type AppMode = 'list' | 'flashcards' | 'quiz' | 'typing' | 'sentences';
+type FlashcardType = 'kanji' | 'kotoba';
+type ListType = 'kanji' | 'kotoba';
 
 const seededValue = (seed: number, id: number) => {
   const value = Math.sin(seed * 1000 + id * 97.13) * 10000;
@@ -27,11 +30,13 @@ const navItems = [
 
 function App() {
   const [mode, setMode] = useState<AppMode>('list');
+  const [listType, setListType] = useState<ListType>('kanji');
+  const [flashcardType, setFlashcardType] = useState<FlashcardType>('kanji');
   const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleSeed, setShuffleSeed] = useState(0);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const { progress, recordAnswer, getOverallStats, resetProgress } = useProgress();
+  const { progress, kotobaProgress, recordAnswer, recordKotobaAnswer, getCombinedStats, resetProgress } = useProgress();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('theme') as 'light' | 'dark' || 'light';
@@ -57,8 +62,48 @@ function App() {
     return list;
   }, [selectedLessons, isShuffled, shuffleSeed]);
 
-  const handleNextCard = () => setCurrentCardIndex((prev) => (prev + 1) % filteredKanji.length);
-  const handlePrevCard = () => setCurrentCardIndex((prev) => (prev - 1 + filteredKanji.length) % filteredKanji.length);
+  const flashcardItems = useMemo(() => {
+    if (flashcardType === 'kanji') {
+      return filteredKanji.map((kanji) => ({
+        type: 'kanji' as const,
+        id: `kanji-${kanji.id}`,
+        kanji,
+      }));
+    }
+
+    const list = isShuffled
+      ? [...kotobaList]
+          .map((item, index) => ({ item, score: seededValue(shuffleSeed, index + 1) }))
+          .sort((a, b) => a.score - b.score)
+          .map(({ item }) => item)
+      : kotobaList;
+
+    return list.map((kotoba, index) => ({
+      type: 'kotoba' as const,
+      id: `kotoba-${index}-${kotoba.word}`,
+      kotoba,
+    }));
+  }, [filteredKanji, flashcardType, isShuffled, shuffleSeed]);
+
+  const activeFlashcardCount = flashcardItems.length;
+  const currentFlashcardItem = flashcardItems[currentCardIndex] || null;
+  const currentPageTitle =
+    mode === 'list'
+      ? listType === 'kanji'
+        ? 'Daftar Kanji'
+        : 'Daftar Kotoba'
+      : navItems.find(i => i.id === mode)?.fullLabel;
+  const desktopCountLabel =
+    mode === 'list'
+      ? listType === 'kanji'
+        ? `${kanjiList.length} Kanji`
+        : `${kotobaList.length} Kotoba`
+      : mode === 'flashcards' && flashcardType === 'kotoba'
+      ? `${activeFlashcardCount} Kotoba`
+      : `${filteredKanji.length} Kanji`;
+
+  const handleNextCard = () => setCurrentCardIndex((prev) => (prev + 1) % activeFlashcardCount);
+  const handlePrevCard = () => setCurrentCardIndex((prev) => (prev - 1 + activeFlashcardCount) % activeFlashcardCount);
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   return (
@@ -119,7 +164,7 @@ function App() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm font-jp">漢</span>
             </div>
-            <span className="text-lg font-extrabold tracking-tight">{navItems.find(i => i.id === mode)?.fullLabel}</span>
+            <span className="text-lg font-extrabold tracking-tight">{currentPageTitle}</span>
           </div>
           <button
             data-testid="mobile-theme-toggle"
@@ -142,49 +187,97 @@ function App() {
               {/* Desktop Page Title */}
               <div className="hidden md:flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-extrabold tracking-tight text-foreground">
-                  {navItems.find(i => i.id === mode)?.fullLabel}
+                  {currentPageTitle}
                 </h2>
                 <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                  {filteredKanji.length} Kanji
+                  {desktopCountLabel}
                 </div>
               </div>
 
               {/* Progress Summary */}
               {mode !== 'list' && (
-                <ProgressBar stats={getOverallStats()} totalKanji={kanjiList.length} onReset={resetProgress} />
+                <ProgressBar stats={getCombinedStats()} totalKanji={kanjiList.length + kotobaList.length} onReset={resetProgress} />
               )}
 
               {mode === 'list' ? (
-                <KanjiList kanjiList={kanjiList} progress={progress} />
+                <KanjiList
+                  kanjiList={kanjiList}
+                  progress={progress}
+                  kotobaProgress={kotobaProgress}
+                  listType={listType}
+                  onListTypeChange={setListType}
+                />
               ) : mode === 'typing' ? (
-                <TypingQuiz kanjiList={kanjiList} progress={progress} onAnswer={recordAnswer} />
+                <TypingQuiz
+                  kanjiList={kanjiList}
+                  progress={progress}
+                  kotobaProgress={kotobaProgress}
+                  onAnswer={recordAnswer}
+                  onKotobaAnswer={recordKotobaAnswer}
+                />
               ) : mode === 'sentences' ? (
                 <SentenceQuiz />
               ) : (
                 <div className="space-y-6 md:space-y-8">
                   {/* Lesson Selector */}
-                  <div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Pilih Pelajaran</p>
-                    <LessonSelector 
-                      selectedLessons={selectedLessons} 
-                      onSelectLessons={(lessons) => {
-                        setSelectedLessons(lessons);
-                        setCurrentCardIndex(0);
-                      }} 
-                      maxLesson={maxLesson} 
-                    />
-                  </div>
+                  {!(mode === 'flashcards' && flashcardType === 'kotoba') && (
+                    <div>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Pilih Pelajaran</p>
+                      <LessonSelector 
+                        selectedLessons={selectedLessons} 
+                        onSelectLessons={(lessons) => {
+                          setSelectedLessons(lessons);
+                          setCurrentCardIndex(0);
+                        }} 
+                        maxLesson={maxLesson} 
+                      />
+                    </div>
+                  )}
 
-                  {filteredKanji.length === 0 ? (
+                  {(mode === 'flashcards' ? activeFlashcardCount : filteredKanji.length) === 0 ? (
                     <div className="text-center py-16 border-2 border-dashed border-border rounded-2xl" data-testid="empty-state">
-                      <p className="text-lg font-bold text-muted-foreground">Kanji tidak ditemukan.</p>
+                      <p className="text-lg font-bold text-muted-foreground">
+                        {mode === 'flashcards' && flashcardType === 'kotoba' ? 'Kotoba tidak ditemukan.' : 'Kanji tidak ditemukan.'}
+                      </p>
                     </div>
                   ) : mode === 'flashcards' ? (
                     <div className="flex flex-col items-center space-y-5">
+                      <div className="inline-flex items-center gap-1 rounded-full border border-border bg-background p-1">
+                        <button
+                          data-testid="flashcard-type-kanji"
+                          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                            flashcardType === 'kanji'
+                              ? 'bg-foreground text-background'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                          onClick={() => {
+                            setFlashcardType('kanji');
+                            setCurrentCardIndex(0);
+                          }}
+                        >
+                          Kanji
+                        </button>
+                        <button
+                          data-testid="flashcard-type-kotoba"
+                          className={`px-4 py-2 rounded-full text-xs font-bold inline-flex items-center gap-1.5 transition-all ${
+                            flashcardType === 'kotoba'
+                              ? 'bg-foreground text-background'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                          onClick={() => {
+                            setFlashcardType('kotoba');
+                            setCurrentCardIndex(0);
+                          }}
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          Kotoba
+                        </button>
+                      </div>
+
                       {/* Card Counter & Controls */}
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-muted-foreground" data-testid="flashcard-counter">
-                          {currentCardIndex + 1} / {filteredKanji.length}
+                          {currentCardIndex + 1} / {activeFlashcardCount}
                         </span>
                         <button 
                           data-testid="shuffle-btn"
@@ -223,10 +316,12 @@ function App() {
                       </div>
 
                       {/* Flashcard */}
-                      <Flashcard 
-                        key={filteredKanji[currentCardIndex].id}
-                        kanji={filteredKanji[currentCardIndex]} 
-                      />
+                      {currentFlashcardItem && (
+                        <Flashcard 
+                          key={currentFlashcardItem.id}
+                          item={currentFlashcardItem}
+                        />
+                      )}
 
                       {/* Navigation Buttons */}
                       <div className="flex gap-3 w-full max-w-sm">
@@ -247,7 +342,14 @@ function App() {
                       </div>
                     </div>
                   ) : (
-                    <AdvancedQuiz key={selectedLessons.join(',')} kanjiList={filteredKanji} progress={progress} onAnswer={recordAnswer} />
+                    <AdvancedQuiz
+                      key={selectedLessons.join(',')}
+                      kanjiList={filteredKanji}
+                      progress={progress}
+                      kotobaProgress={kotobaProgress}
+                      onAnswer={recordAnswer}
+                      onKotobaAnswer={recordKotobaAnswer}
+                    />
                   )}
                 </div>
               )}

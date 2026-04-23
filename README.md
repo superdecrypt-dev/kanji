@@ -8,8 +8,9 @@ Aplikasi web untuk mempelajari **345 kanji** dengan antarmuka modern, responsif,
 
 ## Fitur
 
-### Daftar Kanji
+### Daftar
 - Referensi lengkap 345 kanji dengan arti, Kunyomi, Onyomi, dan Romaji
+- Daftar Kotoba dengan arti, cara baca, dan romaji
 - Pencarian berdasarkan kanji, arti, atau cara baca
 - Filter per pelajaran (L1–L31)
 - Contoh kalimat per Kanji (Jepang, cara baca, terjemahan Indonesia)
@@ -17,17 +18,19 @@ Aplikasi web untuk mempelajari **345 kanji** dengan antarmuka modern, responsif,
 
 ### Flashcards
 - Kartu membalik dengan animasi 3D
+- Mode Kanji dan Kotoba
 - Navigasi Sebelumnya / Lanjut
 - Mode acak (shuffle) dan acak ulang
 - Filter per pelajaran
 
 ### Latihan Kuis (Pilihan Ganda)
-- Mode Kanji dan Jukugo (250+ kata majemuk)
+- Mode Kanji dan Kotoba (250+ kata majemuk)
 - Tipe soal: Arti, Baca, atau Campur
-- Jawaban Jukugo menggunakan Hiragana/Katakana
+- Jawaban Kotoba menggunakan Hiragana/Katakana
 - Kuis adaptif — Kanji yang sering salah muncul lebih sering
 
 ### Kuis Ketik
+- Mode Kanji dan Kotoba
 - Pertanyaan spesifik Kunyomi atau Onyomi
 - Tipe soal: Arti, Baca, atau Campur
 - Filter per pelajaran
@@ -112,7 +115,7 @@ Buka `http://localhost:5173` di browser.
 src/
 ├── App.tsx                    # Komponen utama + navigasi + progress bar
 ├── data.ts                    # Data 345 kanji (N4 + tambahan Marugoto)
-├── jukugoData.ts              # Data 250+ kata majemuk (Jukugo)
+├── kotobaData.ts              # Data 250+ kata majemuk (Kotoba)
 ├── sentenceData.ts            # Data soal kalimat rumpang
 ├── exampleSentences.ts        # Contoh kalimat per Kanji
 ├── hooks/
@@ -120,7 +123,7 @@ src/
 ├── components/
 │   ├── KanjiList.tsx          # Daftar Kanji dengan search & filter
 │   ├── Flashcard.tsx          # Kartu flashcard dengan animasi flip
-│   ├── AdvancedQuiz.tsx       # Kuis pilihan ganda (Kanji + Jukugo)
+│   ├── AdvancedQuiz.tsx       # Kuis pilihan ganda (Kanji + Kotoba)
 │   ├── TypingQuiz.tsx         # Kuis ketik
 │   ├── SentenceQuiz.tsx       # Kuis kalimat rumpang
 │   ├── LessonSelector.tsx     # Pemilih pelajaran (horizontal scroll)
@@ -135,6 +138,6 @@ src/
 - Data Kanji utama bersumber dari daftar standar JLPT N4, diterjemahkan ke Bahasa Indonesia
 - Lesson tambahan `L23–L31` diambil dari daftar kanji Marugoto
 - Contoh kalimat disertai cara baca (Hiragana) dan terjemahan Indonesia
-- Data Jukugo menggunakan Hiragana untuk cara baca
+- Data Kotoba menggunakan Hiragana untuk cara baca
 - Progres belajar disimpan di **LocalStorage** browser
 - Aturan gloss, reading, dan sumber verifikasi data didokumentasikan di [memory/KANJI_DATA_GUIDELINES.md](memory/KANJI_DATA_GUIDELINES.md)

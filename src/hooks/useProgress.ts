@@ -6,9 +6,12 @@ export interface KanjiProgress {
   lastReviewed: string;
 }
 
+export type KotobaProgress = KanjiProgress;
+
 export type MasteryLevel = 'new' | 'learning' | 'reviewing' | 'mastered';
 
 const STORAGE_KEY = 'kanji-progress-v1';
+const KOTOBA_STORAGE_KEY = 'kotoba-progress-v1';
 
 function loadProgress(): Record<number, KanjiProgress> {
   try {
@@ -21,6 +24,19 @@ function loadProgress(): Record<number, KanjiProgress> {
 
 function saveProgress(data: Record<number, KanjiProgress>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadKotobaProgress(): Record<string, KotobaProgress> {
+  try {
+    const raw = localStorage.getItem(KOTOBA_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveKotobaProgress(data: Record<string, KotobaProgress>) {
+  localStorage.setItem(KOTOBA_STORAGE_KEY, JSON.stringify(data));
 }
 
 export function getMasteryLevel(p: KanjiProgress | undefined): MasteryLevel {
@@ -52,10 +68,15 @@ export function getMasteryLabel(level: MasteryLevel): string {
 
 export function useProgress() {
   const [progress, setProgress] = useState<Record<number, KanjiProgress>>(loadProgress);
+  const [kotobaProgress, setKotobaProgress] = useState<Record<string, KotobaProgress>>(loadKotobaProgress);
 
   useEffect(() => {
     saveProgress(progress);
   }, [progress]);
+
+  useEffect(() => {
+    saveKotobaProgress(kotobaProgress);
+  }, [kotobaProgress]);
 
   const recordAnswer = useCallback((kanjiId: number, isCorrect: boolean) => {
     setProgress(prev => {
@@ -75,6 +96,24 @@ export function useProgress() {
     return progress[kanjiId];
   }, [progress]);
 
+  const recordKotobaAnswer = useCallback((kotobaWord: string, isCorrect: boolean) => {
+    setKotobaProgress(prev => {
+      const current = prev[kotobaWord] || { correct: 0, wrong: 0, lastReviewed: '' };
+      return {
+        ...prev,
+        [kotobaWord]: {
+          correct: current.correct + (isCorrect ? 1 : 0),
+          wrong: current.wrong + (isCorrect ? 0 : 1),
+          lastReviewed: new Date().toISOString(),
+        }
+      };
+    });
+  }, []);
+
+  const getKotobaProgress = useCallback((kotobaWord: string): KotobaProgress | undefined => {
+    return kotobaProgress[kotobaWord];
+  }, [kotobaProgress]);
+
   const getOverallStats = useCallback(() => {
     const entries = Object.values(progress);
     const totalReviewed = entries.filter(p => p.correct + p.wrong > 0).length;
@@ -93,12 +132,63 @@ export function useProgress() {
     };
   }, [progress]);
 
+  const getOverallKotobaStats = useCallback(() => {
+    const entries = Object.values(kotobaProgress);
+    const totalReviewed = entries.filter(p => p.correct + p.wrong > 0).length;
+    const mastered = entries.filter(p => getMasteryLevel(p) === 'mastered').length;
+    const reviewing = entries.filter(p => getMasteryLevel(p) === 'reviewing').length;
+    const learning = entries.filter(p => getMasteryLevel(p) === 'learning').length;
+    const totalCorrect = entries.reduce((sum, p) => sum + p.correct, 0);
+    const totalWrong = entries.reduce((sum, p) => sum + p.wrong, 0);
+    const totalAnswers = totalCorrect + totalWrong;
+    return {
+      totalReviewed,
+      mastered,
+      reviewing,
+      learning,
+      accuracy: totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0,
+    };
+  }, [kotobaProgress]);
+
+  const getCombinedStats = useCallback(() => {
+    const kanjiEntries = Object.values(progress);
+    const kotobaEntries = Object.values(kotobaProgress);
+    const entries = [...kanjiEntries, ...kotobaEntries];
+    const totalReviewed = entries.filter(p => p.correct + p.wrong > 0).length;
+    const mastered = entries.filter(p => getMasteryLevel(p) === 'mastered').length;
+    const reviewing = entries.filter(p => getMasteryLevel(p) === 'reviewing').length;
+    const learning = entries.filter(p => getMasteryLevel(p) === 'learning').length;
+    const totalCorrect = entries.reduce((sum, p) => sum + p.correct, 0);
+    const totalWrong = entries.reduce((sum, p) => sum + p.wrong, 0);
+    const totalAnswers = totalCorrect + totalWrong;
+    return {
+      totalReviewed,
+      mastered,
+      reviewing,
+      learning,
+      accuracy: totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0,
+    };
+  }, [progress, kotobaProgress]);
+
   const resetProgress = useCallback(() => {
     setProgress({});
+    setKotobaProgress({});
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(KOTOBA_STORAGE_KEY);
   }, []);
 
-  return { progress, recordAnswer, getProgress, getOverallStats, resetProgress };
+  return {
+    progress,
+    kotobaProgress,
+    recordAnswer,
+    recordKotobaAnswer,
+    getProgress,
+    getKotobaProgress,
+    getOverallStats,
+    getOverallKotobaStats,
+    getCombinedStats,
+    resetProgress
+  };
 }
 
 // Adaptive quiz: pick kanji weighted by weakness
@@ -157,6 +247,69 @@ export function pickAdaptiveKanji<T extends { id: number }>(
         const pick = remaining[Math.floor(Math.random() * remaining.length)];
         results.push(pick);
         usedIds.add(pick.id);
+      }
+    }
+  }
+
+  return results;
+}
+
+export function pickAdaptiveByKey<T>(
+  items: T[],
+  progress: Record<string, KotobaProgress>,
+  recentKeys: string[],
+  getKey: (item: T) => string,
+  count: number = 1
+): T[] {
+  if (items.length === 0) return [];
+
+  const weighted = items.map(item => {
+    const key = getKey(item);
+    const p = progress[key];
+    const level = getMasteryLevel(p);
+    const isRecent = recentKeys.includes(key);
+
+    let weight: number;
+    switch (level) {
+      case 'new': weight = 3; break;
+      case 'learning': weight = 5; break;
+      case 'reviewing': weight = 2; break;
+      case 'mastered': weight = 0.5; break;
+    }
+
+    if (p && p.wrong > 0) {
+      const accuracy = p.correct / (p.correct + p.wrong);
+      if (accuracy < 0.5) weight *= 1.5;
+    }
+
+    if (isRecent) weight *= 0.2;
+
+    return { item, key, weight };
+  });
+
+  const results: T[] = [];
+  const usedKeys = new Set<string>();
+
+  for (let i = 0; i < count && usedKeys.size < items.length; i++) {
+    const available = weighted.filter(entry => !usedKeys.has(entry.key));
+    const totalWeight = available.reduce((sum, entry) => sum + entry.weight, 0);
+    let rand = Math.random() * totalWeight;
+
+    for (const entry of available) {
+      rand -= entry.weight;
+      if (rand <= 0) {
+        results.push(entry.item);
+        usedKeys.add(entry.key);
+        break;
+      }
+    }
+
+    if (results.length <= i) {
+      const remaining = available.filter(entry => !usedKeys.has(entry.key));
+      if (remaining.length > 0) {
+        const pick = remaining[Math.floor(Math.random() * remaining.length)];
+        results.push(pick.item);
+        usedKeys.add(pick.key);
       }
     }
   }

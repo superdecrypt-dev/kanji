@@ -21,7 +21,7 @@ const toHiragana = (text: string): string =>
     String.fromCharCode(char.charCodeAt(0) - 0x60)
   );
 
-const kanaToRomaji = (input: string): string => {
+export const kanaToRomaji = (input: string): string => {
   const kana = toHiragana(input);
   const digraphMap: Record<string, string> = {
     'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',

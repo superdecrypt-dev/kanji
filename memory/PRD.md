@@ -5,7 +5,7 @@ Perbaiki website Kanji agar responsif di perangkat HP/smartphone atau PC/laptop.
 
 ## Architecture
 - **Frontend**: Vite + React 19 + TypeScript + Tailwind CSS 4 + Framer Motion
-- **Data**: Static TypeScript arrays (kanjiList, jukugoList, sentenceList, exampleSentences)
+- **Data**: Static TypeScript arrays (kanjiList, kotobaList, sentenceList, exampleSentences)
 - **Storage**: localStorage untuk progress tracking
 - **Styling**: CSS custom properties for theming (light/dark)
 - **PWA**: Configured via vite-plugin-pwa
@@ -23,7 +23,7 @@ Perbaiki website Kanji agar responsif di perangkat HP/smartphone atau PC/laptop.
 - [x] Dark/Light theme toggle
 - [x] Kanji Dictionary with search and lesson filter
 - [x] Flashcards with flip animation
-- [x] Multiple choice quiz (Kanji + Jukugo)
+- [x] Multiple choice quiz (Kanji + Kotoba)
 - [x] Typing quiz (hardcore recall)
 - [x] Sentence fill-in-the-blank quiz
 - [x] Horizontal scrolling lesson selector on mobile
