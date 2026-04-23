@@ -32,6 +32,7 @@ credentials.json
 *.key
 .credentials
 Kanji_Marugoto.docx
+Kanji-Kotoba.png
 -e 
 # Environment and credential files
 .env
